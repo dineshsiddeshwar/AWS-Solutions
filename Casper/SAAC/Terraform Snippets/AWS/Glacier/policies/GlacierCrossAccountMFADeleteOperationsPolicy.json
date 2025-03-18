@@ -1,0 +1,25 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+       {
+          "Sid": "add-mfa-delete-requirement",
+          "Principal": {
+             "AWS": [
+                "arn:aws:iam::${cross_account_id}:root"
+             ]
+          },
+          "Effect": "Allow",
+          "Action": [ 
+             "glacier:Delete*" 
+          ],
+          "Resource": [
+             "arn:aws:glacier:${aws_region}:${account_id}:vaults/${vault_name}"
+          ],
+          "Condition": {
+             "Bool": {
+                "aws:MultiFactorAuthPresent": true
+             }
+          }
+       }
+    ]
+}

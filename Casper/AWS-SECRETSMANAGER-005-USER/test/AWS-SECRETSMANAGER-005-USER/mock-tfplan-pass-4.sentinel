@@ -1,0 +1,105 @@
+terraform_version = "1.5.5"
+
+planned_values = {
+	"outputs": {},
+	"resources": {
+		"aws_iam_user.test_user": {
+			"address":        "aws_iam_user.test_user",
+			"depends_on":     [],
+			"deposed_key":    "",
+			"index":          null,
+			"mode":           "managed",
+			"module_address": "",
+			"name":           "test_user",
+			"provider_name":  "registry.terraform.io/hashicorp/aws",
+			"tainted":        false,
+			"type":           "aws_iam_user",
+			"values": {
+				"force_destroy":        false,
+				"name":                 "test_user",
+				"path":                 "/",
+				"permissions_boundary": null,
+				"tags":                 null,
+			},
+		},
+		"aws_iam_user_policy.test_policy": {
+			"address":        "aws_iam_user_policy.test_policy",
+			"depends_on":     [],
+			"deposed_key":    "",
+			"index":          null,
+			"mode":           "managed",
+			"module_address": "",
+			"name":           "test_policy",
+			"provider_name":  "registry.terraform.io/hashicorp/aws",
+			"tainted":        false,
+			"type":           "aws_iam_user_policy",
+			"values": {
+				"name":        "test_policy",
+				"name_prefix": null,
+				"policy":      "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Action\":\"ec2:Describe*\",\"Effect\":\"Allow\",\"Resource\":\"arn:aws:secretsmanager:us-east-1:053936224785:secret:test_secret\"}]}",
+			},
+		},
+	},
+}
+
+variables = {}
+
+resource_changes = {
+	"aws_iam_user.test_user": {
+		"address": "aws_iam_user.test_user",
+		"change": {
+			"actions": [
+				"create",
+			],
+			"after": {
+				"force_destroy":        false,
+				"name":                 "test_user",
+				"path":                 "/",
+				"permissions_boundary": null,
+				"tags":                 null,
+			},
+			"after_unknown": {
+				"arn":       true,
+				"id":        true,
+				"tags_all":  true,
+				"unique_id": true,
+			},
+			"before": null,
+		},
+		"deposed":        "",
+		"index":          null,
+		"mode":           "managed",
+		"module_address": "",
+		"name":           "test_user",
+		"provider_name":  "registry.terraform.io/hashicorp/aws",
+		"type":           "aws_iam_user",
+	},
+	"aws_iam_user_policy.test_policy": {
+		"address": "aws_iam_user_policy.test_policy",
+		"change": {
+			"actions": [
+				"create",
+			],
+			"after": {
+				"name":        "test_policy",
+				"name_prefix": null,
+				"policy":      "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Action\":\"ec2:Describe*\",\"Effect\":\"Allow\",\"Resource\":\"arn:aws:secretsmanager:us-east-1:053936224785:secret:test_secret\"}]}",
+			},
+			"after_unknown": {
+				"id":   true,
+				"role": true,
+			},
+			"before": null,
+		},
+		"deposed":        "",
+		"index":          null,
+		"mode":           "managed",
+		"module_address": "",
+		"name":           "test_policy",
+		"provider_name":  "registry.terraform.io/hashicorp/aws",
+		"type":           "aws_iam_user_policy",
+	},
+}
+
+output_changes = {}
+

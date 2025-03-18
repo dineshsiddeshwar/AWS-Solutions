@@ -1,0 +1,98 @@
+[
+    {
+      "ParameterKey": "releses3bucket",
+      "ParameterValue": "azure-devops-da2.0-release-prod-us-east-1"
+    },
+    {
+        "ParameterKey": "FolderName",
+        "ParameterValue": "ReleaseNumber"
+    },
+    {
+        "ParameterKey": "BucketNameWithOutRegion",
+        "ParameterValue": "azure-devops-da2.0-stackset-prod-"
+    },
+    {
+      "ParameterKey": "PrivateException",
+      "ParameterValue": "ou-sdpg-vqfh6169"
+    },
+    {
+      "ParameterKey": "PrivateProduction",
+      "ParameterValue": "ou-sdpg-kdgducg0"
+    },
+    {
+      "ParameterKey": "HybridAccount",
+      "ParameterValue": "ou-sdpg-npy37s4n"
+    },
+    {
+      "ParameterKey": "PrivateStaging",
+      "ParameterValue": "ou-sdpg-4vidyeqk"
+    },
+    {
+      "ParameterKey": "PublicException",
+      "ParameterValue": "ou-sdpg-nikeyvf1"
+    },
+    {
+      "ParameterKey": "PublicProduction",
+      "ParameterValue": "ou-sdpg-x9i1c7i3"
+    },
+    {
+      "ParameterKey": "PublicStaging",
+      "ParameterValue": "ou-sdpg-9ooxpcl2"
+    },
+    {
+      "ParameterKey": "Migration",
+      "ParameterValue": "ou-sdpg-6bzq5bo9"
+    },
+    {
+      "ParameterKey": "DataManagement",
+      "ParameterValue": "ou-sdpg-wrrls8r2"
+    },
+    {
+      "ParameterKey": "ManagedServicesBeAgile",
+      "ParameterValue": "ou-sdpg-dtt2388g"
+    },
+    {
+      "ParameterKey": "DataScanning",
+      "ParameterValue": "Enabled"
+    },
+    {
+      "ParameterKey": "OrchestratorAccountID",
+      "ParameterValue": "910770603551"
+    },
+    {
+      "ParameterKey": "RolePrefix",
+      "ParameterValue": "PROD"
+    },
+    {
+      "ParameterKey": "ServerlessScanning",
+      "ParameterValue": "Enabled"
+    },
+    {
+      "ParameterKey": "RoleARN",
+      "ParameterValue": ""
+    },
+    {
+      "ParameterKey": "DynatraceRoleNameChild",
+      "ParameterValue": "Dynatrace_monitoring_role"
+    },
+    {
+      "ParameterKey": "DynatraceAccountID",
+      "ParameterValue": "148229142884"
+    },
+    {
+      "ParameterKey": "WizRoleNameChild",
+      "ParameterValue": "PROD-WizAccess-Role"
+    },
+    {
+      "ParameterKey": "ExternalId",
+      "ParameterValue": "4897bb81-ac81-4f1e-8540-481b450d67ee"
+    },
+    {
+      "ParameterKey": "masteraccount",
+      "ParameterValue": "604596384198"
+    },
+    {
+      "ParameterKey": "RootMonitorEventBusName",
+      "ParameterValue": "platform-hub-root-activity"
+    }
+]

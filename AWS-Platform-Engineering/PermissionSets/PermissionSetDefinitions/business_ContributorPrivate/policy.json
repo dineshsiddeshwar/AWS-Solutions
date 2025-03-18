@@ -1,0 +1,13 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Deny",
+            "Action": "iam:*OpenIDConnectProvider",
+            "NotResource": [
+                "arn:aws:iam::*:oidc-provider/token.actions.githubusercontent.com",
+                "arn:aws:iam::*:oidc-provider/oidc.eks.*.amazonaws.com*"
+            ]
+        }
+    ]
+}

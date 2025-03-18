@@ -1,0 +1,13 @@
+#import common functions
+import "tfplan-functions" as tfplan
+
+# Get all neptune_cluster_instance
+allNeptuneClusterInstances = tfplan.find_resources("aws_neptune_cluster_instance")
+
+# Return all the neptune_cluster_instance with auto_minor_version_upgrade disable
+violating_resources = tfplan.filter_attribute_is_not_value(allNeptuneClusterInstances,"auto_minor_version_upgrade", true, true)
+
+# Main rule
+main = rule {
+    length(violating_resources["messages"]) is 0
+}

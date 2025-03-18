@@ -1,0 +1,17 @@
+{
+  "serviceprovider": "azure",
+  "servicerequirement_name": "Azure::VDI::Implementation",
+  "serviceDisplayName": "AWS VDI",
+  "id": "AWS_VDI_8_1",
+  "label": "Ensure Azure Virtual Desktop implements RBAC access control",
+  "description": "Ensure Azure Virtual Desktop uses Azure role-based access control (RBAC) to control access to resources. Cloud products and services must be deployed on private subnets and public access must be disabled for these services",
+  "type": "Detective",
+  "implementationProvider": "wiz",
+  "wizNativeType": [
+      ""
+  ],
+  "link": "link to terrform line/comment where requirement is implemented",
+  "requirementId": [
+      "Azure_VDI_8"
+  ]
+}

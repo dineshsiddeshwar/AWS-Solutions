@@ -1,0 +1,19 @@
+{
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "sns:Subscribe"
+            ],
+            "Resource": "*",
+            "Condition": {
+                "StringLike": {
+                    "SNS:Endpoint": "${sns_endpoint}"
+                },
+                "StringEquals": {
+                    "sns:Protocol": "email"
+                }
+            }
+        }
+    ]
+}

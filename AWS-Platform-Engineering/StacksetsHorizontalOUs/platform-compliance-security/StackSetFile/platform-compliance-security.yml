@@ -1,0 +1,474 @@
+Description: Template to create the set up in Security & Complaince Framework in Business Account
+Parameters:
+  S3BucketName:
+    Type: String
+    Description: S3 Bucket Name
+  FolderName:
+    Type: String
+    Description: Folder Name
+  DNSSESKeyEmail:
+     Description: DNS Zone delegation email to infoblox
+     Type: String
+  DNSSESSecrtEmail:
+     Description: DNS Zone delegation email to infoblox
+     Type: String
+Conditions:
+  CreateinUS: !Equals [!Ref 'AWS::Region', us-east-1]
+Resources:
+  DNSSESKeyEmailSSM:
+    Condition: CreateinUS
+    Type: AWS::SSM::Parameter
+    Properties:
+      Type: String
+      Name: /platform-dns/DNSSESKeyEmail
+      Value: !Ref DNSSESKeyEmail
+  DNSSESSecrtEmailSSM:
+    Condition: CreateinUS
+    Type: AWS::SSM::Parameter
+    Properties:
+      Type: String
+      Name: /platform-dns/DNSSESSecrtEmail
+      Value: !Ref DNSSESSecrtEmail
+#----------------------------------------------------------------------------------------------------------------------
+  ComplianceNotificationTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: platform_Compliance_Security_Notification
+      KmsMasterKeyId: alias/aws/sns
+      Tags:
+        - Value: 'yes'
+          Key: platform_donotdelete
+
+#----------------------------------------------------------------------------------------------------------------------
+  AWSSupportAccessRole:
+    Type: 'AWS::IAM::Role'
+    Condition: CreateinUS
+    Properties:
+      Description: CIS 1.20 - Ensure a support role has been created to manage incidents with AWS Support
+      RoleName: platform_aws_support_access
+      Tags:
+        - Value: 'yes'
+          Key: platform_donotdelete
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - support.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - 'arn:aws:iam::aws:policy/AWSSupportAccess'
+
+#----------------------------------------------------------------------------------------------------------------------
+  ComplianceSecurityStackSetRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: !Sub 'platform_stackset_compliance_security_${AWS::Region}'
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ssm.amazonaws.com
+                - config.amazonaws.com
+                - lambda.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      Path: /
+      Policies:
+        - PolicyName: platform_stackset_compliance_security_inlinepolicy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - ssm:GetParameter
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                  - sns:ListSubscriptions
+                  - sns:ListSubscriptionsByTopic
+                  - sns:ListTopics
+                  - sns:GetEndpointAttributes
+                  - sns:GetSubscriptionAttributes
+                  - sns:GetTopicAttributes
+                  - sns:Publish
+                  - sns:SetSubscriptionAttributes
+                  - sns:SetTopicAttributes
+                  - sns:Subscribe
+                  - ec2:DescribeInstances
+                  - ec2:AssociateIamInstanceProfile
+                  - ec2:DescribeIamInstanceProfileAssociations
+                  - ec2:DisassociateIamInstanceProfile
+                  - ec2:ReplaceIamInstanceProfileAssociation
+                  - ec2:RevokeSecurityGroupIngress
+                  - ec2:DescribeSecurityGroupReferences
+                  - ec2:DescribeSecurityGroups
+                  - ec2:DescribeStaleSecurityGroups
+                  - ec2:CreateTags
+                  - ec2:Describe*
+                  - ssm:Get*
+                  - ssm:Describe*
+                  - ec2:UpdateSecurityGroupRuleDescriptionsIngress
+                  - lambda:ListFunctions
+                  - lambda:GetFunction
+                  - lambda:InvokeAsync
+                  - lambda:InvokeFunction
+                  - lambda:DeleteFunction
+                  - lambda:CreateFunction
+                  - cloudformation:DescribeStacks
+                  - cloudformation:ListStacks
+                  - cloudformation:DescribeStackResource
+                  - cloudformation:CreateStack
+                  - cloudformation:DeleteStack
+                  - iam:PassRole
+                  - iam:GetInstanceProfile
+                  - iam:GetRole
+                  - iam:AttachRolePolicy
+                  - iam:UpdateAssumeRolePolicy
+                  - iam:UpdateRole
+                  - iam:ListAttachedRolePolicies
+                  - sqs:ListQueues
+                  - sqs:GetQueueAttributes
+                  - sqs:GetQueueUrl
+                  - sqs:ListDeadLetterSourceQueues
+                  - sqs:ListQueueTags
+                  - sqs:ReceiveMessage
+                  - sqs:AddPermission
+                  - sqs:RemovePermission
+                  - sqs:ChangeMessageVisibility
+                  - sqs:ChangeMessageVisibilityBatch
+                  - sqs:CreateQueue
+                  - sqs:DeleteMessage
+                  - sqs:DeleteMessageBatch
+                  - sqs:SendMessage
+                  - sqs:SendMessageBatch
+                  - sqs:SetQueueAttributes
+                  - sqs:TagQueue
+                  - sqs:UntagQueue
+                  - kms:Decrypt
+                  - securityhub:GetInsights
+                  - securityhub:GetInsightResults
+                Resource: '*'
+#----------------------------------------------------------------------------------------------------------------------
+  MasterSecHubLambda:
+    Type: 'AWS::Lambda::Function'
+    Properties:
+      Description: Master Lambda function to invoke the Child Lambda based on the Security Hub Finding.
+      Code:
+        S3Bucket:
+          Fn::Sub:
+              - "${S3BucketName}${AWS::Region}"
+              - {S3BucketName: !Ref S3BucketName}
+        S3Key:
+          Fn::Sub:
+              - "${releasefolder}/platform_remediate_sechub_master.zip"
+              - {releasefolder: !Ref FolderName}
+      FunctionName: platform_remediate_sechub_master
+      Tags:
+        - Value: 'yes'
+          Key: platform_donotdelete
+      Handler: platform_remediate_sechub_master.lambda_handler
+      Role: !GetAtt ComplianceSecurityStackSetRole.Arn
+      MemorySize: 256
+      Timeout: 900
+      Runtime: python3.8
+  MasterSecHubLambdaEventSourcing:
+    Type: 'AWS::Lambda::EventSourceMapping'
+    Properties:
+      BatchSize: 5
+      Enabled: true
+      EventSourceArn: !GetAtt SecurityHubRemediationQueue.Arn
+      FunctionName: !GetAtt MasterSecHubLambda.Arn
+    Metadata:
+      Comment:
+        Mapping the SQS Queue as Trigger for the Lambda Function
+
+#  RemediateNotificationLambda:
+#    Type: 'AWS::Lambda::Function'
+#    Properties:
+#      Description: Notification Lambda function to send notification to Child Account based on the Security Hub Finding.
+#      Code:
+#        S3Bucket:
+#          Fn::Sub:
+#              - "${S3BucketName}${AWS::Region}"
+#              - {S3BucketName: !Ref S3BucketName}
+#        S3Key:
+#          Fn::Sub:
+#              - "${releasefolder}/platform_remediate_by_notification.zip"
+#              - {releasefolder: !Ref FolderName}
+#      FunctionName: platform_remediate_by_notification
+#      Tags:
+#        - Value: 'yes'
+#          Key: platform_donotdelete
+#      Handler: platform_remediate_by_notification.lambda_handler
+#      Role: !GetAtt ComplianceSecurityStackSetRole.Arn
+#      MemorySize: 256
+#      Timeout: 900
+#      Runtime: python3.8
+
+  RemediatePortLambda:
+    Type: 'AWS::Lambda::Function'
+    Properties:
+      Description: Lambda function to remediate SSH & RDP ports in Child Account based on the Security Hub Finding.
+      Code:
+        S3Bucket:
+          Fn::Sub:
+              - "${S3BucketName}${AWS::Region}"
+              - {S3BucketName: !Ref S3BucketName}
+        S3Key:
+          Fn::Sub:
+              - "${releasefolder}/platform_remediate_port_22_3389.zip"
+              - {releasefolder: !Ref FolderName}
+      FunctionName: platform_remediate_port_22_3389
+      Tags:
+        - Value: 'yes'
+          Key: platform_donotdelete
+      Handler: platform_remediate_port_22_3389.lambda_handler
+      Role: !GetAtt ComplianceSecurityStackSetRole.Arn
+      MemorySize: 256
+      Timeout: 900
+      Runtime: python3.8
+
+  SecHubFindingsEventRule:
+    Type: "AWS::Events::Rule"
+    Properties:
+      Description: CloudWatch Events rule for Security Hub Findings to trigger a SQS which inturn invoke a Master Lambda
+                   for remediating the findings
+      EventPattern:
+        source:
+          - aws.securityhub
+      Name: 'platform_remediate_sechub_findings_rule'
+      State: ENABLED
+      Targets:
+        - Arn: !GetAtt SecurityHubRemediationQueue.Arn
+          Id: TargetFunction
+
+  SecurityHubRemediationQueue:
+    Type: 'AWS::SQS::Queue'
+    Properties:
+      QueueName: 'platform-remediate-sechub-findings-queue'
+      MessageRetentionPeriod: 1209600
+      Tags:
+        - Value: 'yes'
+          Key: platform_donotdelete
+      VisibilityTimeout: 900
+    Metadata:
+      Comment: Create a SQS queue to store all the Security Hub events as message and Custom Lambda
+               will use this queue to query the findings and remediate them.
+  SecurityHubRemediationQueuePolicy:
+    Type: 'AWS::SQS::QueuePolicy'
+    Properties:
+      Queues:
+        - !Ref SecurityHubRemediationQueue
+      PolicyDocument:
+        Id: SecurityHubRemediationQueuePolicy
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: events.amazonaws.com
+            Sid: SecHubFindingsEventRuletoSendEvents
+            Action:
+              - 'sqs:SendMessage'
+              - 'sqs:AddPermission'
+            Resource: !GetAtt SecurityHubRemediationQueue.Arn
+            Condition:
+              ArnEquals:
+                'aws:SourceArn': !GetAtt SecHubFindingsEventRule.Arn
+    Metadata:
+      Comment: Create a SQS queue policy with necessary permissions for the Security Hub CWE Rule
+               to send a message to the SecurityHubRemediationQueue queue.
+
+  OIDCRemediateLambda:
+    Type: 'AWS::Lambda::Function'
+    Properties:
+      Description: Lambda function to remediate non-compliant OIDC trsuted orgs .
+      Code:
+        S3Bucket:
+          Fn::Sub:
+              - "${S3BucketName}${AWS::Region}"
+              - {S3BucketName: !Ref S3BucketName}
+        S3Key:
+          Fn::Sub:
+              - "${releasefolder}/platform_oidc_remediate.zip"
+              - {releasefolder: !Ref FolderName}
+      FunctionName: platform_oidc_remediate
+      Tags:
+        - Value: 'yes'
+          Key: platform_donotdelete
+      Handler: platform_oidc_remediate.lambda_handler
+      Role: !GetAtt ComplianceSecurityStackSetRole.Arn
+      MemorySize: 256
+      Timeout: 900
+      Runtime: python3.8
+  
+  EventBridgeToInvokeOIDCRemediation:
+    Type: AWS::Events::Rule
+    Properties:
+      Name: platform_OIDCEventRule
+      Description: This event is to tigger the OIDC Remediation lambda.
+      EventPattern:
+        source:
+           - aws.iam
+        detail-type:
+          - AWS API Call via CloudTrail
+        detail:
+          eventSource:
+            - iam.amazonaws.com
+      Targets:
+        - Arn: !GetAtt OIDCRemediateLambda.Arn
+          Id: "platformMonitorOIDC"
+      State: ENABLED
+  PermissionForOIDCEventBridge:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref OIDCRemediateLambda
+      Action: "lambda:InvokeFunction"
+      Principal: "events.amazonaws.com"
+      SourceArn:
+        Fn::GetAtt:
+          - "EventBridgeToInvokeOIDCRemediation"
+          - "Arn"
+  
+  TRBChildLambda:
+    Type: 'AWS::Lambda::Function'
+    Properties:
+      Description: Lambda function to enable TRB approved SaaS or name based AMIs.
+      Code:
+        S3Bucket:
+          Fn::Sub:
+              - "${S3BucketName}${AWS::Region}"
+              - {S3BucketName: !Ref S3BucketName}
+        S3Key:
+          Fn::Sub:
+              - "${releasefolder}/platform_TRB_management_child.zip"
+              - {releasefolder: !Ref FolderName}
+      FunctionName: platform_TRB_management_child
+      Tags:
+        - Value: 'yes'
+          Key: platform_donotdelete
+      Handler: platform_TRB_management_child.lambda_handler
+      Environment:
+        Variables:
+          trb_parameter_ami_name: platform_trb_ami_name
+          trb_parameter_owner_id: platform_trb_ami_owner_id
+          trb_parameter_image_id: platform_trb_ami_image_id
+      Role: !GetAtt ComplianceSecurityStackSetRole.Arn
+      MemorySize: 256
+      Timeout: 900
+      Runtime: python3.8
+
+  FunctionPlatformSSMAgentReconcillation:
+    Condition: CreateinUS
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        S3Bucket:
+          Fn::Sub:
+              - "${S3BucketName}${AWS::Region}"
+              - {S3BucketName: !Ref S3BucketName}
+        S3Key:
+          Fn::Sub:
+            - "${releasefolder}/platform_ssm_automation.zip"
+            - {releasefolder: !Ref FolderName}
+      FunctionName: platform_ssm_automation
+      Tags:
+        - Value: "yes"
+          Key: platform_donotdelete
+      Handler: platform_ssm_automation.lambda_handler
+      Role: !GetAtt ComplianceSecurityStackSetRole.Arn
+      Timeout: 900
+      MemorySize: 186
+      Runtime: python3.8
+
+  SchedulePlatformSSMAgentReconcillation:
+    Condition: CreateinUS
+    Type: "AWS::Events::Rule"
+    Properties:
+      Name: platform-SSMAgentReconcillation
+      Description: "Scheduled Rule for once every week"
+      ScheduleExpression: "cron(00 12 1,15 * ? *)" 
+      State: "ENABLED"
+      Targets:
+        - Arn: !GetAtt FunctionPlatformSSMAgentReconcillation.Arn
+          Id: "TargetFunctionV1"
+
+  PermissionForFunctionPlatformAMIsTagScheduler:
+    Condition: CreateinUS
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref FunctionPlatformSSMAgentReconcillation
+      Action: "lambda:InvokeFunction"
+      Principal: "events.amazonaws.com"
+      SourceArn:
+        Fn::GetAtt:
+          - "SchedulePlatformSSMAgentReconcillation"
+          - "Arn"  
+  
+  ToeRole:
+    Condition: CreateinUS
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: !Sub 'platform_toe_tag_role_${AWS::Region}'
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonEC2FullAccess
+        - arn:aws:iam::aws:policy/AmazonSSMFullAccess
+
+  FunctionToTagTOECompliantInstances:
+    Condition: CreateinUS
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: platform_ToeCompliantInstances
+      Code:
+        S3Bucket:
+          Fn::Sub:
+              - "${S3BucketName}${AWS::Region}"
+              - {S3BucketName: !Ref S3BucketName}
+        S3Key:
+          Fn::Sub:
+              - "${releasefolder}/platform_ToeCompliantInstances.zip"
+              - {releasefolder: !Ref FolderName}
+      Description: Tag the EC2 instances based on TOE complaince status
+      Handler: platform_ToeCompliantInstances.lambda_handler
+      MemorySize: 1024
+      Role: !GetAtt ToeRole.Arn
+      Runtime: python3.8
+      Timeout: 900
+
+  ScheduledRuleTagTOE:
+    Condition: CreateinUS
+    Type: "AWS::Events::Rule"
+    Properties:
+      Name: platform_ToeCompliantInstancesSchedule
+      Description: "Scheduled Rule for every 30 minutes"
+      ScheduleExpression: "cron(0 11 13,25 * ? *)"
+      State: "ENABLED"
+      Targets:
+        - Arn: !GetAtt FunctionToTagTOECompliantInstances.Arn
+          Id: "TargetFunctionV1"
+
+  PermissionForTOEscheduler:
+    Condition: CreateinUS
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref FunctionToTagTOECompliantInstances
+      Action: "lambda:InvokeFunction"
+      Principal: "events.amazonaws.com"
+      SourceArn:
+        Fn::GetAtt:
+          - "ScheduledRuleTagTOE"
+          - "Arn"
+
+
+#----------------------------------------------------------------------------------------------------------------------

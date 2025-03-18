@@ -1,0 +1,17 @@
+{
+    "serviceprovider": "azure",
+    "servicerequirement_name": "Azure::ContainerInstances::Implementation",
+    "serviceDisplayName": "AWS ContainerInstances",
+    "id": "AWS_ContainerInstances_1_1",
+    "label": "Ensure Azure Container instance is deployed in Private Endpoint",
+    "description": "Azure Virtual Network provides secure, private networking for your Azure and on-premises resources. By deploying container groups into an Azure virtual network, Azure containers can communicate securely with other resources in the virtual network. Container groups deployed into an Azure virtual network enable container communication with on-premises resources through a VPN gateway or ExpressRoute.",
+    "type": "Detective",
+    "implementationProvider": "wiz",
+    "wizNativeType": [
+        ""
+    ],
+    "link": "link to terrform line/comment where requirement is implemented",
+    "requirementId": [
+        "Azure_ContainerInstances_1"
+    ]
+  }

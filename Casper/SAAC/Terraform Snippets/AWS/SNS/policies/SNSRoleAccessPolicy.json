@@ -1,0 +1,19 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Principal": {
+                "AWS": [
+                    "arn:aws:iam::${account_id}:role/SNSusers/*"
+                ]
+            },
+            "Effect": "Allow",
+            "Action": [
+                "sns: *"
+            ],
+            "Resource": [
+                "arn:aws:sns:${aws_region}:${account_id}:*"
+            ]
+        }
+    ]
+}

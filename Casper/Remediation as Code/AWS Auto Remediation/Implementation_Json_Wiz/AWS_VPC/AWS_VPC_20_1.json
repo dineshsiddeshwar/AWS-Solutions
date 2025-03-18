@@ -1,0 +1,17 @@
+{
+    "serviceprovider": "aws",
+    "servicerequirement_name": "AWS::VPC::Implementation",
+    "serviceDisplayName": "AWS VPC",
+    "id": "AWS_VPC_20_1",
+    "label": "Ensure VPC Endpoint Services do not allow non-org AWS accounts to access org services via PrivateLink",
+    "description": "",
+    "type": "Detective",
+    "implementationProvider": "wiz",
+    "wizNativeType": [
+        "vpc"
+    ],
+    "link": "",
+    "requirementId": [
+        "AWS_VPC_20"
+    ]
+}

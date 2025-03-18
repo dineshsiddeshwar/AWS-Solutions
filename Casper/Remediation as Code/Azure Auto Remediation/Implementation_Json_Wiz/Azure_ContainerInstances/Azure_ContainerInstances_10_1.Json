@@ -1,0 +1,17 @@
+{
+    "serviceprovider": "azure",
+    "servicerequirement_name": "Azure::ContainerInstances::Implementation",
+    "serviceDisplayName": "AWS ContainerInstances",
+    "id": "AWS_ContainerInstances_10_1",
+    "label": "Ensure only organization approved container images are used for deployment in production",
+    "description": "Organization approved Container images are the Azure Resource Manager templates of the Container which are customized and configured to meet the organization and compliance policies. New instances must be deployed only using these approved images promoting the uniformity and secured design. Patch updates and maintenance will be done to this approved container Images by Infrastructure team.",
+    "type": "Detective",
+    "implementationProvider": "wiz",
+    "wizNativeType": [
+        ""
+    ],
+    "link": "link to terrform line/comment where requirement is implemented",
+    "requirementId": [
+        "Azure_ContainerInstances_10"
+    ]
+  }

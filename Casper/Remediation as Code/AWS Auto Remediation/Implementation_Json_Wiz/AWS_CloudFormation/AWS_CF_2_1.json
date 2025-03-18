@@ -1,0 +1,17 @@
+{
+    "serviceprovider": "aws",
+    "servicerequirement_name": "AWS::cloudformation::Implementation",
+    "serviceDisplayName": "AWS CloudFormation",
+    "id": "AWS_CF_2_1",
+    "label": "Ensure AWS Cloud Formation deletion policy is set",
+    "description": "Check that DeletionPolicy attribute is set to retain to ensure that deletion of stack does not cause loss of additional attached resources",
+    "type": "Detective",
+    "implementationProvider": "wiz",
+    "wizNativeType": [
+        "stackset"
+    ],
+    "link": "Detective-Pipeline/AWS/AWS_CloudFormation/AWS_CF_2_1.rego",
+    "requirementId": [
+        "AWS_CF_2"
+    ]
+}

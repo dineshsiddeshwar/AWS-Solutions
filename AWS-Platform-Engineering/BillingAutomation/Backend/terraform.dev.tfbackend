@@ -1,0 +1,4 @@
+# config.remote.tfbackend
+workspaces { name = "awsatshell_billing_automation__dev_us-east-1" }
+hostname     = "app.terraform.io"
+organization = "ecp-shell-prod"

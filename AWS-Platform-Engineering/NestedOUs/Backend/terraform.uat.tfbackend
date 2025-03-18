@@ -1,0 +1,4 @@
+# config.remote.tfbackend
+workspaces { name = "aws_at_shell_services__production__awsatshell_ous__uat_us-east-1" }
+organization = "ecp-shell-prod"
+hostname     = "app.terraform.io"

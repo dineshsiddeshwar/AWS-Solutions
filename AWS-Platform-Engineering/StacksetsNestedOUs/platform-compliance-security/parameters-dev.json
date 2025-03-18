@@ -1,0 +1,34 @@
+[
+    {
+      "ParameterKey": "releses3bucket",
+      "ParameterValue": "azure-devops-da2.0-release-dev-us-east-1"
+    },
+    {
+        "ParameterKey": "FolderName",
+        "ParameterValue": "ReleaseNumber"
+    },
+    {
+        "ParameterKey": "BucketNameWithOutRegion",
+        "ParameterValue": "azure-devops-da2.0-stackset-dev-"
+    },
+    {
+        "ParameterKey": "Prod",
+        "ParameterValue": "ou-93cv-deu05lj5"
+    },
+    {
+        "ParameterKey": "NonProd",
+        "ParameterValue": "ou-93cv-9rufgzcq"
+    },
+    {
+        "ParameterKey": "RESPCMigration",
+        "ParameterValue": "ou-93cv-kz8l46qu"
+    },
+    {
+        "ParameterKey": "DNSSESKeyEmail",
+        "ParameterValue": "DNSSESKeyEmailValue"
+    },
+    {
+      "ParameterKey": "DNSSESSecrtEmail",
+      "ParameterValue": "DNSSESSecrtEmailValue"
+    }
+]

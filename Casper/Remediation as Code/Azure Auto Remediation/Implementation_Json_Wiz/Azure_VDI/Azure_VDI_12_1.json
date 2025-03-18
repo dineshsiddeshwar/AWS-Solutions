@@ -1,0 +1,17 @@
+{
+  "serviceprovider": "azure",
+  "servicerequirement_name": "Azure::VDI::Implementation",
+  "serviceDisplayName": "AWS VDI",
+  "id": "AWS_VDI_12_1",
+  "label": "Ensure that added VM in virtual desktop is enrolled with Intune",
+  "description": "If Intune is configured in the Azure Active Directory tenant, the virtual machine msut get automatically enrolled during the deployment for the endpoint protection.",
+  "type": "Detective",
+  "implementationProvider": "wiz",
+  "wizNativeType": [
+      ""
+  ],
+  "link": "link to terrform line/comment where requirement is implemented",
+  "requirementId": [
+      "Azure_VDI_12"
+  ]
+}

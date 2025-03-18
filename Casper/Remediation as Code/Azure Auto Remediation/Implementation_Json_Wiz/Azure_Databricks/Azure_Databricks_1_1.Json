@@ -1,0 +1,17 @@
+{
+    "serviceprovider": "azure",
+    "servicerequirement_name": "Azure::Databricks::Implementation",
+    "serviceDisplayName": "AWS Databricks",
+    "id": "AWS_Databricks_1_1",
+    "label": "Ensure Azure Databricks is deployed in enterprise-managed virtual network (VNet)",
+    "description": "This control checks whether the Azure Databricks is deployed in organization managed Azure virtual network (VNet) in order to have highest network protection. The default deployment of Azure Databricks is a fully managed service on Azure. All data plane resources, including a VNet that all clusters will be associated with, are deployed to a locked resource group. If organization require network customization, however, organization can deploy Azure Databricks data plane resources in organization own virtual network (VNet). This enables organization to implement custom network configurations with custom network level security controls. Organization can apply their own network security group (NSG) with custom rules to specific egress traffic restrictions.",
+    "type": "Detective",
+    "implementationProvider": "wiz",
+    "wizNativeType": [
+        ""
+    ],
+    "link": "link to terrform line/comment where requirement is implemented",
+    "requirementId": [
+        "Azure_Databricks_1"
+    ]
+  }

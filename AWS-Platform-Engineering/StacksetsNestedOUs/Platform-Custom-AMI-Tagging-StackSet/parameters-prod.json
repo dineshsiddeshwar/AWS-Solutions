@@ -1,0 +1,74 @@
+[
+    {
+      "ParameterKey": "releses3bucket",
+      "ParameterValue": "azure-devops-da2.0-release-prod-us-east-1"
+    },
+    {
+        "ParameterKey": "FolderName",
+        "ParameterValue": "ReleaseNumber"
+    },
+    {
+        "ParameterKey": "BucketNameWithOutRegion",
+        "ParameterValue": "azure-devops-da2.0-stackset-prod-"
+    },
+    {
+        "ParameterKey": "Prod",
+        "ParameterValue": "ou-sdpg-m0bmjby4"
+    },
+    {
+        "ParameterKey": "NonProd",
+        "ParameterValue": "ou-sdpg-fcd0ld6e"
+    },
+    {
+        "ParameterKey": "RESPCMigration",
+        "ParameterValue": "ou-sdpg-vc3iqnav"
+    },
+    {
+        "ParameterKey": "Exceptions",
+        "ParameterValue": "ou-sdpg-r1y7t298"
+    },
+    {
+      "ParameterKey": "DataScanning",
+      "ParameterValue": "Enabled"
+    },
+    {
+      "ParameterKey": "OrchestratorAccountID",
+      "ParameterValue": "910770603551"
+    },
+    {
+      "ParameterKey": "RolePrefix",
+      "ParameterValue": "PROD"
+    },
+    {
+      "ParameterKey": "ServerlessScanning",
+      "ParameterValue": "Enabled"
+    },
+    {
+      "ParameterKey": "RoleARN",
+      "ParameterValue": ""
+    },
+    {
+      "ParameterKey": "DynatraceRoleNameChild",
+      "ParameterValue": "Dynatrace_monitoring_role"
+    },
+    {
+      "ParameterKey": "DynatraceAccountID",
+      "ParameterValue": "148229142884"
+    },
+    {
+      "ParameterKey": "WizRoleNameChild",
+      "ParameterValue": "PROD-WizAccess-Role"
+    },
+    {
+      "ParameterKey": "ExternalId",
+      "ParameterValue": "4897bb81-ac81-4f1e-8540-481b450d67ee"
+    },
+    {
+      "ParameterKey": "masteraccount",
+      "ParameterValue": "604596384198"
+    },
+    {
+      "ParameterKey": "RootMonitorEventBusName",
+      "ParameterValue": "platform-hub-root-activity"
+    }
+]

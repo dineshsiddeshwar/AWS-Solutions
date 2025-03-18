@@ -1,0 +1,413 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "generalallow",
+            "Effect": "Allow",
+            "Action": [
+                "xray:*",
+                "transcribe:*",
+                "textract:*",
+                "tag:*",
+                "support:*",
+                "sts:*",
+                "states:*",
+                "ssm:*",
+                "sqs:*",
+                "sns:*",
+                "ses:*",
+                "secretsmanager:*",
+                "sdb:*",
+                "sagemaker:*",
+                "s3:*",
+                "resource-groups:*",
+                "rekognition:*",
+                "rds:*",
+                "polly:*",
+                "pi:*",
+                "neptune-db:*",
+                "mq:*",
+                "mobileanalytics:*",
+                "machinelearning:*",
+                "logs:*",
+                "lex:*",
+                "lambda:*",
+                "kms:*",
+                "kafka:*",
+                "iot:*",
+                "iam:Simulate*",
+                "iam:PassRole",
+                "iam:List*",
+                "iam:Get*",
+                "iam:Generate*",
+                "iam:CreateServiceLinkedRole",
+                "health:*",
+                "glue:*",
+                "glacier:*",
+                "execute-api:*",
+                "events:*",
+                "es:*",
+                "elastictranscoder:*",
+                "elasticmapreduce:*",
+                "elasticloadbalancing:*",
+                "elasticache:*",
+                "elastic-inference:*",
+                "eks:List*",
+                "eks:Describe*",
+                "ecs:*",
+                "ecr:List*",
+                "ecr:Get*",
+                "ecr:Describe*",
+                "ecr:BatchGet*",
+                "ecr:BatchCheck*",
+                "ec2messages:*",
+                "ec2:*",
+                "dynamodb:*",
+                "dms:*",
+                "dax:*",
+                "datapipeline:*",
+                "compute-optimizer:*",
+                "cloudwatch:*",
+                "cloudsearch:*",
+                "cloudfront:*",
+                "cloudformation:*",
+                "cassandra:*",
+                "batch:*",
+                "backup:*",
+                "aws-marketplace:View*",
+                "aws-marketplace:Search*",
+                "aws-marketplace:List*",
+                "aws-marketplace:Get*",
+                "aws-marketplace:Describe*",
+                "autoscaling:*",
+                "athena:*",
+                "application-autoscaling:*",
+                "apigateway:*",
+                "amplify:*",
+                "acm:*",
+                "a4b:*"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "r53allow",
+            "Effect": "Allow",
+            "Action": [
+                "route53:UpdateTrafficPolicy*",
+                "route53:UpdateHealthCheck",
+                "route53:Test*",
+                "route53:List*",
+                "route53:Get*",
+                "route53:DisassociateVPCFromHostedZone",
+                "route53:DeleteVPCAssociationAuthorization",
+                "route53:DeleteTrafficPolicy*",
+                "route53:DeleteReusableDelegationSet",
+                "route53:DeleteQueryLoggingConfig",
+                "route53:DeleteHealthCheck",
+                "route53:CreateVPCAssociationAuthorization",
+                "route53:CreateTrafficPolicy*",
+                "route53:CreateReusableDelegationSet",
+                "route53:CreateQueryLoggingConfig",
+                "route53:CreateHealthCheck",
+                "route53:Change*",
+                "route53:AssociateVPCWithHostedZone"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "ecrallow",
+            "Effect": "Allow",
+            "Action": "ecr:*",
+            "Resource": "arn:aws:ecr:us-east-1:679923227529:repository/*"
+        },
+        {
+            "Sid": "IamGeneralAllow",
+            "Effect": "Allow",
+            "Action": [
+                "iam:SetDefaultPolicyVersion",
+                "iam:RemoveRoleFromInstanceProfile",
+                "iam:DeletePolicy*",
+                "iam:DeleteInstanceProfile",
+                "iam:CreatePolicy*",
+                "iam:CreateInstanceProfile",
+                "iam:AddRoleToInstanceProfile"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "IamRoleDeleteUpdateAllow",
+            "Effect": "Allow",
+            "Action": [
+                "iam:UpdateRoleDescription",
+                "iam:UpdateRole",
+                "iam:UpdateAssumeRolePolicy",
+                "iam:PutRolePolicy",
+                "iam:DetachRolePolicy",
+                "iam:DeleteServiceLinkedRole",
+                "iam:DeleteRolePolicy",
+                "iam:DeleteRole",
+                "iam:AttachRolePolicy"
+            ],
+            "Resource": "*",
+            "Condition": {
+                "StringEquals": {
+                    "iam:ResourceTag/service-team": [
+                        "${aws:PrincipalTag/service-team}"
+                    ]
+                }
+            }
+        },
+        {
+            "Sid": "IamRoleTeamTagOnCreate",
+            "Effect": "Allow",
+            "Action": "iam:TagRole",
+            "Resource": "*",
+            "Condition": {
+                "StringEquals": {
+                    "aws:RequestTag/service-team": [
+                        "${aws:PrincipalTag/service-team}"
+                    ]
+                }
+            }
+        },
+        {
+            "Sid": "IamRoleTaggingAllows",
+            "Effect": "Allow",
+            "Action": [
+                "iam:UntagRole",
+                "iam:TagRole"
+            ],
+            "Resource": "*",
+            "Condition": {
+                "ForAllValues:StringNotLike": {
+                    "aws:TagKeys": [
+                        "service-team"
+                    ]
+                },
+                "StringEquals": {
+                    "iam:ResourceTag/service-team": [
+                        "${aws:PrincipalTag/service-team}"
+                    ]
+                }
+            }
+        },
+        {
+            "Sid": "IamRoleCreateAllows",
+            "Effect": "Allow",
+            "Action": [
+                "iam:PutRolePermissionsBoundary",
+                "iam:CreateServiceLinkedRole",
+                "iam:CreateRole"
+            ],
+            "Resource": "*",
+            "Condition": {
+                "StringEquals": {
+                    "aws:RequestTag/service-team": [
+                        "${aws:PrincipalTag/service-team}"
+                    ],
+                    "iam:PermissionsBoundary": [
+                        "arn:aws:iam::679923227529:policy/bea-platform-boundary-iam-policy"
+                    ]
+                }
+            }
+        },
+        {
+            "Sid": "IamDetachPermissionBoundary",
+            "Effect": "Deny",
+            "Action": [
+                "iam:DeleteRolePermissionsBoundary"
+            ],
+            "Resource": "*",
+            "Condition": {
+                "StringEquals": {
+                    "iam:PermissionsBoundary": [
+                        "arn:aws:iam:::policy/platform_ContributorExternalPermissionBoundary"
+                    ]
+                }
+            }
+        },
+        {
+            "Sid": "generaldeny",
+            "Effect": "Deny",
+            "Action": [
+                "shield:Update*",
+                "shield:Delete*",
+                "securityhub:*",
+                "outposts:*",
+                "organizations:*",
+                "networkmanager:*",
+                "guardduty:*",
+                "fms:*",
+                "directconnect:*",
+                "cloudtrail:Update*",
+                "cloudtrail:Stop*",
+                "cloudtrail:Start*",
+                "cloudtrail:Remove*",
+                "cloudtrail:Put*",
+                "cloudtrail:Delete*",
+                "cloudtrail:Create*",
+                "cloudtrail:Add*",
+                "cloudhsm:*",
+                "aws-portal:*",
+                "account:GetAccountInformation",
+                "billing:Get*",
+                "payments:List*",
+                "payments:Get*",
+                "tax:List*",
+                "tax:Get*",
+                "consolidatedbilling:Get*",
+                "consolidatedbilling:List*",
+                "invoicing:List*",
+                "invoicing:Get*",
+                "cur:Get*",
+                "cur:Validate*",
+                "freetier:Get*",
+                "ce:*",
+                "billing:ListBillingViews",
+                "account:*"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "iamobjectdeny",
+            "Effect": "Deny",
+            "Action": [
+                "iam:SetDefaultPolicyVersion",
+                "iam:DeleteRole",
+                "iam:DeletePolicy*",
+                "iam:CreatePolicy*",
+                "iam:AddRoleToInstanceProfile"
+            ],
+            "Resource": [
+                "arn:aws:iam::679923227529:role/bea-read-only-iam-role",
+                "arn:aws:iam::679923227529:role/bea-billing-iam-role",
+                "arn:aws:iam::679923227529:role/bea-*-sre-iam-role",
+                "arn:aws:iam::679923227529:role/bea-*-jenkins-iam-role",
+                "arn:aws:iam::679923227529:role/bea-*-developer-iam-role",
+                "arn:aws:iam::679923227529:role/bea-*-ci-iam-role",
+                "arn:aws:iam::679923227529:role/bea-*-cd-iam-role",
+                "arn:aws:iam::679923227529:policy/bea-standard-*",
+                "arn:aws:iam::679923227529:policy/bea-platform-*",
+                "arn:aws:iam::679923227529:policy/bea-mgmt-*"
+            ]
+        },
+        {
+            "Sid": "s3",
+            "Effect": "Allow",
+            "Action": "*",
+            "Resource": [
+                "arn:aws:s3:::sdu-leostream-terraform-state/*",
+                "arn:aws:s3:::sdu-leostream-ssl-certificates/*",
+                "arn:aws:s3:::sdu-leostream-admin/*"
+            ]
+        },
+        {
+            "Effect": "Deny",
+            "Action": [
+                "ec2:EnableVgwRoutePropagation",
+                "ec2:DeleteLocalGatewayRouteTableVpcAssociation",
+                "ec2:DeleteVpnGateway",
+                "ec2:CreateLocalGatewayRouteTableVpcAssociation",
+                "ec2:AssociateClientVpnTargetNetwork",
+                "ec2:DetachVpnGateway",
+                "ec2:*VpnConnection*",
+                "ec2:ModifyVpnTunnelCertificate",
+                "ec2:CreateClientVpnRoute",
+                "ec2:AttachVpnGateway",
+                "ec2:CreateLocalGatewayRoute",
+                "ec2:RevokeClientVpnIngress",
+                "ec2:ModifyVpnTunnelOptions",
+                "ec2:AuthorizeClientVpnIngress",
+                "ec2:ImportClientVpnClientCertificateRevocationList",
+                "ec2:*CustomerGateway*",
+                "ec2:DeleteClientVpnRoute",
+                "ec2:ApplySecurityGroupsToClientVpnTargetNetwork",
+                "ec2:DeregisterInstanceEventNotificationAttributes",
+                "ec2:DisableVgwRoutePropagation",
+                "ec2:CreateVpnGateway",
+                "ec2:DeleteLocalGatewayRoute",
+                "ec2:TerminateClientVpnConnections",
+                "ec2:DisassociateClientVpnTargetNetwork",
+                "ec2:DisableEbsEncryptionByDefault",
+                "s3:PutBucketPublicAccessBlock",
+                "iam:*MFADevice",
+                "iam:DeleteAccountPasswordPolicy",
+                "iam:*OpenIDConnectProvider",
+                "iam:*GroupPolicy",
+                "iam:AttachUserPolicy",
+                "iam:DeleteUserPolicy",
+                "iam:DetachUserPolicy",
+                "iam:PutUserPolicy",
+                "iam:ChangePassword",
+                "iam:CreateAccountAlias",
+                "iam:CreateLoginProfile",
+                "iam:CreateSAMLProvider",
+                "iam:DeleteGroupPolicy",
+                "iam:DeleteInstanceProfile",
+                "iam:DeleteLoginProfile",
+                "elasticmapreduce:PutBlockPublicAccessConfiguration",
+                "ec2:DisableEbsEncryptionByDefault",
+                "ds:UnshareDirectory",
+                "ds:DeleteConditionalForwarder",
+                "ds:DeleteTrust",
+                "ds:UpdateConditionalForwarder",
+                "ds:DeleteDirectory",
+                "sso:Import*",
+                "sso:Delete*",
+                "sso:Update*",
+                "sso:Detach*",
+                "sso:DisassociateDirectory",
+                "sso:Put*",
+                "sso:AssociateDirectory",
+                "sso-directory:Disable*",
+                "sso-directory:Update*",
+                "sso-directory:Delete*",
+                "sso-directory:Create*",
+                "sso-directory:Remove*",
+                "aws-portal:ModifyAccount",
+                "account:CloseAccount",
+                "account:DeleteAlternateContact",
+                "account:Put*",
+                "billing:PutContractInformation",
+                "billing:Update*",
+                "aws-portal:ModifyBilling",
+                "billing:RedeemCredits",
+                "ce:Create*",
+                "ce:Delete*",
+                "ce:ProvideAnomalyFeedback",
+                "ce:StartSavingsPlansPurchaseRecommendationGeneration",
+                "ce:Update*",
+                "cur:PutClassicReportPreferences",
+                "freetier:PutFreeTierAlertPreference",
+                "invoicing:PutInvoiceEmailDeliveryPreferences",
+                "payments:CreatePaymentInstrument",
+                "payments:DeletePaymentInstrument",
+                "payments:MakePayment",
+                "payments:UpdatePaymentPreferences",
+                "tax:BatchPutTaxRegistration",
+                "tax:DeleteTaxRegistration",
+                "tax:PutTaxInheritance",
+                "aws-portal:ModifyPaymentMethods",
+                "account:GetAccountInformation",
+                "securityhub:*Disable*",
+                "securityhub:DeleteInvitations",
+                "securityhub:DeleteMembers",
+                "securityhub:UpdateStandardsControl"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Effect": "Deny",
+            "Action": [
+                "iam:DeleteRole",
+                "iam:UpdateRole",
+                "iam:AttachRolePolicy",
+                "iam:DetachRolePolicy",
+                "iam:UpdateAssumeRolePolicy"
+            ],
+            "Resource": [
+                "arn:aws:iam::*:role/business_service*"
+            ]
+        }
+    ]
+}

@@ -1,0 +1,110 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Parameters": {
+        "DynamoDBTableName": {
+            "Type": "String",
+            "Description": "Name of the DynamoDB table"
+        },
+        "KmsKeyId": {
+            "Type": "String",
+            "Description": "ID of the CMK for encryption at rest"
+        },
+        "Ec2InstanceName": {
+            "Type": "String",
+            "Description": "IAM Role name for the EC2 instance"
+        }
+    },
+    "Resources": {
+        "DynamoDBTable": {
+            "Type": "AWS::DynamoDB::Table",
+            "Properties": {
+                "TableName": {
+                    "Ref": "DynamoDBTableName"
+                },
+                "AttributeDefinitions": [
+                    {
+                        "AttributeName": "PartitionKey",
+                        "AttributeType": "S"
+                    }
+                ],
+                "KeySchema": [
+                    {
+                        "AttributeName": "PartitionKey",
+                        "KeyType": "HASH"
+                    }
+                ],
+                "SSESpecification": {
+                    "SSEEnabled": true,
+                    "KMSMasterKeyId": {
+                        "Ref": "KmsKeyId"
+                    }
+                }
+            }
+        },
+        "InstanceProfile": {
+            "Type": "AWS::IAM::InstanceProfile",
+            "Properties": {
+                "InstanceProfileName": {
+                    "Ref": "Ec2InstanceName"
+                },
+                "Roles": [
+                    {
+                        "Ref": "EC2Role"
+                    }
+                ]
+            }
+        },
+        "EC2Role": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+                "RoleName": "EC2DynamoDBRole",
+                "AssumeRolePolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": "ec2.amazonaws.com"
+                            },
+                            "Action": "sts:AssumeRole"
+                        }
+                    ]
+                },
+                "Policies": [
+                    {
+                        "PolicyName": "DynamoDBAccessPolicy",
+                        "PolicyDocument": {
+                            "Version": "2012-10-17",
+                            "Statement": [
+                                {
+                                    "Effect": "Allow",
+                                    "Action": [
+                                        "dynamodb:PutItem",
+                                        "dynamodb:GetItem",
+                                        "dynamodb:UpdateItem",
+                                        "dynamodb:DeleteItem",
+                                        "dynamodb:DescribeTable"
+                                    ],
+                                    "Resource": {
+                                        "Fn::Sub": "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${DynamoDBTableName}"
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        },
+        "DynamoDBCloudTrail": {
+            "Type": "AWS::CloudTrail::Trail",
+            "Properties": {
+                "S3BucketName": {
+                    "Fn::Sub": "dynamodb-cloudtrail-${AWS::Region}-${AWS::AccountId}"
+                },
+                "IsLogging": true,
+                "EnableLogFileValidation": true,
+                "IncludeGlobalServiceEvents": true
+            }
+        }
+    }
+}

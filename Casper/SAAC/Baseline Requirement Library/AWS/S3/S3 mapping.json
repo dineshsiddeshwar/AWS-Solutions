@@ -1,0 +1,255 @@
+{ 
+    "serviceprovider": "aws", 
+    "servicerequirement_name": [ 
+        "AWS::S3::*" 
+    ], 
+    "service_type":"storage",
+    "servicedisplay_name": "S3", 
+    "serviceapproval_status": { 
+        "Prod": "approved", 
+        "SNP": "approved", 
+        "NP": "approved" 
+    }, 
+    "phase": "Service Discovery", 
+    "mapping": [ 
+
+        { 
+            "requirement_name": "Ensure AWS S3 buckets are not granting FULL_CONTROL access to authenticated users (least privilege access)", 
+            "policy": "https://github.com/ey-org/cloudsec-ccm/blob/master/Baseline%20Requirement%20Library/AWS/S3/S3%20Runbook.md#1-ensure-aws-s3-buckets-are-not-granting-full_control-access-to-authenticated-users-least-privilege-access", 
+            "security_domain": "IAM", 
+            "ticket_enabled": "false", 
+            "tags": [], 
+            "severity": { 
+                "cvss_score":"Medium",
+                "cvss_severity":"Medium",
+                "cvss_vector": "#CVSS:3.1/AV:L/AC:H/PR:H/UI:R/S:U/C:L/I:H/A:H"                      
+            },           
+            "control_mapping": ["CS0012298"], 
+            "implementations": [] 
+        }, 
+        { 
+            "requirement_name": "Ensure AWS S3 buckets are not publicly accessible via bucket policies (least privilege access)", 
+            "policy": "https://github.com/ey-org/cloudsec-ccm/blob/master/Baseline%20Requirement%20Library/AWS/S3/S3%20Runbook.md#2-ensure-aws-s3-buckets-are-not-publicly-accessible-via-bucket-policies-least-privilege-access", 
+            "Security Domain": "IAM", 
+            "ticket_enabled": "false", 
+            "tags": [], 
+            "severity": { 
+                "cvss_score":"High",
+                "cvss_severity":"High",
+                "cvss_vector": "#CVSS:3.1/AV:N/AC:H/PR:H/UI:R/S:C/C:H/I:H/A:H"                      
+            },           
+            "control_mapping": ["CS0012298"], 
+            "implementations": [] 
+        }, 
+        { 
+            "requirement_name": "Ensure MFA is enabled for sensitive S3 resources", 
+            "policy": "https://github.com/ey-org/cloudsec-ccm/blob/master/Baseline%20Requirement%20Library/AWS/S3/S3%20Runbook.md#3-ensure-mfa-is-enabled-for-sensitive-s3-resources", 
+            "Security Domain": "IAM", 
+            "ticket_enabled": "false", 
+            "tags": [], 
+            "severity": { 
+                "cvss_score":"High",
+                "cvss_severity":"High",
+                "cvss_vector": "#CVSS:3.1/AV:A/AC:L/PR:L/UI:N/S:C/C:H/I:H/A:L"                      
+            },           
+            "control_mapping": ["CS0012298"], 
+            "implementations": [] 
+        }, 
+        { 
+            "requirement_name": "Ensure MFA Delete feature is enabled on S3 Bucket", 
+            "policy": "https://github.com/ey-org/cloudsec-ccm/blob/master/Baseline%20Requirement%20Library/AWS/S3/S3%20Runbook.md#4-ensure-mfa-delete-feature-is-enabled-on-s3-bucket", 
+            "Security Domain": "IAM", 
+            "ticket_enabled": "false", 
+            "tags": [], 
+            "severity": { 
+                "cvss_score":"Medium",
+                "cvss_severity":"Medium",
+                "cvss_vector": "#CVSS:3.1/AV:N/AC:L/PR:L/UI:R/S:U/C:L/I:L/A:L"                      
+            },           
+            "control_mapping": ["CS0012298"], 
+            "implementations": [] 
+        }, 
+        { 
+            "requirement_name": "Ensure S3 Buckets are encrypted at rest using organization managed key(CMK)", 
+            "policy": "https://github.com/ey-org/cloudsec-ccm/blob/master/Baseline%20Requirement%20Library/AWS/S3/S3%20Runbook.md#5-ensure-s3-buckets-are-encrypted-at-rest-using-organization-managed-keycmk", 
+            "Security Domain": "Data Protection", 
+            "ticket_enabled": "false", 
+            "tags": [], 
+            "severity": { 
+                "cvss_score":"Medium",
+                "cvss_severity":"Medium",
+                "cvss_vector": "#CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:L/I:L/A:L"                      
+            },           
+            "control_mapping": ["CS0012168"], 
+            "implementations": [] 
+        }, 
+        { 
+            "requirement_name": "Ensure Secure transfer is enabled on S3 bucket", 
+            "policy": "https://github.com/ey-org/cloudsec-ccm/blob/master/Baseline%20Requirement%20Library/AWS/S3/S3%20Runbook.md#6-ensure-secure-transfer-is-enabled-on-s3-bucket", 
+            "Security Domain": "Data Protection", 
+            "ticket_enabled": "false", 
+            "tags": [], 
+            "severity": { 
+                "cvss_score":"Medium",
+                "cvss_severity":"Medium",
+                "cvss_vector": "#CVSS:3.1/AV:N/AC:L/PR:L/UI:R/S:U/C:L/I:L/A:N"                      
+            },           
+            "control_mapping": ["CS0012261"], 
+            "implementations": [] 
+        }, 
+        { 
+            "requirement_name": "Ensure Block public access setting is turned on", 
+            "policy": "https://github.com/ey-org/cloudsec-ccm/blob/master/Baseline%20Requirement%20Library/AWS/S3/S3%20Runbook.md#7-ensure-block-public-access-setting-is-turned-on", 
+            "Security Domain": "IAM", 
+            "ticket_enabled": "false", 
+            "tags": [], 
+            "severity": { 
+                "cvss_score":"High",
+                "cvss_severity":"High",
+                "cvss_vector": "#CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:C/C:H/I:L/A:L"                      
+            },           
+            "control_mapping": ["CS0012300"], 
+            "implementations": [] 
+        }, 
+        { 
+            "requirement_name": "Ensure S3 is communicating with services inside VPC via VPC end-point", 
+            "policy": "https://github.com/ey-org/cloudsec-ccm/blob/master/Baseline%20Requirement%20Library/AWS/S3/S3%20Runbook.md#8-ensure-s3-is-communicating-with-services-inside-vpc-via-vpc-end-point", 
+            "Security Domain": "Network Security", 
+            "ticket_enabled": "false", 
+            "tags": [], 
+            "severity": { 
+                "cvss_score":"Medium",
+                "cvss_severity":"Medium",
+                "cvss_vector": "#CVSS:3.1/AV:N/AC:H/PR:L/UI:N/S:U/C:L/I:L/A:L"                      
+            },           
+            "control_mapping": ["CS0012300"], 
+            "implementations": [] 
+        }, 
+        { 
+            "requirement_name": "Ensure AWS s3 bucket have server Access Logging enabled to track access request", 
+            "policy": "https://github.com/ey-org/cloudsec-ccm/blob/master/Baseline%20Requirement%20Library/AWS/S3/S3%20Runbook.md#9-ensure-aws-s3-bucket-have-server-access-logging-enabled-to-track-access-request", 
+            "Security Domain": "Security Logging", 
+            "ticket_enabled": "false", 
+            "tags": [], 
+            "severity": { 
+                "cvss_score":"Medium",
+                "cvss_severity":"Medium",
+                "cvss_vector": "#CVSS:3.1/AV:N/AC:H/PR:H/UI:R/S:C/C:L/I:L/A:N"                      
+            },           
+            "control_mapping": ["CS0012233"], 
+            "implementations": [] 
+        }, 
+        { 
+            "requirement_name": "Ensure that AWS S3 buckets use Object Lock for data protection", 
+            "policy": "https://github.com/ey-org/cloudsec-ccm/blob/master/Baseline%20Requirement%20Library/AWS/S3/S3%20Runbook.md#10-ensure-that-aws-s3-buckets-use-object-lock-for-data-protection", 
+            "Security Domain": "Data Protection", 
+            "ticket_enabled": "false", 
+            "tags": [], 
+            "severity": { 
+                "cvss_score":"Medium",
+                "cvss_severity":"Medium",
+                "cvss_vector": "#CVSS:3.1/AV:N/AC:L/PR:H/UI:R/S:U/C:L/I:H/A:L"                      
+            },           
+            "control_mapping": [""], 
+            "implementations": [] 
+        }, 
+        { 
+            "requirement_name": "Ensure S3 buckets do not allow unknown cross-account access via bucket policy", 
+            "policy": "https://github.com/ey-org/cloudsec-ccm/blob/master/Baseline%20Requirement%20Library/AWS/S3/S3%20Runbook.md#11-ensure-s3-buckets-do-not-allow-unknown-cross-account-access-via-bucket-policy", 
+            "Security Domain": "IAM", 
+            "ticket_enabled": "false", 
+            "tags": [], 
+            "severity": { 
+                "cvss_score":"High",
+                "cvss_severity":"High",
+                "cvss_vector": "#CVSS:3.1/AV:A/AC:H/PR:L/UI:N/S:C/C:L/I:H/A:H"                      
+            },           
+            "control_mapping": ["CS0012300"], 
+            "implementations": [] 
+        }, 
+        { 
+            "requirement_name": "Ensure S3 buckets backup strategies are complaint with Organization standards", 
+            "policy": "https://github.com/ey-org/cloudsec-ccm/blob/master/Baseline%20Requirement%20Library/AWS/S3/S3%20Runbook.md#12-ensure-s3-buckets-backup-strategies-are-complaint-with-organization-standards", 
+            "Security Domain": "Data Protection", 
+            "ticket_enabled": "false", 
+            "tags": [], 
+            "severity": { 
+                "cvss_score":"Medium",
+                "cvss_severity":"Medium",
+                "cvss_vector": "#CVSS:3.1/AV:N/AC:H/PR:L/UI:N/S:U/C:N/I:L/A:L"                      
+            },           
+            "control_mapping": ["CS0012142"], 
+            "implementations": [] 
+        }, 
+        { 
+            "requirement_name": "Ensure CloudWatch alarms is enabled for S3", 
+            "policy": "https://github.com/ey-org/cloudsec-ccm/blob/master/Baseline%20Requirement%20Library/AWS/S3/S3%20Runbook.md#14-ensure-cloudwatch-alarms-is-enabled-for-s3", 
+            "Security Domain": "Security Logging", 
+            "ticket_enabled": "false", 
+            "tags": [], 
+            "severity": { 
+                "cvss_score":"Medium",
+                "cvss_severity":"Medium",
+                "cvss_vector": "#CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:L/A:L"                      
+            },           
+            "control_mapping": ["CS0012133"], 
+            "implementations": [] 
+        }, 
+        { 
+            "requirement_name": "Ensure resource tagging is added to S3 bucket", 
+            "policy": "https://github.com/ey-org/cloudsec-ccm/blob/master/Baseline%20Requirement%20Library/AWS/S3/S3%20Runbook.md#15-ensure-resource-tagging-is-added-to-s3-bucket", 
+            "Security Domain": "Asset Management", 
+            "ticket_enabled": "false", 
+            "tags": [], 
+            "severity": { 
+                "cvss_score":"Low",
+                "cvss_severity":"Low",
+                "cvss_vector": "#CVSS:3.1/AV:L/AC:L/PR:H/UI:N/S:U/C:N/I:L/A:L"                      
+            },           
+            "control_mapping": ["CS0012128"], 
+            "implementations": [] 
+        }, 
+        { 
+            "requirement_name": "Ensure AWS Config is enabled for S3 bucket", 
+            "policy": "https://github.com/ey-org/cloudsec-ccm/blob/master/Baseline%20Requirement%20Library/AWS/S3/S3%20Runbook.md#16-ensure-aws-config-is-enabled-for-s3-bucket", 
+            "Security Domain": "Security Logging", 
+            "ticket_enabled": "false", 
+            "tags": [], 
+            "severity": { 
+                "cvss_score":"Low",
+                "cvss_severity":"Low",
+                "cvss_vector": "#CVSS:3.1/AV:L/AC:L/PR:H/UI:N/S:U/C:N/I:N/A:L"                      
+            },           
+            "control_mapping": ["CS0012133"], 
+            "implementations": [] 
+        }, 
+        { 
+            "requirement_name": "Ensure to enable AWS Trusted Advisor", 
+            "policy": "https://github.com/ey-org/cloudsec-ccm/blob/master/Baseline%20Requirement%20Library/AWS/S3/S3%20Runbook.md#17-ensure-to-enable-aws-trusted-advisor", 
+            "Security Domain": "Asset Management", 
+            "ticket_enabled": "false", 
+            "tags": [], 
+            "severity": { 
+                "cvss_score":"Low",
+                "cvss_severity":"Low",
+                "cvss_vector": "#CVSS:3.1/AV:A/AC:H/PR:H/UI:N/S:C/C:L/I:N/A:N"                      
+            },           
+            "control_mapping": ["CS0012142"], 
+            "implementations": [] 
+        }, 
+        { 
+            "requirement_name": "Ensure organization backup plans have a compliant lifecycle configuration enabled", 
+            "policy": "https://github.com/ey-org/cloudsec-ccm/blob/master/Baseline%20Requirement%20Library/AWS/S3/S3%20Runbook.md#18-ensure-organization-backup-plans-have-a-compliant-lifecycle-configuration-enabled", 
+            "Security Domain": "Asset Management", 
+            "ticket_enabled": "false", 
+            "tags": [], 
+            "severity": { 
+                "cvss_score":"Medium",
+                "cvss_severity":"Medium",
+                "cvss_vector": "#CVSS:3.1/AV:N/AC:H/PR:H/UI:N/S:C/C:N/I:L/A:H"                      
+            },           
+            "control_mapping": ["CS0012142"], 
+            "implementations": [] 
+        }
+    ]
+}

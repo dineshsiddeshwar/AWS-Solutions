@@ -1,0 +1,17 @@
+{
+    "serviceprovider": "azure",
+    "servicerequirement_name": "Azure::ContainerInstances::Implementation",
+    "serviceDisplayName": "AWS ContainerInstances",
+    "id": "AWS_ContainerInstances_11_1",
+    "label": "Ensure organizational CI/CD pipeline is integrated with Container vulnerability scanner to scan container images before deployment",
+    "description": "Container vulnerability scanners like Qualys uses CI/CD plugins that can be integrated to Azure devops or Github actions to scan container Images before deploying any images to Enterprise Azure tenant. This ensures vulnerable container images are not deployed.",
+    "type": "Detective",
+    "implementationProvider": "wiz",
+    "wizNativeType": [
+        ""
+    ],
+    "link": "link to terrform line/comment where requirement is implemented",
+    "requirementId": [
+        "Azure_ContainerInstances_11"
+    ]
+  }

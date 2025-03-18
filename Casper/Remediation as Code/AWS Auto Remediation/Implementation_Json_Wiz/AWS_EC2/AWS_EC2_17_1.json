@@ -1,0 +1,17 @@
+{
+    "serviceprovider": "aws",
+    "servicerequirement_name": "AWS::EC2::Implementation",
+    "serviceDisplayName": "AWS EC2",
+    "id": "AWS_EC2_17_1",
+    "label": "input monitoring is enabled",
+    "description": "Ensure EC2 instance detailed monitoring is enabled (Ensure CloudWatch or other similar agents or log forwarding solution is implemented) (To collect data every minute and display monitoring graph instead of 5-minutes interval",
+    "type": "Detective",
+    "implementationProvider": "wiz",
+    "wizNativeType": [
+        "virtualMachine"
+    ],
+    "link": "Detective-Pipeline/AWS/AWS_EC2/AWS_EC2_17_1.rego",
+    "requirementId": [
+        "AWS_EC2_17"
+    ]
+}

@@ -1,0 +1,18 @@
+[
+    {
+        "ParameterKey": "releses3bucket",
+        "ParameterValue": "azure-devops-da2.0-release-prod-us-east-1"
+    },
+    {
+        "ParameterKey": "FolderName",
+        "ParameterValue": "ReleaseNumber"
+    },
+    {
+        "ParameterKey": "EnvType",
+        "ParameterValue": "prod"
+    },
+    {
+        "ParameterKey": "ExcludedAccount1",
+        "ParameterValue": "892838277707"
+    }
+]

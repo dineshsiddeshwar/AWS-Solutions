@@ -1,0 +1,42 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "description": " ARM template to deploy APP Config which uses a SKU that does not supports private link(SKU Value)"
+  },
+  "parameters": {
+    "resName": {
+      "type": "string",
+      "defaultValue": "APPCONFIG-003",
+      "metadata": {
+        "description": "Name of the ARM Template"
+      }
+    },
+    "allowedSku": {
+      "type": "string",
+      "metadata": {
+        "description": "The list of sku that support private links",
+        "displayName": "allowedSku that enables private links"
+      },
+      "defaultValue": "Free"
+    },
+    "resLocation": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": {
+        "description": "App Config resource location"
+      }
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.AppConfiguration/configurationStores",
+      "apiVersion": "2023-03-01",
+      "name": "[parameters('resName')]",
+      "location": "[parameters('resLocation')]",
+      "sku": {
+        "name": "[parameters('allowedSku')]"
+      }
+    }
+  ]
+}

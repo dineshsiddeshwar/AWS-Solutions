@@ -1,0 +1,13 @@
+{
+    "serviceprovider": "aws",
+    "servicerequirement_name": "AWS::KMS::Implementation",
+    "serviceDisplayName": "AWS KMS",
+    "id": "AWS_KMS_4_1",
+    "label": "Ensure AWS KMS does not have scheduled for deletion",
+    "description": "Ensure AWS KMS does not have scheduled for deletion",
+    "type": "Detective",
+    "implementationProvider": "wiz",
+    "wizNativeType": ["kms"],
+    "link": "Detective-Pipeline/AWS/AWS_KMS/AWS_KMS_4_1.rego",
+    "requirementId": ["AWS_KMS_4"]
+}

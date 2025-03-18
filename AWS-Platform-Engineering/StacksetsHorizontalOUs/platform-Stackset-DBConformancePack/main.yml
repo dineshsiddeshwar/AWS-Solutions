@@ -1,0 +1,77 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Parameters:
+  releses3bucket:
+    MinLength: '1'
+    MaxLength: '50'
+    Type: String
+    Description: CI/CD Release bucket
+    ConstraintDescription: Relese S3 Bucket
+  FolderName:
+    MinLength: '1'
+    MaxLength: '50'
+    Type: String
+    Description: CI/CD Release ID
+    ConstraintDescription: ReleaseID
+  EnvType:
+    Description: Environment type.
+    Type: String
+    AllowedValues:
+      - prod
+      - uat
+      - dev
+  ExcludedAccount1:
+    Type: String
+    Description: Accounts to exclude from the conformance pack deployment.
+Resources:
+  StacksetPlatformDBConformancePack:
+    Type: AWS::CloudFormation::StackSet
+    DeletionPolicy: Retain
+    Properties:
+      TemplateURL:
+        Fn::Sub:
+          - https://${bucket}.s3.amazonaws.com/${releasefolder}/CloudFormation/DBComplianceDeploymentStack_${env_type}.yaml
+          - bucket:
+              Ref: releses3bucket
+            releasefolder:
+              Ref: FolderName
+            env_type:
+                Ref: EnvType
+      StackSetName: platform-Stackset-DBConformancePack
+      PermissionModel: SELF_MANAGED
+      Capabilities:
+        - CAPABILITY_NAMED_IAM
+      StackInstancesGroup:
+        - Regions:
+            - us-east-1
+            - eu-west-1
+            - us-east-2
+            - us-west-1
+            - us-west-2
+            - ap-south-1
+            - ap-southeast-2
+            - ap-southeast-1
+            - eu-central-1
+            - eu-west-2
+            - eu-north-1
+            - ap-northeast-2
+            - ap-northeast-1
+            - ca-central-1
+          DeploymentTargets:
+            Accounts:
+              - !Ref AWS::AccountId
+      OperationPreferences:
+        RegionConcurrencyType: 'PARALLEL'
+        FailureTolerancePercentage: 90
+        MaxConcurrentPercentage: 50
+      Tags:
+        - Value: 'yes'
+          Key: platform_donotdelete
+      Parameters:
+        - ParameterKey: releses3bucket
+          ParameterValue: !Ref releses3bucket
+        - ParameterKey: FolderName
+          ParameterValue: !Ref FolderName
+        - ParameterKey: EnvType
+          ParameterValue: !Ref EnvType
+        - ParameterKey: ExcludedAccount1
+          ParameterValue: !Ref ExcludedAccount1

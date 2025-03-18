@@ -1,0 +1,28 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "metadata": {
+    "description": "ARM to  deploy App Service with FTPS/FTP enabled"
+  },
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "webAppName": {
+      "defaultValue": "webapp-002",
+      "type": "string"
+    },
+    "webAppLocation": {
+      "defaultValue": "canadacentral",
+      "type": "string"
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Web/sites",
+      "apiVersion": "2022-03-01",
+      "name": "[parameters('webAppName')]",
+      "location": "[parameters('webAppLocation')]",
+      "properties": {
+        "ftpsState": "enabled"
+      }
+    }
+  ]
+}

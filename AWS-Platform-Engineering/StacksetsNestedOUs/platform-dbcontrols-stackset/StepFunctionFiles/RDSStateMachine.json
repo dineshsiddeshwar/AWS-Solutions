@@ -1,0 +1,607 @@
+{
+  "StartAt": "Run on all DB's or One?",
+  "States": {
+    "Run on all DB's or One?": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "And": [
+            {
+              "Variable": "$.instance_name",
+              "IsPresent": true
+            },
+            {
+              "Variable": "$.region",
+              "IsPresent": true
+            }
+          ],
+          "Next": "isRegionSpecified?",
+          "Comment": "Only run for user specified DB"
+        }
+      ],
+      "Default": "Get Regions"
+    },
+    "Get Regions": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:${account_region}:${account_number}:function:platform_ScoreCardGetRegions:$LATEST",
+      "Next": "Map Region",
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "BackoffRate": 1,
+          "IntervalSeconds": 10,
+          "MaxAttempts": 5,
+          "Comment": "Retry Getting Regions"
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.ALL"
+          ],
+          "Comment": "Write to Dynamo and send email",
+          "Next": "ErrorProcessor",
+          "ResultPath": "$.error"
+        }
+      ]
+    },
+    "ErrorProcessor": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "OutputPath": "$.Payload",
+      "Parameters": {
+        "Payload.$": "$",
+        "FunctionName": "arn:aws:lambda:${account_region}:${account_number}:function:platform_ScoreCardErrorHandler:$LATEST"
+      },
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException",
+            "Lambda.TooManyRequestsException"
+          ],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 6,
+          "BackoffRate": 2
+        }
+      ],
+      "End": true
+    },
+    "Map Region": {
+      "Type": "Map",
+      "Iterator": {
+        "StartAt": "Get VPC's with RDS Instances",
+        "States": {
+          "Get VPC's with RDS Instances": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::lambda:invoke",
+            "Parameters": {
+              "Payload.$": "$",
+              "FunctionName": "arn:aws:lambda:${account_region}:${account_number}:function:platform_ScoreCardGetVPCs:$LATEST"
+            },
+            "Retry": [
+              {
+                "ErrorEquals": [
+                  "States.ALL"
+                ],
+                "IntervalSeconds": 2,
+                "MaxAttempts": 6,
+                "BackoffRate": 2
+              }
+            ],
+            "Next": "Map VPC",
+            "Catch": [
+              {
+                "ErrorEquals": [
+                  "States.ALL"
+                ],
+                "Next": "RegionErrorProcessor",
+                "ResultPath": "$.error"
+              }
+            ],
+            "OutputPath": "$.Payload"
+          },
+          "Map VPC": {
+            "Type": "Map",
+            "ItemProcessor": {
+              "ProcessorConfig": {
+                "Mode": "DISTRIBUTED",
+                "ExecutionType": "STANDARD"
+              },
+              "StartAt": "Change VPC",
+              "States": {
+                "Change VPC": {
+                  "Type": "Task",
+                  "Resource": "arn:aws:states:::lambda:invoke",
+                  "Parameters": {
+                    "Payload.$": "$",
+                    "FunctionName": "arn:aws:lambda:${account_region}:${account_number}:function:platform_ScoreCardChangeVPC:$LATEST"
+                  },
+                  "Retry": [
+                    {
+                      "ErrorEquals": [
+                        "Lambda.ServiceException",
+                        "Lambda.AWSLambdaException",
+                        "Lambda.SdkClientException",
+                        "Lambda.TooManyRequestsException"
+                      ],
+                      "IntervalSeconds": 2,
+                      "MaxAttempts": 6,
+                      "BackoffRate": 2
+                    }
+                  ],
+                  "Next": "Does VPC need to change?",
+                  "Catch": [
+                    {
+                      "ErrorEquals": [
+                        "States.ALL"
+                      ],
+                      "Next": "VPCErrorProcessor",
+                      "ResultPath": "$.error"
+                    }
+                  ],
+                  "OutputPath": "$.Payload"
+                },
+                "Does VPC need to change?": {
+                  "Type": "Choice",
+                  "Choices": [
+                    {
+                      "Variable": "$.message",
+                      "StringEquals": "Already in same VPC",
+                      "Next": "Create Secrets Manager Endpoint"
+                    }
+                  ],
+                  "Default": "Wait For VPC to Change"
+                },
+                "Wait For VPC to Change": {
+                  "Type": "Wait",
+                  "Seconds": 60,
+                  "Next": "Update VPC Change Status"
+                },
+                "Update VPC Change Status": {
+                  "Type": "Task",
+                  "Resource": "arn:aws:states:::lambda:invoke",
+                  "OutputPath": "$.Payload",
+                  "Parameters": {
+                    "Payload.$": "$",
+                    "FunctionName": "arn:aws:lambda:${account_region}:${account_number}:function:platform_ScoreCardCheckVPCChangeStatus:$LATEST"
+                  },
+                  "Retry": [
+                    {
+                      "ErrorEquals": [
+                        "Lambda.ServiceException",
+                        "Lambda.AWSLambdaException",
+                        "Lambda.SdkClientException",
+                        "Lambda.TooManyRequestsException"
+                      ],
+                      "IntervalSeconds": 2,
+                      "MaxAttempts": 6,
+                      "BackoffRate": 2
+                    }
+                  ],
+                  "Next": "Has Lambda Finished Changing VPC",
+                  "Catch": [
+                    {
+                      "ErrorEquals": [
+                        "States.ALL"
+                      ],
+                      "Next": "VPCErrorProcessor",
+                      "ResultPath": "$.error"
+                    }
+                  ]
+                },
+                "Has Lambda Finished Changing VPC": {
+                  "Type": "Choice",
+                  "Choices": [
+                    {
+                      "Variable": "$.status",
+                      "StringEquals": "Success",
+                      "Next": "Create Secrets Manager Endpoint"
+                    },
+                    {
+                      "Variable": "$.status",
+                      "StringEquals": "InProgress",
+                      "Next": "Wait For VPC to Change"
+                    }
+                  ]
+                },
+                "Create Secrets Manager Endpoint": {
+                  "Type": "Task",
+                  "Resource": "arn:aws:states:::lambda:invoke",
+                  "OutputPath": "$.Payload",
+                  "Parameters": {
+                    "Payload.$": "$",
+                    "FunctionName": "arn:aws:lambda:${account_region}:${account_number}:function:platform_ScoreCardCreateSecretManagerEndpoint:$LATEST"
+                  },
+                  "Retry": [
+                    {
+                      "ErrorEquals": [
+                        "Lambda.ServiceException",
+                        "Lambda.AWSLambdaException",
+                        "Lambda.SdkClientException",
+                        "Lambda.TooManyRequestsException"
+                      ],
+                      "IntervalSeconds": 2,
+                      "MaxAttempts": 6,
+                      "BackoffRate": 2
+                    }
+                  ],
+                  "Next": "Pass",
+                  "Catch": [
+                    {
+                      "ErrorEquals": [
+                        "States.ALL"
+                      ],
+                      "Next": "VPCErrorProcessor",
+                      "ResultPath": "$.error"
+                    }
+                  ]
+                },
+                "Pass": {
+                  "Type": "Pass",
+                  "Next": "Pre Checks & Group By Subnet",
+                  "Parameters": {
+                    "endpoint_ip.$": "$.endpoint_ip",
+                    "endpoint_id.$": "$.endpoint_id",
+                    "security_group_id.$": "$.security_group_id",
+                    "vpc_id.$": "$.vpc_id",
+                    "region.$": "$.region",
+                    "subnet_id.$": "$.subnet_id",
+                    "invocationType": "precheck_sockets",
+                    "rds_instances.$": "$.rds_instances"
+                  }
+                },
+                "Pre Checks & Group By Subnet": {
+                  "Type": "Task",
+                  "Resource": "arn:aws:states:::lambda:invoke",
+                  "Parameters": {
+                    "Payload.$": "$",
+                    "FunctionName": "arn:aws:lambda:${account_region}:${account_number}:function:platform_ScoreCardGetRDSBySubnet:$LATEST"
+                  },
+                  "Retry": [
+                    {
+                      "ErrorEquals": [
+                        "Lambda.ServiceException",
+                        "Lambda.AWSLambdaException",
+                        "Lambda.SdkClientException",
+                        "Lambda.TooManyRequestsException"
+                      ],
+                      "IntervalSeconds": 2,
+                      "MaxAttempts": 6,
+                      "BackoffRate": 2
+                    }
+                  ],
+                  "Next": "Map Subnets",
+                  "Catch": [
+                    {
+                      "ErrorEquals": [
+                        "States.ALL"
+                      ],
+                      "Next": "VPCErrorProcessor",
+                      "ResultPath": "$.error"
+                    }
+                  ],
+                  "ResultPath": "$.subnetOutput"
+                },
+                "Map Subnets": {
+                  "Type": "Map",
+                  "ItemProcessor": {
+                    "ProcessorConfig": {
+                      "Mode": "DISTRIBUTED",
+                      "ExecutionType": "STANDARD"
+                    },
+                    "StartAt": "Change Subnet of Lambda and Endpoint If Necessary",
+                    "States": {
+                      "Change Subnet of Lambda and Endpoint If Necessary": {
+                        "Type": "Task",
+                        "Resource": "arn:aws:states:::lambda:invoke",
+                        "OutputPath": "$.Payload",
+                        "Parameters": {
+                          "Payload.$": "$",
+                          "FunctionName": "arn:aws:lambda:${account_region}:${account_number}:function:platform_ScoreCardChangeVPC:$LATEST"
+                        },
+                        "Retry": [
+                          {
+                            "ErrorEquals": [
+                              "Lambda.ServiceException",
+                              "Lambda.AWSLambdaException",
+                              "Lambda.SdkClientException",
+                              "Lambda.TooManyRequestsException"
+                            ],
+                            "IntervalSeconds": 2,
+                            "MaxAttempts": 6,
+                            "BackoffRate": 2
+                          }
+                        ],
+                        "Next": "Does subnet need to change?",
+                        "Catch": [
+                          {
+                            "ErrorEquals": [
+                              "States.ALL"
+                            ],
+                            "Next": "SubnetErrorProcessor",
+                            "ResultPath": "$.error"
+                          }
+                        ]
+                      },
+                      "Does subnet need to change?": {
+                        "Type": "Choice",
+                        "Choices": [
+                          {
+                            "Variable": "$.message",
+                            "StringEquals": "Already in same subnet",
+                            "Next": "Map RDS"
+                          }
+                        ],
+                        "Default": "Wait for Subnet to Change"
+                      },
+                      "Wait for Subnet to Change": {
+                        "Type": "Wait",
+                        "Seconds": 60,
+                        "Next": "Update Subnet Change Status"
+                      },
+                      "Update Subnet Change Status": {
+                        "Type": "Task",
+                        "Resource": "arn:aws:states:::lambda:invoke",
+                        "OutputPath": "$.Payload",
+                        "Parameters": {
+                          "Payload.$": "$",
+                          "FunctionName": "arn:aws:lambda:${account_region}:${account_number}:function:platform_ScoreCardCheckVPCChangeStatus:$LATEST"
+                        },
+                        "Retry": [
+                          {
+                            "ErrorEquals": [
+                              "Lambda.ServiceException",
+                              "Lambda.AWSLambdaException",
+                              "Lambda.SdkClientException",
+                              "Lambda.TooManyRequestsException"
+                            ],
+                            "IntervalSeconds": 2,
+                            "MaxAttempts": 6,
+                            "BackoffRate": 2
+                          }
+                        ],
+                        "Next": "Has Lambda Finished Changing Subnet",
+                        "Catch": [
+                          {
+                            "ErrorEquals": [
+                              "States.ALL"
+                            ],
+                            "Next": "SubnetErrorProcessor",
+                            "ResultPath": "$.error"
+                          }
+                        ]
+                      },
+                      "Has Lambda Finished Changing Subnet": {
+                        "Type": "Choice",
+                        "Choices": [
+                          {
+                            "Variable": "$.status",
+                            "StringEquals": "Success",
+                            "Next": "Map RDS"
+                          },
+                          {
+                            "Variable": "$.status",
+                            "StringEquals": "InProgress",
+                            "Next": "Change Subnet of Lambda and Endpoint If Necessary"
+                          }
+                        ]
+                      },
+                      "SubnetErrorProcessor": {
+                        "Type": "Task",
+                        "Resource": "arn:aws:states:::lambda:invoke",
+                        "OutputPath": "$.Payload",
+                        "Parameters": {
+                          "Payload.$": "$",
+                          "FunctionName": "arn:aws:lambda:${account_region}:${account_number}:function:platform_ScoreCardErrorHandler:$LATEST"
+                        },
+                        "Retry": [
+                          {
+                            "ErrorEquals": [
+                              "Lambda.ServiceException",
+                              "Lambda.AWSLambdaException",
+                              "Lambda.SdkClientException",
+                              "Lambda.TooManyRequestsException"
+                            ],
+                            "IntervalSeconds": 2,
+                            "MaxAttempts": 6,
+                            "BackoffRate": 2
+                          }
+                        ],
+                        "End": true
+                      },
+                      "Map RDS": {
+                        "Type": "Map",
+                        "ItemProcessor": {
+                          "ProcessorConfig": {
+                            "Mode": "DISTRIBUTED",
+                            "ExecutionType": "STANDARD"
+                          },
+                          "StartAt": "GenerateScorecard",
+                          "States": {
+                            "GenerateScorecard": {
+                              "Type": "Task",
+                              "Resource": "arn:aws:states:::lambda:invoke",
+                              "OutputPath": "$.Payload",
+                              "Parameters": {
+                                "Payload.$": "$",
+                                "FunctionName": "arn:aws:lambda:${account_region}:${account_number}:function:platform_ScoreCardNonVPCGenerator:$LATEST"
+                              },
+                              "Retry": [
+                                {
+                                  "ErrorEquals": [
+                                    "RDSNotAvailableError"
+                                  ],
+                                  "IntervalSeconds": 120,
+                                  "MaxAttempts": 5,
+                                  "BackoffRate": 1,
+                                  "Comment": "Retry"
+                                }
+                              ],
+                              "Catch": [
+                                {
+                                  "ErrorEquals": [
+                                    "States.ALL"
+                                  ],
+                                  "Next": "ScorecardErrorProcessor",
+                                  "ResultPath": "$.error"
+                                }
+                              ],
+                              "End": true
+                            },
+                            "ScorecardErrorProcessor": {
+                              "Type": "Task",
+                              "Resource": "arn:aws:states:::lambda:invoke",
+                              "OutputPath": "$.Payload",
+                              "Parameters": {
+                                "Payload.$": "$",
+                                "FunctionName": "arn:aws:lambda:${account_region}:${account_number}:function:platform_ScoreCardErrorHandler:$LATEST"
+                              },
+                              "Retry": [
+                                {
+                                  "ErrorEquals": [
+                                    "Lambda.ServiceException",
+                                    "Lambda.AWSLambdaException",
+                                    "Lambda.SdkClientException",
+                                    "Lambda.TooManyRequestsException"
+                                  ],
+                                  "IntervalSeconds": 2,
+                                  "MaxAttempts": 6,
+                                  "BackoffRate": 2
+                                }
+                              ],
+                              "End": true
+                            }
+                          }
+                        },
+                        "End": true,
+                        "Label": "MapRDS",
+                        "MaxConcurrency": 1000,
+                        "ToleratedFailurePercentage": 100,
+                        "ItemsPath": "$.rds_instances"
+                      }
+                    }
+                  },
+                  "Next": "Destroy Secrets Manager Endpoint",
+                  "Label": "MapSubnets",
+                  "MaxConcurrency": 1000,
+                  "ItemsPath": "$.subnetOutput.Payload",
+                  "ResultPath": null
+                },
+                "Destroy Secrets Manager Endpoint": {
+                  "Type": "Task",
+                  "Resource": "arn:aws:states:::lambda:invoke",
+                  "OutputPath": "$.Payload",
+                  "Parameters": {
+                    "Payload.$": "$",
+                    "FunctionName": "arn:aws:lambda:${account_region}:${account_number}:function:platform_ScoreCardDestroySecretManagerEndpoint:$LATEST"
+                  },
+                  "Retry": [
+                    {
+                      "ErrorEquals": [
+                        "Lambda.ServiceException",
+                        "Lambda.AWSLambdaException",
+                        "Lambda.SdkClientException",
+                        "Lambda.TooManyRequestsException"
+                      ],
+                      "IntervalSeconds": 2,
+                      "MaxAttempts": 6,
+                      "BackoffRate": 2
+                    }
+                  ],
+                  "End": true,
+                  "Catch": [
+                    {
+                      "ErrorEquals": [
+                        "States.ALL"
+                      ],
+                      "Next": "VPCErrorProcessor",
+                      "ResultPath": "$.error"
+                    }
+                  ]
+                },
+                "VPCErrorProcessor": {
+                  "Type": "Task",
+                  "Resource": "arn:aws:states:::lambda:invoke",
+                  "OutputPath": "$.Payload",
+                  "Parameters": {
+                    "Payload.$": "$",
+                    "FunctionName": "arn:aws:lambda:${account_region}:${account_number}:function:platform_ScoreCardErrorHandler:$LATEST"
+                  },
+                  "Retry": [
+                    {
+                      "ErrorEquals": [
+                        "Lambda.ServiceException",
+                        "Lambda.AWSLambdaException",
+                        "Lambda.SdkClientException",
+                        "Lambda.TooManyRequestsException"
+                      ],
+                      "IntervalSeconds": 2,
+                      "MaxAttempts": 6,
+                      "BackoffRate": 2
+                    }
+                  ],
+                  "End": true
+                }
+              }
+            },
+            "Label": "MapVPC",
+            "MaxConcurrency": 1,
+            "ToleratedFailurePercentage": 100,
+            "End": true,
+            "ResultPath": null
+          },
+          "RegionErrorProcessor": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::lambda:invoke",
+            "OutputPath": "$.Payload",
+            "Parameters": {
+              "Payload.$": "$",
+              "FunctionName": "arn:aws:lambda:${account_region}:${account_number}:function:platform_ScoreCardErrorHandler:$LATEST"
+            },
+            "Retry": [
+              {
+                "ErrorEquals": [
+                  "Lambda.ServiceException",
+                  "Lambda.AWSLambdaException",
+                  "Lambda.SdkClientException",
+                  "Lambda.TooManyRequestsException"
+                ],
+                "IntervalSeconds": 2,
+                "MaxAttempts": 6,
+                "BackoffRate": 2
+              }
+            ],
+            "End": true
+          }
+        },
+        "ProcessorConfig": {
+          "Mode": "DISTRIBUTED",
+          "ExecutionType": "STANDARD"
+        }
+      },
+      "Label": "RuninSpecificDBorAll",
+      "MaxConcurrency": 1000,
+      "ToleratedFailurePercentage": 100,
+      "ItemsPath": "$.regions",
+      "End": true,
+      "ResultPath": null
+    },
+    "isRegionSpecified?": {
+      "Type": "Pass",
+      "Next": "Map Region",
+      "Parameters": {
+        "regions": [
+          {
+            "rds_instance_name.$": "$.instance_name",
+            "region.$": "$.region"
+          }
+        ],
+        "region.$": "$.region"
+      }
+    }
+  }
+}

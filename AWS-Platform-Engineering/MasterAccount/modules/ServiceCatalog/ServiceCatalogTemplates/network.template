@@ -1,0 +1,282 @@
+{
+	"AWSTemplateFormatVersion": "2010-09-09",
+	"Description": "Custom Resource Lambda for Network Management in Accounts",
+	"Metadata": {
+		"AWS::CloudFormation::Interface": {
+			"ParameterGroups": [{
+					"Label": {
+						"default": "Account Details"
+					},
+					"Parameters": ["AccountNumber"]
+				},
+				{
+					"Label": {
+						"default": "Request Details"
+					},
+					"Parameters": ["RequestNo"]
+				},
+				{
+					"Label": {
+						"default": "Private Environment and Region"
+					},
+					"Parameters": ["Environment", "NVirginia", "Ireland","Singapore","IsNonroutableSubnets", "VPCIDnonroutable"]
+				},
+				{
+					"Label": {
+						"default": "Existing VPC extension"
+					},
+					"Parameters": ["VPCID1", "IPSize1","VPCID2", "IPSize2","VPCID3", "IPSize3","VPCID4", "IPSize4"]
+				}
+			],
+			"ParameterLabels": {
+				"AccountNumber": {
+					"default": "Enter the AWS@Shell Private Account Number:"
+				},
+				"Region": {
+					"default": "Select the Region and Corresponding VPC IP size."
+				},
+				"Environment": {
+					"default": "Private Environment"
+				},
+				"NVirginia": {
+					"default": "us-east-1 (N. Virginia)"
+				},
+				"Ireland": {
+					"default": "eu-west-1 (Ireland)"
+				},
+				"Singapore": {
+					"default": "ap-southeast-1 (Singapore)"
+				},
+				"IsNonroutableSubnets": {
+					"default": "Non-routable subnets for existing VPC:"
+				},
+				"VPCIDnonroutable": {
+					"default": "Enter the VPCID of existing VPC:"
+				},
+				"VPCID1": {
+					"default": "Enter the VPCID:"
+				},
+				"IPSize1": {
+					"default": "Select the IP Size:"
+				},
+				"VPCID2": {
+					"default": "Enter the VPCID:"
+				},
+				"IPSize2": {
+					"default": "Select the IP Size:"
+				},
+				"VPCID3": {
+					"default": "Enter the VPCID:"
+				},
+				"IPSize3": {
+					"default": "Select the IP Size:"
+				},
+				"VPCID4": {
+					"default": "Enter the VPCID:"
+				},
+				"IPSize4": {
+					"default": "Select the IP Size:"
+				},
+				"UpdateIndex": {
+					"default": "Increment the update index:"
+				}
+			}
+		}
+	},
+	"Parameters": {
+		"AccountNumber": {
+			"Type": "String",
+			"MinLength": "1",
+			"ConstraintDescription": "Enter Valid AccountNumber",
+			"Description": "Account Number"
+		},
+		"RequestNo": {
+			"Type": "String",
+			"MinLength": "1",
+			"MaxLength": "50",
+			"ConstraintDescription": "Enter the current Request Number",
+			"Description": "Request Number"
+		},
+		"Environment": {
+			"Description": "Type of Environment",
+			"Default": "Private",
+			"Type": "String",
+			"AllowedValues": ["Private", "Hybrid"]
+		},
+		"NVirginia": {
+			"Description": "VPCs Available for Private only",
+			"Default": "No-VPC",
+			"Type": "String",
+			"AllowedValues": ["No-VPC", 32, 64, 128, 256,512]
+		},
+		"Ireland": {
+			"Description": "VPCs Available for Private only",
+			"Type": "String",
+			"Default": "No-VPC",
+			"AllowedValues": ["No-VPC", 32, 64, 128, 256,512]
+		},
+		"Singapore": {
+			"Description": "VPCs Available for Private only",
+			"Type": "String",
+			"Default": "No-VPC",
+			"AllowedValues": ["No-VPC", 32, 64, 128, 256,512]
+		},
+		"VPCIDnonroutable": {
+			"Description": "ID of the VPC to be extended for NonRoutableSubnet",
+			"Type": "String"
+		},
+		"VPCID1": {
+			"Description": "ID of the VPC to be extended",
+			"Type": "String"
+		},
+		"IPSize1": {
+			"Description": "Select the new IP Block Size:",
+			"Default": "0",
+			"Type": "String",
+			"AllowedValues": [0, 32, 64, 128, 256,512]
+		},
+		"VPCID2": {
+			"Description": "ID of the VPC to be extended",
+			"Type": "String"
+		},
+		"IPSize2": {
+			"Description": "Select the new IP Block Size:",
+			"Default": "0",
+			"Type": "String",
+			"AllowedValues": [0, 32, 64, 128, 256,512]
+		},
+		"VPCID3": {
+			"Description": "ID of the VPC to be extended",
+			"Type": "String"
+		},
+		"IPSize3": {
+			"Description": "Select the new IP Block Size:",
+			"Default": "0",
+			"Type": "String",
+			"AllowedValues": [0, 32, 64, 128, 256,512]
+		},
+		"VPCID4": {
+			"Description": "ID of the VPC to be extended",
+			"Type": "String"
+		},
+		"IPSize4": {
+			"Description": "Select the new IP Block Size:",
+			"Default": "0",
+			"Type": "String",
+			"AllowedValues": [0, 32, 64, 128, 256,512]
+		},
+		"IsNonroutableSubnets": {
+			"Description": "Non-routable Subnets required",
+            "Type": "String",
+            "Default": "No",
+            "AllowedValues": [
+               "Yes",
+               "No"
+            ]
+        },
+		"UpdateIndex": {
+			"Default": "1",
+			"Type": "Number",
+			"Description": "Increase this index when no parameter are changed, during an update, as this will force the update to occur. If any parameter is changed on update, leave this value as is."
+		}
+	},
+	"Resources": {
+		"NetworkManagement": {
+			"Type": "Custom::NetworkManagement",
+			"Properties": {
+				"AWSAccountId": {
+					"Ref": "AWS::AccountId"
+				},
+				"AWSRegion": {
+					"Ref": "AWS::Region"
+				},
+				"RequestNo": {
+					"Ref": "RequestNo"
+				},
+				"AccountNumber": {
+					"Ref": "AccountNumber"
+				},
+				"Environment": {
+					"Ref": "Environment"
+				},
+                "NVirginia": {
+                    "Ref": "NVirginia"
+                },
+                "Ireland": {
+                    "Ref": "Ireland"
+                },
+                "Singapore": {
+                    "Ref": "Singapore"
+                },
+                "VPCID1": {
+                     "Ref": "VPCID1"
+                },
+                "IPSize1": {
+                     "Ref": "IPSize1"
+                },
+                "VPCID2": {
+                     "Ref": "VPCID2"
+                },
+                "IPSize2": {
+                     "Ref": "IPSize2"
+                },
+                "VPCID3": {
+                     "Ref": "VPCID3"
+                },
+                "IPSize3": {
+                     "Ref": "IPSize3"
+                },
+                "VPCID4": {
+                     "Ref": "VPCID4"
+                },
+                "IPSize4": {
+                     "Ref": "IPSize4"
+                },
+				"UpdateIndex": {
+					"Ref": "UpdateIndex"
+				},
+				"IsNonroutableSubnets": {
+					 "Ref": "IsNonroutableSubnets"
+				},
+				"VPCIDnonroutable": {
+					"Ref": "VPCIDnonroutable"
+				},
+				"ServiceToken":{
+					"Fn::Join": ["", ["arn:aws:lambda:", {
+						"Ref": "AWS::Region"
+					}, ":", {
+						"Ref": "AWS::AccountId"
+					}, ":function:platform_network_custom_resource"]]
+				}
+			}
+		}
+
+	},
+	"Outputs": {
+		"AccountName": {
+			"Value": {
+				"Fn::GetAtt": ["NetworkManagement", "AccountName"]
+			}
+		},
+		"AccountNumber": {
+			"Value": {
+				"Fn::GetAtt": ["NetworkManagement", "AccountNumber"]
+			}
+		},
+		"NVirginiaVPC": {
+			"Value": {
+				"Fn::GetAtt": ["NetworkManagement", "NVirginiaVPC"]
+			}
+		},
+		"IrelandVPC": {
+			"Value": {
+				"Fn::GetAtt": ["NetworkManagement", "IrelandVPC"]
+			}
+		},
+		"SingaporeVPC": {
+			"Value": {
+				"Fn::GetAtt": ["NetworkManagement", "SingaporeVPC"]
+			}
+		}
+	}
+}

@@ -1,0 +1,62 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "description": "ARM to deploy App configuration with remoteDebugging enabled"
+  },
+  "parameters": {
+    "webAppName": {
+      "defaultValue": "SC-AZURE-APPWC-002",
+      "type": "string"
+    }
+  },
+  "variables": {
+    "webAppPortalName": "[concat(parameters('webAppName'),'-webapp')]",
+    "appServicePlanName": "[concat('AppServicePaln-',parameters('webAppName'))]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Web/serverfarms",
+      "apiVersion": "2022-09-01",
+      "name": "[variables('appServicePlanName')]",
+      "location": "canadacentral",
+      "sku": {
+        "name": "S1"
+      },
+      "kind": "linux",
+      "properties": {
+        "reserved": true
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites",
+      "apiVersion": "2022-09-01",
+      "name": "[variables('webAppPortalName')]",
+      "location": "canadacentral",
+      "dependsOn": [
+        "[resourceID('Microsoft.Web/serverfarms',variables('appServicePlanName'))]"
+      ],
+      "kind": "app",
+      "properties": {
+        "serverFarmId": "[resourceID('Microsoft.Web/serverfarms',variables('appServicePlanName'))]",
+        "siteConfig": {
+          "linuxFXVersion": "php|7.4"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Web/sites/config",
+      "apiVersion": "2018-11-01",
+      "name": "[concat(variables('webAppPortalName'),'/web')]",
+      "location": "canadacentral",
+      "dependsOn": [
+        "[resourceID('Microsoft.Web/sites',variables('webAppPortalName'))]"
+      ],
+      "properties": {
+        "web": {
+          "remoteDebuggingEnabled": "true"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,313 @@
+Description: Template to create Config Rules for Security & Complaince Framework in Business Account
+Parameters:
+  S3BucketName:
+    Type: String
+    Description: S3 Bucket Name
+  FolderName:
+    Type: String
+    Description: Folder Name
+Resources:
+#----------------------------------------------------------------------------------------------------------------------
+  ComplianceConfigStackSetRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: !Sub 'platform_stackset_compliance_config_${AWS::Region}'
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ssm.amazonaws.com
+                - config.amazonaws.com
+                - lambda.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      Path: /
+      Policies:
+        - PolicyName: platform_stackset_compliance_config_inlinepolicy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - rds:DescribeDBInstanceAutomatedBackups
+                  - rds:DescribeDBInstances
+                  - rds:ModifyDBInstance
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                  - sns:ListSubscriptions
+                  - sns:ListSubscriptionsByTopic
+                  - sns:ListTopics
+                  - sns:GetEndpointAttributes
+                  - sns:GetSubscriptionAttributes
+                  - sns:GetTopicAttributes
+                  - sns:Publish
+                  - sns:SetSubscriptionAttributes
+                  - sns:SetTopicAttributes
+                  - sns:Subscribe
+                  - ssm:DescribeDocument
+                  - ssm:ListDocuments
+                  - ssm:ListDocumentVersions
+                  - ssm:DescribeDocument
+                  - ssm:DescribeDocumentParameters
+                  - ssm:DescribeDocumentPermission
+                  - ssm:GetDocument
+                  - ssm:GetParameterHistory
+                  - ssm:GetParameters
+                  - ssm:GetParametersByPath
+                  - ssm:ListDocumentMetadataHistory
+                  - ssm:StartAssociationsOnce
+                  - ssm:StartAutomationExecution
+                  - ssm:StartChangeRequestExecution
+                  - ssm:StartSession
+                  - ec2:DescribeInstances
+                  - ec2:AssociateIamInstanceProfile
+                  - ec2:DescribeIamInstanceProfileAssociations
+                  - ec2:DisassociateIamInstanceProfile
+                  - ec2:ReplaceIamInstanceProfileAssociation
+                  - ec2:RevokeSecurityGroupIngress
+                  - ec2:DescribeSecurityGroupReferences
+                  - ec2:DescribeSecurityGroups
+                  - ec2:DescribeStaleSecurityGroups
+                  - ec2:UpdateSecurityGroupRuleDescriptionsIngress
+                  - lambda:ListFunctions
+                  - lambda:GetFunction
+                  - lambda:InvokeAsync
+                  - lambda:InvokeFunction
+                  - cloudformation:DescribeStacks
+                  - cloudformation:ListStacks
+                  - cloudformation:DescribeStackResource
+                  - cloudformation:CreateStack
+                  - cloudformation:DeleteStack
+                  - lambda:DeleteFunction
+                  - lambda:CreateFunction
+                  - iam:PassRole
+                  - iam:AttachRolePolicy
+                  - iam:GetInstanceProfile
+                  - iam:GetRole
+                  - iam:ListAttachedRolePolicies
+                Resource: '*'
+#----------------------------------------------------------------------------------------------------------------------
+  WaitLambdaLayer:
+    Type: AWS::Lambda::LayerVersion
+    Properties:
+      CompatibleRuntimes:
+        - python3.8
+      Content:
+        S3Bucket:
+          Fn::Sub:
+              - "${S3BucketName}${AWS::Region}"
+              - {S3BucketName: !Ref S3BucketName}
+        S3Key:
+          Fn::Sub:
+              - "${releasefolder}/python.zip"
+              - {releasefolder: !Ref FolderName}
+      Description: Wait Lambda Function - Lambda Layer for Requests module
+      LayerName: platform_lambda_layer
+
+#----------------------------------------------------------------------------------------------------------------------
+  WaitLambda:
+    Type: 'AWS::Lambda::Function'
+    Properties:
+      Description: Lambda function to Sleep for 10 minutes
+      Code:
+        S3Bucket:
+          Fn::Sub:
+            - "${S3BucketName}${AWS::Region}"
+            - {S3BucketName: !Ref S3BucketName}
+        S3Key:
+          Fn::Sub:
+            - "${releasefolder}/platform_security_wait_function.zip"
+            - {releasefolder: !Ref FolderName}
+      FunctionName: platform_security_wait_function
+      Layers:
+        - !Ref WaitLambdaLayer
+      Tags:
+        - Value: 'yes'
+          Key: platform_donotdelete
+      Handler: platform_security_wait_function.lambda_handler
+      Role: !GetAtt ComplianceConfigStackSetRole.Arn
+      MemorySize: 256
+      Timeout: 650
+      Runtime: python3.8
+
+#----------------------------------------------------------------------------------------------------------------------
+  CallWaitLambda:
+    Type: 'Custom::WaitLambda'
+    Properties:
+      ServiceToken: !GetAtt WaitLambda.Arn
+#----------------------------------------------------------------------------------------------------------------------
+#  ElasticSearchDomainConfigRule:
+#    DependsOn: CallWaitLambda
+#    Type: 'AWS::Config::ConfigRule'
+#    Properties:
+#      ConfigRuleName: platform_ELASTICSEARCH_IN_VPC_ONLY
+#      Description: >-
+#        Checks whether Amazon Elasticsearch Service domains are in Amazon
+#        Virtual Private Cloud (VPC). The rule is NON_COMPLIANT if ElasticSearch
+#        Service domain endpoint is public.
+#      Source:
+#        Owner: AWS
+#        SourceIdentifier: ELASTICSEARCH_IN_VPC_ONLY
+#      MaximumExecutionFrequency: Twelve_Hours
+
+#  ElasticSearchDomainRemediate:
+#    Type: AWS::Config::RemediationConfiguration
+#    Properties:
+#      Automatic: True
+#      ConfigRuleName: !Ref ElasticSearchDomainConfigRule
+#      MaximumAutomaticAttempts: 1
+#      Parameters:
+#        AutomationAssumeRole:
+#          StaticValue:
+#            Values:
+#              - !GetAtt ComplianceConfigStackSetRole.Arn
+#        Message:
+#          StaticValue:
+#            Values:
+#              - 'Hello User,
+#                 As per Shell IRM Compliance,ElasticSearch domains should not be Public.
+#                 Please refer - QRG_Best Practices for Whitelisted Services.
+#                 For any queries,raise a ServiceNow case to Cloud Hosting Services.'
+#        TopicArn:
+#          StaticValue:
+#            Values:
+#              - !Sub 'arn:aws:sns:${AWS::Region}:${AWS::AccountId}:platform_Compliance_Security_Notification'
+#      RetryAttemptSeconds: 2670000
+#      TargetId: AWS-PublishSNSNotification
+#      TargetType: SSM_DOCUMENT
+
+#----------------------------------------------------------------------------------------------------------------------
+#  APIGWStageEncryptionConfigRule:
+#    DependsOn: ElasticSearchDomainConfigRule
+#    Type: 'AWS::Config::ConfigRule'
+#    Properties:
+#      ConfigRuleName: platform_API_GW_CACHE_ENABLED_AND_ENCRYPTED
+#      Description: >-
+#        Checks that all methods in Amazon API Gateway stages have cache enabled and cache encrypted.
+#        The rule is NON_COMPLIANT if any method in Amazon API Gateway stage is not configured to cache
+#        or the cache is not encrypted.
+#      Scope:
+#        ComplianceResourceTypes:
+#          - 'AWS::ApiGateway::Stage'
+#      Source:
+#        Owner: AWS
+#        SourceIdentifier: API_GW_CACHE_ENABLED_AND_ENCRYPTED
+
+#  APIGWStageEncryptionRemediate:
+#    Type: AWS::Config::RemediationConfiguration
+#    Properties:
+#      Automatic: True
+#      ConfigRuleName: !Ref APIGWStageEncryptionConfigRule
+#      MaximumAutomaticAttempts: 1
+#      Parameters:
+#        AutomationAssumeRole:
+#          StaticValue:
+#            Values:
+#              - !GetAtt ComplianceConfigStackSetRole.Arn
+#        Message:
+#          StaticValue:
+#            Values:
+#              - 'Hello User,
+#                 As per Shell IRM Compliance,enable Encryption in API Gateway.
+#                 Please refer - QRG_Best Practices for Whitelisted Services.
+#                 For any queries,raise a ServiceNow case to Cloud Hosting Services.'
+#        TopicArn:
+#          StaticValue:
+#            Values:
+#              - !Sub 'arn:aws:sns:${AWS::Region}:${AWS::AccountId}:platform_Compliance_Security_Notification'
+#      RetryAttemptSeconds: 2670000
+#      TargetId: AWS-PublishSNSNotification
+#      TargetType: SSM_DOCUMENT
+
+#----------------------------------------------------------------------------------------------------------------------
+#  APIGWStageLoggingConfigRule:
+#    DependsOn: APIGWStageEncryptionConfigRule
+#    Type: 'AWS::Config::ConfigRule'
+#    Properties:
+#      ConfigRuleName: platform_API_GW_EXECUTION_LOGGING_ENABLED
+#      Description: >-
+#        Checks that all methods in Amazon API Gateway stage has logging enabled.
+#        The rule is NON_COMPLIANT if logging is not enabled.
+#        The rule is NON_COMPLIANT if loggingLevel is neither ERROR nor INFO.
+#      InputParameters:
+#        loggingLevel: 'ERROR'
+#      Scope:
+#        ComplianceResourceTypes:
+#          - 'AWS::ApiGateway::Stage'
+#          - 'AWS::ApiGatewayV2::Stage'
+#      Source:
+#        Owner: AWS
+#        SourceIdentifier: API_GW_EXECUTION_LOGGING_ENABLED
+
+#  APIGWStageLoggingRemediate:
+#    Type: AWS::Config::RemediationConfiguration
+#    Properties:
+#      Automatic: True
+#      ConfigRuleName: !Ref APIGWStageLoggingConfigRule
+#      MaximumAutomaticAttempts: 1
+#      Parameters:
+#        AutomationAssumeRole:
+#          StaticValue:
+#            Values:
+#              - !GetAtt ComplianceConfigStackSetRole.Arn
+#        Message:
+#          StaticValue:
+#            Values:
+#              - 'Hello User,
+#                 As per Shell IRM Compliance,enable Logging in API Gateway.
+#                 Please refer - QRG_Best Practices for Whitelisted Services.
+#                 For any queries,raise a ServiceNow case to Cloud Hosting Services.'
+#        TopicArn:
+#          StaticValue:
+#            Values:
+#              - !Sub 'arn:aws:sns:${AWS::Region}:${AWS::AccountId}:platform_Compliance_Security_Notification'
+#      RetryAttemptSeconds: 2670000
+#      TargetId: AWS-PublishSNSNotification
+#      TargetType: SSM_DOCUMENT
+
+# ---------------------------------------------------------------------------------------------------------------------
+  EC2InstanceRoleConfigRule:
+    #DependsOn: APIGWStageLoggingConfigRule
+    Type: 'AWS::Config::ConfigRule'
+    Properties:
+      ConfigRuleName: platform_INSTANCES_IN_VPC
+      Description: >-
+        Checks whether an EC2 instance has IAM Role - 'platform service
+        instance' is attached.
+      InputParameters:
+        vpcId: 'NoVPC'
+      Scope:
+        ComplianceResourceTypes:
+          - 'AWS::EC2::Instance'
+      Source:
+        Owner: AWS
+        SourceIdentifier: INSTANCES_IN_VPC
+
+  EC2InstanceRoleRemediate:
+    Type: AWS::Config::RemediationConfiguration
+    Properties:
+      Automatic: True
+      ConfigRuleName: !Ref EC2InstanceRoleConfigRule
+      MaximumAutomaticAttempts: 1
+      Parameters:
+        AutomationAssumeRole:
+          StaticValue:
+            Values:
+              - !GetAtt ComplianceConfigStackSetRole.Arn
+        InstanceId:
+          ResourceValue:
+            Value: RESOURCE_ID
+        LambdaAssumeRole:
+          StaticValue:
+            Values:
+              - !GetAtt ComplianceConfigStackSetRole.Arn
+        RoleName:
+          StaticValue:
+            Values:
+              - 'platform_service_instance'
+      RetryAttemptSeconds: 2670000
+      TargetId: AWS-SetupManagedRoleOnEc2Instance
+      TargetType: SSM_DOCUMENT

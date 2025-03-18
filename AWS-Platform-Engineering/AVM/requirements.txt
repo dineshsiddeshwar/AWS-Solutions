@@ -1,0 +1,7 @@
+requests
+boto3
+pytest
+pytest-github-report 
+pytest-cov 
+coverage 
+pre-commit

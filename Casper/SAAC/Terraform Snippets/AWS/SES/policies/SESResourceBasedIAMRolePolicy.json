@@ -1,0 +1,32 @@
+{
+    "Version": "2012-10-17",
+    "ID": "SESPolicyID1",
+    "Statement": [
+        {
+            "Sid": "IPAllow",
+            "Effect": "Deny",
+            "Principal": {
+                "AWS": "${ses_iam_role_arn}"
+            },
+            "Action": "ses:*",
+            "Resource": "*",
+            "Condition": {
+                "NotIpAddress": {
+                    "aws:SourceIp": "${source_ip_address}"
+                }
+            }
+        },
+        {
+            "Sid": "SESAccessCrossAccount",
+            "Effect": "Allow",
+            "Principal": {
+                "AWS": "${ses_iam_role_arn}"
+            },
+            "Action": [
+                "ses:SendEmail",
+                "ses:SendRawEmail"
+            ],
+            "Resource": "*"
+        }
+    ]
+}

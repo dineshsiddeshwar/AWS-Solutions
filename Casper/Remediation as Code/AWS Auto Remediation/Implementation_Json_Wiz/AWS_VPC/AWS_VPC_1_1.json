@@ -1,0 +1,17 @@
+{
+    "serviceprovider": "aws",
+    "servicerequirement_name": "AWS::VPC::Implementation",
+    "serviceDisplayName": "AWS VPC",
+    "id": "AWS_VPC_1_1",
+    "label": "Ensure log metric filter and alarm exists for Network gateway changes",
+    "description": "",
+    "type": "Detective",
+    "implementationProvider": "wiz",
+    "wizNativeType": [
+        "vpc"
+    ],
+    "link": "",
+    "requirementId": [
+        "AWS_VPC_1"
+    ]
+}

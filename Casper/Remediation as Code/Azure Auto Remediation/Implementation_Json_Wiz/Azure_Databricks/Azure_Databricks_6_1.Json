@@ -1,0 +1,17 @@
+{
+    "serviceprovider": "azure",
+    "servicerequirement_name": "Azure::Databricks::Implementation",
+    "serviceDisplayName": "AWS Databricks",
+    "id": "AWS_Databricks_6_1",
+    "label": "Ensure Azure Active Directory tokens are used for authentication",
+    "description": "This control checks whether Azure Active Directory (AAD) tokens are utilized to authenticate the non-UI capabilities of the Azure Databricks workspace, including REST API, Power BI connectivity and Databricks Connect. For running jobs workloads with REST API, it is recommended to use Azure Service Principals with AAD Tokens.",
+    "type": "Detective",
+    "implementationProvider": "wiz",
+    "wizNativeType": [
+        ""
+    ],
+    "link": "link to terrform line/comment where requirement is implemented",
+    "requirementId": [
+        "Azure_Databricks_6"
+    ]
+  }

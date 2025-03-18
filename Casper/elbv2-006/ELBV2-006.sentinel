@@ -1,0 +1,16 @@
+# Imports common-functions
+import "tfplan-functions" as tfplan
+
+# approved load balancer group type should have target type instance, ip or alb
+approved_load_balancer_target_type = ["instance", "ip","alb"]
+
+# Get all ELBV2 load balancers
+allLoadBalancers = tfplan.find_resources("aws_lb_target_group")
+
+# Return all the load balancer target group in which target_type is not set as indtance,ip or alb
+violating_resources = tfplan.filter_attribute_not_in_list(allLoadBalancers, "target_type", approved_load_balancer_target_type, true)
+
+# Main rule
+main = rule {
+    length(violating_resources["messages"]) is 0
+}

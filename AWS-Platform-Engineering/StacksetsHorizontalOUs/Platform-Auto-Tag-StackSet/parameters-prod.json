@@ -1,0 +1,50 @@
+[
+    {
+      "ParameterKey": "releses3bucket",
+      "ParameterValue": "azure-devops-da2.0-release-prod-us-east-1"
+    },
+    {
+        "ParameterKey": "FolderName",
+        "ParameterValue": "ReleaseNumber"
+    },
+    {
+        "ParameterKey": "BucketNameWithOutRegion",
+        "ParameterValue": "azure-devops-da2.0-stackset-prod-"
+    },
+    {
+      "ParameterKey": "PrivateException",
+      "ParameterValue": "ou-sdpg-vqfh6169"
+    },
+    {
+      "ParameterKey": "PrivateProduction",
+      "ParameterValue": "ou-sdpg-kdgducg0"
+    },
+    {
+      "ParameterKey": "HybridAccount",
+      "ParameterValue": "ou-sdpg-npy37s4n"
+    },
+    {
+      "ParameterKey": "PrivateStaging",
+      "ParameterValue": "ou-sdpg-4vidyeqk"
+    },
+    {
+      "ParameterKey": "PublicException",
+      "ParameterValue": "ou-sdpg-nikeyvf1"
+    },
+    {
+      "ParameterKey": "PublicProduction",
+      "ParameterValue": "ou-sdpg-x9i1c7i3"
+    },
+    {
+      "ParameterKey": "PublicStaging",
+      "ParameterValue": "ou-sdpg-9ooxpcl2"
+    },
+    {
+      "ParameterKey": "Migration",
+      "ParameterValue": "ou-sdpg-6bzq5bo9"
+    },
+    {
+      "ParameterKey": "DataManagement",
+      "ParameterValue": "ou-sdpg-wrrls8r2"
+    }
+]

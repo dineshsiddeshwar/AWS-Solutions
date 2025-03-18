@@ -1,0 +1,17 @@
+{
+    "serviceprovider": "azure",
+    "servicerequirement_name": "Azure::Databricks::Implementation",
+    "serviceDisplayName": "AWS Databricks",
+    "id": "AWS_Databricks_2_1",
+    "label": "Ensure Activity logging is enabled for Azure Databricks",
+    "description": "Information System must create a log and record activities occurring on or originating from the information system. Logs must be made accessible to the enterprise SIEM solution.",
+    "type": "Detective",
+    "implementationProvider": "wiz",
+    "wizNativeType": [
+        ""
+    ],
+    "link": "link to terrform line/comment where requirement is implemented",
+    "requirementId": [
+        "Azure_Databricks_2"
+    ]
+  }

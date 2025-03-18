@@ -1,0 +1,17 @@
+{
+    "serviceprovider": "aws",
+    "servicerequirement_name": "AWS::LAMBDA::Implementation",
+    "serviceDisplayName": "AWS LAMBDA",
+    "id": "AWS_LAMBDA_8_1",
+    "label": "Ensure Lambda is assigned to access within VPC",
+    "description": "",
+    "type": "Detective",
+    "implementationProvider": "wiz",
+    "wizNativeType": [
+        ""
+    ],
+    "link": "Detective-Pipeline/AWS/LAMBDA/AWS_LAMBDA_8_1.rego",
+    "requirementId": [
+        "AWS_LAMBDA_8"
+    ]
+}

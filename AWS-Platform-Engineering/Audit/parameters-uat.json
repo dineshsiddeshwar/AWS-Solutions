@@ -1,0 +1,21 @@
+{
+    "IAM" :{
+    "ListOfPlatformIAMRoles" : ["Platform_AuditAdmin","platform_service_cloudhealth","ServiceNow_ITOM_Discovery_Child_Role"],
+    "ListOfPlatformIAMPolicies" :["platform_audit_admin","platform_cloud_health_policy","ServiceNow_ITOM_Discovery_Child_Policy"],
+    "PlatformInstanceProfile" : "Platform-AuditAccount-ServiceNowITOMDiscoveryChildInstanceProfile-vwregtMaTb7G"
+    },
+    "Lambda" :{
+        "function_name" : ["platform_sechub_findings_s3", "platform_ScoreCardS3ToSharePoint"]
+    },
+    "S3": {
+        "ListOfBuckets" : ["platform-db-controls-scorecard-uat"],
+        "ListOfBucketsWithBlockPublicAccess" : ["platform-db-controls-scorecard-uat"],
+        "ListOfBucketsWithOwnershipControls" : ["platform-db-controls-scorecard-uat"],
+        "ListOfBucketsWithNotificationConfiguration" : ["platform-db-controls-scorecard-uat"]
+    },
+    "sqs" :{
+        "queue_name" : ["platform-da2-securityhub-s3-acceptance-queue"]
+    },
+    "account_id" : "148006673887"
+
+}

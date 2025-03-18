@@ -1,0 +1,59 @@
+[
+    {
+      "ParameterKey": "ReleaseS3Bucket",
+      "ParameterValue": "azure-devops-da2.0-release-uat-us-east-1"
+    },
+    {
+      "ParameterKey": "ReleaseLambdaS3BucketPrefix",
+      "ParameterValue": "azure-devops-da2.0-stackset-dev-"
+    },
+    {
+      "ParameterKey": "FolderName",
+      "ParameterValue": "ReleaseNumber"
+    },
+    {
+      "ParameterKey": "auditaccount",
+      "ParameterValue": "148006673887"
+    },
+    {
+      "ParameterKey": "PrivateProduction",
+      "ParameterValue": "ou-qkhr-g5muobex"
+    },
+    {
+      "ParameterKey": "PrivateStaging",
+      "ParameterValue": "ou-qkhr-ouggsdwn"
+    },
+    {
+      "ParameterKey": "PrivateException",
+      "ParameterValue": "ou-qkhr-ok6kh8k0"
+    },
+    {
+      "ParameterKey": "PublicProduction",
+      "ParameterValue": "ou-qkhr-7x3aa8gl"
+    },
+    {
+      "ParameterKey": "PublicStaging",
+      "ParameterValue": "ou-qkhr-79elqnfl"
+    },
+    {
+      "ParameterKey": "PublicException",
+      "ParameterValue": "ou-qkhr-2lume00f"
+    },
+    {
+      "ParameterKey": "ManagedServicesBeAgile",
+      "ParameterValue": "ou-qkhr-pch5lram"
+    },
+    {
+      "ParameterKey": "DataManagement",
+      "ParameterValue": "ou-qkhr-vzxo6wp0"
+    },
+    {
+      "ParameterKey": "HybridAccount",
+      "ParameterValue": "ou-qkhr-248fbf5e"
+    },
+    {
+      "ParameterKey": "Migration",
+      "ParameterValue": "ou-qkhr-mbu5x3de"
+    }
+  ]
+  

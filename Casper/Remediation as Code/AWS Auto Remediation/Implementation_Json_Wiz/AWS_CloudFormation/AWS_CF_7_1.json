@@ -1,0 +1,17 @@
+{
+    "serviceprovider": "aws",
+    "servicerequirement_name": "AWS::cloudformation::Implementation",
+    "serviceDisplayName": "AWS CloudFormation",
+    "id": "AWS_CF_7_1",
+    "label": "Ensure resource tagging is added to CloudFormation",
+    "description": "Identification of your IT assets is a crucial aspect of governance and security. You need to have visibility of all  CloudFormation resources to assess their security posture and take action on potential areas of weakness. Tagging resources in the cloud is an easy way for teams to provide information related to who owns the resource, what the resource is used for, as well as other important information related to the deployment lifecycle of the resource. Organization has mandated that all cloud resources are to be tagged with for cross-team use",
+    "type": "Detective",
+    "implementationProvider": "wiz",
+    "wizNativeType": [
+        "cloudformationTemplate"
+    ],
+    "link": "Detective-Pipeline/AWS/AWS_CloudFormation/AWS_CF_7_1.rego",
+    "requirementId": [
+        "AWS_CF_7_1"
+    ]
+}

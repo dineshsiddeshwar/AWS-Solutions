@@ -1,0 +1,362 @@
+Description: Template to create db controls
+Parameters:
+  S3BucketName:
+    MinLength: '1'
+    MaxLength: '50'
+    Type: String
+    Description: CI/CD Release bucket
+    ConstraintDescription: Relese S3 Bucket
+  FolderName:
+    MinLength: '1'
+    MaxLength: '50'
+    Type: String
+    Description: CI/CD Release ID
+    ConstraintDescription: ReleaseID
+  masteraccount: 
+    Type: String
+    Description: Master account Id
+  ScoreCardDBTableName:
+    Type: String
+    Description: Enter a Score card db table name
+Resources:
+#----------------------------ScoreCardErrorHandler Lambda---------------------------
+  ScoreCardErrorHandlerLambda:    
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        S3Bucket:
+          Fn::Sub:
+            - "${S3BucketName}${AWS::Region}"
+            - {S3BucketName: !Ref S3BucketName}
+        S3Key:
+          Fn::Sub:
+            - "${releasefolder}/platform_ScoreCardErrorHandler.zip"
+            - {releasefolder: !Ref FolderName}
+      FunctionName: platform_ScoreCardErrorHandler 
+      Environment:
+        Variables:
+          DYNAMODB_NAME: !Ref ScoreCardDBTableName
+          ACCOUNT_ID: !Ref masteraccount     
+      Tags:
+        - Value: "yes"
+          Key: platform_donotdelete
+      Handler: platform_ScoreCardErrorHandler.lambda_handler
+      Role: !Sub 'arn:aws:iam::${AWS::AccountId}:role/platform_ScoreCardErrorHandlerRole'
+      Timeout: 900
+      MemorySize: 128
+      Runtime: python3.9
+#----------------------------ScoreCardVPCBound Lambda---------------------------   
+  ScoreCardVPCBoundLambda:
+    Type: AWS::Lambda::Function
+    DependsOn:
+      - Boto3LambdaLayer
+      - PyMySQLLambdaLayer
+      - PyMSSQLLambdaLayer
+      - OracleDBLambdaLayer
+      - PostgresLambdaLayer
+    Properties:
+      Code:
+        S3Bucket:
+          Fn::Sub:
+            - "${S3BucketName}${AWS::Region}"
+            - {S3BucketName: !Ref S3BucketName}
+        S3Key:
+          Fn::Sub:
+            - "${releasefolder}/platform_ScoreCardVPCBoundLambda.zip"
+            - {releasefolder: !Ref FolderName}
+      FunctionName: platform_ScoreCardVPCBoundLambda
+      Tags:
+        - Value: "yes"
+          Key: platform_donotdelete
+      Handler: platform_ScoreCardVPCBoundLambda.lambda_handler
+      Layers:
+        - !Ref Boto3LambdaLayer
+        - !Ref PyMySQLLambdaLayer
+        - !Ref PyMSSQLLambdaLayer
+        - !Ref OracleDBLambdaLayer
+        - !Ref PostgresLambdaLayer
+      Role: !Sub 'arn:aws:iam::${AWS::AccountId}:role/platform_ScoreCardVPCBoundLambdaRole'
+      Timeout: 900
+      MemorySize: 128
+      Runtime: python3.9
+
+# Layers for DB Control Lambdas
+  Boto3LambdaLayer:
+    Type: AWS::Lambda::LayerVersion
+    Properties:
+      CompatibleRuntimes:
+        - python3.8
+        - python3.7
+        - python3.9
+      Content:
+        S3Bucket:
+          Fn::Sub:
+            - "${S3BucketName}${AWS::Region}"
+            - {S3BucketName: !Ref S3BucketName}
+        S3Key:
+          Fn::Sub:
+            - "${releasefolder}/boto3.zip"
+            - {releasefolder: !Ref FolderName}
+      Description: Boto3 for Python Layer
+      LayerName: platform_boto3
+
+  PyMySQLLambdaLayer:
+    Type: AWS::Lambda::LayerVersion
+    Properties:
+      CompatibleRuntimes:
+        - python3.8
+        - python3.7
+        - python3.9
+      Content:
+        S3Bucket:
+          Fn::Sub:
+            - "${S3BucketName}${AWS::Region}"
+            - {S3BucketName: !Ref S3BucketName}
+        S3Key:
+          Fn::Sub:
+            - "${releasefolder}/pymysql.zip"
+            - {releasefolder: !Ref FolderName}
+      Description: PyMySQL for Python Layer
+      LayerName: platform_pymysql
+
+  PyMSSQLLambdaLayer:
+    Type: AWS::Lambda::LayerVersion
+    Properties:
+      CompatibleRuntimes:
+        - python3.8
+        - python3.7
+        - python3.9
+      Content:
+        S3Bucket:
+          Fn::Sub:
+            - "${S3BucketName}${AWS::Region}"
+            - {S3BucketName: !Ref S3BucketName}
+        S3Key:
+          Fn::Sub:
+            - "${releasefolder}/pymssql.zip"
+            - {releasefolder: !Ref FolderName}
+      Description: PyMSSQL for Python Layer
+      LayerName: platform_pymssql
+
+  OracleDBLambdaLayer:
+    Type: AWS::Lambda::LayerVersion
+    Properties:
+      CompatibleRuntimes:
+        - python3.8
+        - python3.7
+        - python3.9
+      Content:
+        S3Bucket:
+          Fn::Sub:
+            - "${S3BucketName}${AWS::Region}"
+            - {S3BucketName: !Ref S3BucketName}
+        S3Key:
+          Fn::Sub:
+            - "${releasefolder}/oracledb.zip"
+            - {releasefolder: !Ref FolderName}
+      Description: OracleDB for Python Layer
+      LayerName: platform_oracledb
+
+  PostgresLambdaLayer:
+    Type: AWS::Lambda::LayerVersion
+    Properties:
+      CompatibleRuntimes:
+        - python3.8
+        - python3.7
+        - python3.9
+      Content:
+        S3Bucket:
+          Fn::Sub:
+            - "${S3BucketName}${AWS::Region}"
+            - {S3BucketName: !Ref S3BucketName}
+        S3Key:
+          Fn::Sub:
+            - "${releasefolder}/postgreslayer.zip"
+            - {releasefolder: !Ref FolderName}
+      Description: postgres for Python Layer
+      LayerName: platform_postgreslayer
+  #----------------------------DB Compliance SSM Document-----------------------------
+  RDSPublicAccessDocument:
+    Type: AWS::SSM::Document
+    Properties: 
+      Content:
+        description: |
+          ### Document name - platform_rds_public_access_remediation_with_exception
+          ## What does this document do?
+          The runbook disables public accessibility for the Amazon RDS database instance you specify using 
+          the [ModifyDBInstance](https://docs.aws.amazon.com/AmazonRDS/latest/APIReference/API_ModifyDBInstance.html) API.
+          ## Input Parameters
+          * AutomationAssumeRole: (Required) The Amazon Resource Name (ARN) of the AWS Identity and Access Management (IAM) role that allows Systems Manager Automation to perform the actions on your behalf.
+          * DbiResourceId: (Required) The resource identifier for the DB instance you want to disable public accessibility.
+          ## Output Parameters
+          * DisablePubliclyAccessibleOnRDS.Response: The standard HTTP response from the ModifyDBInstance API.
+        schemaVersion: '0.3'
+        assumeRole: '{{ AutomationAssumeRole }}'
+        outputs:
+          - DisablePubliclyAccessibleOnRDS.Response
+        parameters:
+          AutomationAssumeRole:
+            type: String
+            description: (Required) The Amazon Resource Name (ARN) of the AWS Identity and Access Management (IAM) role that allows Systems Manager Automation to perform the actions on your behalf.
+            allowedPattern: '^arn:aws[a-z0-9-]*:iam::\d{12}:role\/[\w-\/.@+=,]{1,1017}$'
+          DbiResourceId:
+            type: String
+            description: (Required) The resource identifier for the DB instance you want to disable public accessibility.
+            allowedPattern: 'db-[A-Z0-9]{26}'
+        mainSteps:
+          - name: GetRDSInstanceIdentifier
+            action: 'aws:executeAwsApi'
+            description: |
+              ## GetRDSInstanceIdentifier
+              Gathers the DB instance identifier from the DB instance resource identifier.
+              ## Outputs
+              * DbInstanceIdentifier: The Amazon RDS DB instance identifier.
+            timeoutSeconds: 600
+            isEnd: false
+            inputs:
+              Service: rds
+              Api: DescribeDBInstances
+              Filters:
+                - Name: dbi-resource-id
+                  Values:
+                    - '{{ DbiResourceId }}'
+            outputs:
+              - Name: DbInstanceIdentifier
+                Selector: '$.DBInstances[0].DBInstanceIdentifier'
+                Type: String
+          - name: checkTag
+            action: 'aws:executeScript'
+            timeoutSeconds: 300
+            onFailure: Abort
+            inputs:
+              Runtime: python3.8
+              Handler: checkTag
+              InputPayload:
+                dbi-resource-id: '{{ DbiResourceId }}'
+              Script: |-
+                def checkTag(events,context):
+                  import boto3
+                  import botocore
+                  #Initialize client
+                  rds = boto3.client('rds')
+                  rds_id = events['dbi-resource-id']
+                  #GetRDSTags
+                  try:
+                    response = rds.describe_db_instances(
+                        Filters=[
+                            {
+                                'Name': 'dbi-resource-id',
+                                'Values': [
+                                    rds_id,
+                                ]
+                            },
+                        ],)
+                    #result.update({ })
+                    maplist = response['DBInstances'][0]['TagList']
+                    
+                  except botocore.exceptions.ClientError as error:
+                      raise error
+                  for i in maplist:
+                    if i['Key']=="platform_rds_allow_public_access" and i['Value']=="Yes":
+                      return {"DB_Tag": True}
+                    elif i['Key']=="platform_rds_allow_public_access" and i['Value']=="No":
+                      return {"DB_Tag": False}
+                    else:
+                      continue 
+            outputs:
+              - Name: DB_Tag
+                Selector: $.Payload.DB_Tag
+                Type: Boolean
+          - name: chooseAction
+            action: 'aws:branch'
+            inputs:
+              Choices:
+                - NextStep: sleep3
+                  Variable: '{{checkTag.DB_Tag}}'
+                  BooleanEquals: true
+              Default: VerifyDBInstanceStatus
+          - name: sleep3
+            action: 'aws:sleep'
+            isEnd: true
+            inputs:
+              Duration: PT1M
+          - name: VerifyDBInstanceStatus
+            action: 'aws:waitForAwsResourceProperty'
+            timeoutSeconds: 900
+            isEnd: false
+            description: |
+              ## VerifyDBInstanceStatus
+              Waits for and verifies the DB instances is in an AVAILABLE state. 
+            inputs:
+              Service: rds
+              Api: DescribeDBInstances
+              DBInstanceIdentifier: '{{ GetRDSInstanceIdentifier.DbInstanceIdentifier }}'
+              PropertySelector: '$.DBInstances[0].DBInstanceStatus'
+              DesiredValues:
+                - available
+          - name: DisablePubliclyAccessibleOnRDS
+            action: 'aws:executeAwsApi'
+            description: |
+              ## DisablePubliclyAccessibleOnRDS
+              Disables public accessibility on your DB instance.
+              ## Outputs
+              * Response: The standard HTTP response from the ModifyDBInstance API.
+            timeoutSeconds: 600
+            isEnd: false
+            inputs:
+              Service: rds
+              Api: ModifyDBInstance
+              DBInstanceIdentifier: '{{ GetRDSInstanceIdentifier.DbInstanceIdentifier }}'
+              PubliclyAccessible: false
+            outputs:
+              - Name: Response
+                Selector: $
+                Type: StringMap
+          - name: WaitForDBInstanceStatusToModify
+            action: 'aws:waitForAwsResourceProperty'
+            timeoutSeconds: 600
+            isEnd: false
+            description: |
+              ## WaitForDBInstanceStatusToModify
+              Waits for the DB instance to change to a MODIFYING state.
+            inputs:
+              Service: rds
+              Api: DescribeDBInstances
+              DBInstanceIdentifier: '{{ GetRDSInstanceIdentifier.DbInstanceIdentifier }}'
+              PropertySelector: '$.DBInstances[0].DBInstanceStatus'
+              DesiredValues:
+                - modifying
+          - name: WaitForDBInstanceStatusToAvailableAfterModify
+            action: 'aws:waitForAwsResourceProperty'
+            timeoutSeconds: 600
+            isEnd: false
+            description: |
+              ## WaitForDBInstanceStatusToAvailableAfterModify
+              Waits for the DB instance to change to an AVAILABLE state
+            inputs:
+              Service: rds
+              Api: DescribeDBInstances
+              DBInstanceIdentifier: '{{ GetRDSInstanceIdentifier.DbInstanceIdentifier }}'
+              PropertySelector: '$.DBInstances[0].DBInstanceStatus'
+              DesiredValues:
+                - available
+          - name: VerifyDBInstancePubliclyAccess
+            action: 'aws:assertAwsResourceProperty'
+            timeoutSeconds: 600
+            isEnd: true
+            description: |
+              ## VerifyDBInstancePubliclyAccess
+              Confirms public accessibility is disabled on the DB instance.
+            inputs:
+              Service: rds
+              Api: DescribeDBInstances
+              DBInstanceIdentifier: '{{ GetRDSInstanceIdentifier.DbInstanceIdentifier }}'
+              PropertySelector: '$.DBInstances[0].PubliclyAccessible'
+              DesiredValues:
+                - 'False'
+      DocumentFormat: YAML
+      DocumentType: Automation
+      Name: "platform_rds_public_access_remediation_with_exception"
+      Tags: 
+      - Key: "platform_donotdelete"
+        Value: "yes"

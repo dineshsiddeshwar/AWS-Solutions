@@ -1,0 +1,17 @@
+{
+    "serviceprovider": "aws",
+    "servicerequirement_name": "AWS::VPC::Implementation",
+    "serviceDisplayName": "AWS VPC",
+    "id": "AWS_VPC_12_1",
+    "label": "Check for create or accept VPC peering connection",
+    "description": "",
+    "type": "Detective",
+    "implementationProvider": "wiz",
+    "wizNativeType": [
+        "vpc"
+    ],
+    "link": "",
+    "requirementId": [
+        "AWS_VPC_12"
+    ]
+}

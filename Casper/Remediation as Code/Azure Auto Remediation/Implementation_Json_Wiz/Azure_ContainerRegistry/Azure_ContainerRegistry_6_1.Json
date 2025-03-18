@@ -1,0 +1,17 @@
+{
+    "serviceprovider": "azure",
+    "servicerequirement_name": "Azure::ContainerRegistry::Implementation",
+    "serviceDisplayName": "AWS ContainerRegistry",
+    "id": "AWS_ContainerRegistry_6_1",
+    "label": "Ensure that Container Registry authentication is disabled and uses Azure Active Directory (Azure AD) service principal for Admin Authentication",
+    "description": "Admin authentication must be disabled as enabling it allows a single username/pass combination can access everything in the Container Registry.It becomes challenging to understand what user or system really initiated the request to your registry without additional thorough logging, as the username in the log will just be the admin user, not the initial caller. Hence Admin authentication must be disabled and Azure Active Directory authentication must be used to connect to Azure container registry by using identities in Azure Active Directory (Azure AD). With Azure AD authentication, identities of users and other Microsoft services can be managed in one central location which simplifies permission management.",
+    "type": "Detective",
+    "implementationProvider": "wiz",
+    "wizNativeType": [
+        ""
+    ],
+    "link": "link to terrform line/comment where requirement is implemented",
+    "requirementId": [
+        "Azure_ContainerRegistry_6"
+    ]
+  }

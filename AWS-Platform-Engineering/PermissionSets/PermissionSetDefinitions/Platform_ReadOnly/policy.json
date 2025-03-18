@@ -1,0 +1,17 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Sid": "Stmt1718384856424",
+        "Action": "guardduty:*",
+        "Effect": "Deny",
+        "Resource": "*"
+      },
+      {
+        "Sid": "Stmt1718384890514",
+        "Action": "securityhub:*",
+        "Effect": "Deny",
+        "Resource": "*"
+      }
+    ]
+  }

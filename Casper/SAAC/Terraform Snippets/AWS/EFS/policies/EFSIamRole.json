@@ -1,0 +1,13 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Sid" : "EFS Access Role",  
+        "Effect": "Allow",
+        "Action": "sts:AssumeRole",
+        "Principal":{
+          "AWS": "${aws_user}"
+        }
+      }
+    ]
+  }

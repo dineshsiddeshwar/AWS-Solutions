@@ -1,0 +1,15 @@
+{
+    "responseActionName": "Enable LoadBalancer access logs",
+    "responseActionDescription": "Enable is the loadBalancer access logs and adds the s3 buckets",
+    "targetRulesMapping": [
+      {
+        "targetRuleId": "Custom-Rule-2",
+        "targetRuleType": "CLOUD_CONFIGURATION_RULE"
+      },
+      {
+        "targetRuleId": "Custom-Rule-3",
+        "targetRuleType": "CLOUD_CONFIGURATION_RULE"
+      }
+    ]
+  }
+  

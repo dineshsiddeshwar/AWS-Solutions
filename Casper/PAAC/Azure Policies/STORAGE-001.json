@@ -1,0 +1,42 @@
+{
+  "properties": {
+    "displayName": "classic storage account must not be used",
+    "policyType": "Custom",
+    "mode": "Indexed",
+    "metadata": {
+      "version": "1.0.0"
+    },
+    "parameters": {
+      "storage-001-effect": {
+        "type": "String",
+        "metadata": {
+          "displayName": "storage-001-effect",
+          "description": "Enable or disable the execution of the policy"
+        },
+        "allowedValues": [
+          "Audit",
+          "Deny",
+          "Disabled"
+        ],
+        "defaultValue": "Deny"
+      }
+    },
+    "policyRule": {
+      "if": {
+        "allOf": [
+          {
+            "field": "type",
+            "equals": "Microsoft.Storage/storageAccounts"
+          },
+          {
+            "field": "kind",
+            "notEquals": "StorageV2"
+          }
+        ]
+      },
+      "then": {
+        "effect": "[parameters('storage-001-effect')]"
+      }
+    }
+  }
+}

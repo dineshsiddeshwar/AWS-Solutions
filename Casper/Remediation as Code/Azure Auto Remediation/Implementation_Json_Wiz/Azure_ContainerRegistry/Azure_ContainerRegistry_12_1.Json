@@ -1,0 +1,17 @@
+{
+    "serviceprovider": "azure",
+    "servicerequirement_name": "Azure::ContainerRegistry::Implementation",
+    "serviceDisplayName": "AWS ContainerRegistry",
+    "id": "AWS_ContainerRegistry_12_1",
+    "label": "Ensure Container images in registry are Encrypted with Customer Managed Keys",
+    "description": "By default, images stored in the Azure Container registry is encrypted using Microsoft Managed Keys at rest.All object metadata is also encrypted. However, if you want to control and manage this encryption key yourself, customer-managed key must be managed by the organization that key must be used to protect and control access to the key that encrypts the secrets.",
+    "type": "Detective",
+    "implementationProvider": "wiz",
+    "wizNativeType": [
+        ""
+    ],
+    "link": "link to terrform line/comment where requirement is implemented",
+    "requirementId": [
+        "Azure_ContainerRegistry_12"
+    ]
+  }

@@ -1,0 +1,17 @@
+{
+    "serviceprovider": "aws",
+    "servicerequirement_name": "AWS::VPC::Implementation",
+    "serviceDisplayName": "AWS VPC",
+    "id": "AWS_VPC_19_1",
+    "label": "Ensure VPC Endpoints do not allow access to non-GS VPC Endpoint Services via PrivateLink.",
+    "description": "",
+    "type": "Detective",
+    "implementationProvider": "wiz",
+    "wizNativeType": [
+        "vpc"
+    ],
+    "link": "",
+    "requirementId": [
+        "AWS_VPC_19"
+    ]
+}

@@ -1,0 +1,13 @@
+{
+    "serviceprovider": "aws",
+    "servicerequirement_name": "AWS::KMS::Implementation",
+    "serviceDisplayName": "AWS KMS",
+    "id": "AWS_KMS_2_1",
+    "label": "Ensure AWS KMS Key policy is not overly permissive",
+    "description": "Ensure AWS KMS Key policy is not overly permissive \n(check for \"Principal\": \"*\", \"Action\": \"*\",\"Resource\": \"*\") KMs Requires Resource * but condition can be added",
+    "type": "Detective",
+    "implementationProvider": "wiz",
+    "wizNativeType": ["kms"],
+    "link": "Detective-Pipeline/AWS/AWS_KMS/AWS_KMS_2_1.rego",
+    "requirementId": ["AWS_KMS_2"]
+}

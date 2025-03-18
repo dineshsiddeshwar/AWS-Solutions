@@ -1,0 +1,17 @@
+{
+  "serviceprovider": "azure",
+  "servicerequirement_name": "Azure::VDI::Implementation",
+  "serviceDisplayName": "AWS VDI",
+  "id": "AWS_VDI_9_1",
+  "label": "Ensure remote app is used to limit user's access only to certain application and Reverse connect transport is used for secure communication",
+  "description": "When choosing a deployment model, Access to the remote users access must be provided only to certain applications in a virtual desktop instead of providing access to entire virtual desktops . Remote applications, or RemoteApps can provide a seamless experience as the user works with apps on their virtual desktop. RemoteApps help to reduce the risk by only letting the user work with with a subset of the remote machine exposed by the application. Azure Virtual Desktop must be used to reverse connect transport for establishing the remote session and for carrying RDP traffic. Reverse Connect transport must be used for outbound connectivity to the Azure Virtual Desktop infrastructure over the HTTPS connection.",
+  "type": "Detective",
+  "implementationProvider": "wiz",
+  "wizNativeType": [
+      ""
+  ],
+  "link": "link to terrform line/comment where requirement is implemented",
+  "requirementId": [
+      "Azure_VDI_9"
+  ]
+}

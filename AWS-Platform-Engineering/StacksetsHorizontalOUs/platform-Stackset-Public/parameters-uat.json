@@ -1,0 +1,110 @@
+[
+    {
+        "ParameterKey": "releses3bucket",
+        "ParameterValue": "azure-devops-da2.0-release-uat-us-east-1"
+    },
+    {
+        "ParameterKey": "FolderName",
+        "ParameterValue": "ReleaseNumber"
+    },
+    {
+        "ParameterKey": "BucketNameWithOutRegion",
+        "ParameterValue": "azure-devops-da2.0-stackset-uat-"
+    },
+    {
+        "ParameterKey": "PublicException",
+        "ParameterValue": "ou-qkhr-2lume00f"
+    },
+    {
+        "ParameterKey": "Migration",
+        "ParameterValue": "ou-qkhr-mbu5x3de"
+    },
+    {
+        "ParameterKey": "PublicProduction",
+        "ParameterValue": "ou-qkhr-7x3aa8gl"
+    },
+    {
+        "ParameterKey": "PublicStaging",
+        "ParameterValue": "ou-qkhr-79elqnfl"
+    },
+    {
+        "ParameterKey": "ManagedServicesBeAgile",
+        "ParameterValue": "ou-qkhr-pch5lram"
+    },
+    {
+        "ParameterKey": "DataManagement",
+        "ParameterValue": "ou-qkhr-vzxo6wp0"
+    },
+    {
+        "ParameterKey": "EnvType",
+        "ParameterValue": "acceptance"
+    },
+    {
+      "ParameterKey": "GridMasterAPIGEE",
+      "ParameterValue": "api-test.shell.com/ds/"
+    },
+    {
+      "ParameterKey": "APIGEEAuthorizationURL",
+      "ParameterValue": "https://api-test.shell.com/v1/oauth/token"
+    },
+    {
+      "ParameterKey": "APIGEEAuthorizationToken",
+      "ParameterValue": "VkZyQUFhTTkxQVlnQkJsUFhFNTRWNHJBanROcHNVU3A6SzQ3dXFJMklFSjlRZjNVdg=="
+    },
+    {
+      "ParameterKey": "APIGEEAuthorizationTokenExtnl",
+      "ParameterValue": "blFaRnFEeFdCdWQ1YXc4SThnNlRnR05PdE40OVNpaVY6QWE5NTR2cVNLYzVzaXY1WA=="
+    },
+    {
+      "ParameterKey": "GridMasterAPIVersion",
+      "ParameterValue": "v2.11.2"
+    },
+    {
+      "ParameterKey": "ADOReleaseId",
+      "ParameterValue": "1"
+    },
+    {
+      "ParameterKey": "ADOAPIURL",
+      "ParameterValue": "https://vsrm.dev.azure.com/sede-it-itso/Infoblox/_apis/release/releases?api-version=6.0"
+    },
+    {
+      "ParameterKey": "ADOAuthorizationToken",
+      "ParameterValue": "cmVraHUuY2hpbm5hcmF0aG9kQHNoZWxsLmNvbTpic2I2bWV1YXJpdmh5a2IzNGZsYTRkbmlmdGU1ZTYzaXV6N3M3Z2VpZGNpa2U0dHJhMzVx"
+    },
+    {
+        "ParameterKey": "IRMAccount",
+        "ParameterValue": "990427602202"
+    },
+    {
+        "ParameterKey": "IRMEnvironment",
+        "ParameterValue": "uat"
+    },
+    {
+      "ParameterKey": "DNSSecretARN",
+      "ParameterValue": "arn:aws:secretsmanager:us-east-1:136349175397:secret:dns_pem_file-M1mx4k"
+    },
+    {
+      "ParameterKey": "DNSTemplateid",
+      "ParameterValue": "4b33c301db7e38507b153951f3961950"
+    },
+    {
+      "ParameterKey": "DNSRepoName",
+      "ParameterValue": "HyperAutomation-ChangeEventProcessor-App"
+    },
+    {
+      "ParameterKey": "DNSOwnerName",
+      "ParameterValue": "sede-uat"
+    },
+    {
+      "ParameterKey": "DNSJobStepName",
+      "ParameterValue": "Change Acceleration/3_Run ..githubactionscreatestdcr.txt"
+    },
+    {
+     "ParameterKey": "GithubWorkflowID",
+     "ParameterValue": "infoblox-aws-cr.yml"
+   },
+   {
+     "ParameterKey": "GithubAppID",
+     "ParameterValue": "324710"
+   }
+]

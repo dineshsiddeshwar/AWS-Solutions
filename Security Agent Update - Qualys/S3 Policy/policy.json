@@ -1,0 +1,24 @@
+{
+    "Version": "2012-10-17",
+    "Id": "PolicyForDestinationBucket",
+    "Statement": [
+        {
+            "Sid": "Permissions on objects",
+            "Effect": "Allow",
+            "Principal": "*",
+            "Action": [
+                "s3:Get*",
+                "s3:Put*"
+            ],
+            "Resource": [
+                "arn:aws:s3:::qualys-agents-installer/*",
+                "arn:aws:s3:::qualys-agents-installer"
+            ],
+            "Condition": {
+				"StringEquals": {
+					"aws:PrincipalOrgID": "o-1vayc8h0l9"
+				}
+			}
+        }
+    ]
+}

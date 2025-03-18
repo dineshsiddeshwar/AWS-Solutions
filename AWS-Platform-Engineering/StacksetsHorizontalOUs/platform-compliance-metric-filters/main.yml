@@ -1,0 +1,129 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Parameters:
+  releses3bucket:
+    MinLength: '1'
+    MaxLength: '50'
+    Type: String
+    Description: CI/CD Release bucket
+    ConstraintDescription: Relese S3 Bucket
+  FolderName:
+    MinLength: '1'
+    MaxLength: '50'
+    Type: String
+    Description: CI/CD Release ID
+    ConstraintDescription: ReleaseID
+  BucketNameWithOutRegion:
+    MinLength: '1'
+    MaxLength: '50'
+    Type: String
+    Description: CI/CD Release bucket for stack set
+    ConstraintDescription: Relese S3 Bucket for stack set
+  PrivateProduction:
+    MinLength: '1'
+    MaxLength: '50'
+    Type: String
+    Description: Private Production OU ID
+    ConstraintDescription: Private Production OU ID
+  PrivateStaging:
+    MinLength: '1'
+    MaxLength: '50'
+    Type: String
+    Description: Private Staging OU ID
+    ConstraintDescription: Private Staging OU ID
+  PublicProduction:
+    MinLength: '1'
+    MaxLength: '50'
+    Type: String
+    Description: Public Production OU ID
+    ConstraintDescription: Public Production OU ID
+  PublicStaging:
+    MinLength: '1'
+    MaxLength: '50'
+    Type: String
+    Description: Public Staging OU ID
+    ConstraintDescription: Public Staging OU ID
+  DataManagement:
+    MinLength: '1'
+    MaxLength: '50'
+    Type: String
+    Description: DataManagement OU ID
+    ConstraintDescription: DataManagement OU ID
+  HybridAccount:
+    MinLength: '1'
+    MaxLength: '50'
+    Type: String
+    Description: HybridAccount OU ID
+    ConstraintDescription: HybridAccount OU ID
+  Migration:
+    MinLength: '1'
+    MaxLength: '50'
+    Type: String
+    Description: Migration OU ID
+    ConstraintDescription: Migration OU ID
+  ManagedServicesBeAgile:
+    MinLength: '1'
+    MaxLength: '50'
+    Type: String
+    Description: Managed Services BeAgile OU ID
+    ConstraintDescription: Managed Services BeAgile OU ID
+  PrivateException:
+    MinLength: '1'
+    MaxLength: '50'
+    Type: String
+    Description: Private Exception OU ID
+    ConstraintDescription: Private Exception OU ID
+  PublicException:
+    MinLength: '1'
+    MaxLength: '50'
+    Type: String
+    Description: Public Exception OU ID
+    ConstraintDescription: Public Exception OU ID
+
+Resources:
+  StacksetPlatformComplianceMetricFilters:
+    Type: AWS::CloudFormation::StackSet
+    DeletionPolicy: Retain
+    Properties:
+      TemplateURL:
+        Fn::Sub:
+          - https://${bucket}.s3.amazonaws.com/${releasefolder}/CloudFormation/platform-compliance-metric-filters.yml
+          - bucket:
+              Ref: releses3bucket
+            releasefolder:
+              Ref: FolderName
+      StackSetName: platform-compliance-metric-filters
+      AutoDeployment:
+        Enabled: 'true'
+        RetainStacksOnAccountRemoval: 'false'
+      PermissionModel: SERVICE_MANAGED
+      Capabilities:
+        - CAPABILITY_NAMED_IAM
+        - CAPABILITY_IAM
+      Description: Stackset for Config Rules Setup in Compliance Framework
+      StackInstancesGroup:
+        - Regions:
+            - us-east-1
+          DeploymentTargets:
+            OrganizationalUnitIds:
+              - !Ref PrivateProduction
+              - !Ref PrivateStaging
+              - !Ref PublicProduction
+              - !Ref PublicStaging
+              - !Ref DataManagement
+              - !Ref HybridAccount
+              - !Ref Migration
+              - !Ref ManagedServicesBeAgile
+              - !Ref PrivateException
+              - !Ref PublicException
+
+      OperationPreferences:
+        FailureTolerancePercentage: 100
+        MaxConcurrentPercentage: 50
+      Tags:
+        - Value: 'yes'
+          Key: platform_donotdelete
+      Parameters:
+        - ParameterKey: S3BucketName
+          ParameterValue: !Ref BucketNameWithOutRegion
+        - ParameterKey: FolderName
+          ParameterValue: !Ref FolderName

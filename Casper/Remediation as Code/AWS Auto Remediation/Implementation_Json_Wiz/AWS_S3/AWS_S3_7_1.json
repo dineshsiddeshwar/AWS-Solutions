@@ -1,0 +1,17 @@
+{
+    "serviceprovider": "aws",
+    "servicerequirement_name": "AWS::S3::Implementation",
+    "serviceDisplayName": "AWS S3",
+    "id": "AWS_S3_7_1",
+    "label": "Ensure 'Block public access' setting is turned on",
+    "description": "Public access is granted to buckets and objects through access control lists (ACLs), bucket policies, access point policies, or all. In order to ensure that public access to all S3 buckets and objects is blocked, turn on Block all public access. These settings apply only to this bucket and its access points.",
+    "type": "Detective",
+    "implementationProvider": "wiz",
+    "wizNativeType": [
+        "bucketACL"
+    ],
+    "link": "Detective-Pipeline/AWS/AWS_S3/AWS_S3_7_1.rego",
+    "requirementId": [
+        "AWS_S3_7"
+    ]
+}

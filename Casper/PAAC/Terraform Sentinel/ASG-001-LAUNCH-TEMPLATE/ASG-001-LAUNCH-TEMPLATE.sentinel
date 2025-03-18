@@ -1,0 +1,13 @@
+# Imports common-functions
+import "tfplan-functions" as tfplan
+
+# Get all EC2 launch template
+launch_template = tfplan.find_resources("aws_launch_template")
+
+# Return all the ASG launch templates in which public ip is associated
+violating_resources = tfplan.filter_attribute_is_value(launch_template, "network_interfaces.0.associate_public_ip_address", "true", true)
+
+# Main rule
+main = rule {
+    length(violating_resources["messages"]) is 0
+}

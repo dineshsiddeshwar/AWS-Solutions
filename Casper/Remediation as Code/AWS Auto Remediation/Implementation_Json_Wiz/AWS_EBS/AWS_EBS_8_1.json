@@ -1,0 +1,17 @@
+{
+    "serviceprovider": "aws",
+    "servicerequirement_name": "AWS::EBS::Implementation",
+    "serviceDisplayName": "AWS EBS",
+    "id": "AWS_EBS_8_1",
+    "label": "Ensure deletion protection is enabled",
+    "description": "",
+    "type": "Detective",
+    "implementationProvider": "wiz",
+    "wizNativeType": [
+        ""
+    ],
+    "link": "Detective-Pipeline/AWS/EBS/AWS_EBS_8_1.rego",
+    "requirementId": [
+        "AWS_EBS_8"
+    ]
+}

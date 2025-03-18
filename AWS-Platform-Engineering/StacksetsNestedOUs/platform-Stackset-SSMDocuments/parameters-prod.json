@@ -1,0 +1,26 @@
+[
+    {
+        "ParameterKey": "releses3bucket",
+        "ParameterValue": "azure-devops-da2.0-release-prod-us-east-1"
+    },
+    {
+        "ParameterKey": "FolderName",
+        "ParameterValue": "ReleaseNumber"
+    },
+    {
+        "ParameterKey": "Prod",
+        "ParameterValue": "ou-sdpg-m0bmjby4"
+    },
+    {
+        "ParameterKey": "NonProd",
+        "ParameterValue": "ou-sdpg-fcd0ld6e"
+    },
+    {
+        "ParameterKey": "RESPCMigration",
+        "ParameterValue": "ou-sdpg-vc3iqnav"
+    },
+    {
+        "ParameterKey": "Exceptions",
+        "ParameterValue": "ou-sdpg-r1y7t298"
+    }
+]

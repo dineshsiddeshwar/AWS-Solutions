@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Approval Page</title>
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.978.0.min.js"></script>
+</head>
+<body>
+    <h2>Approval Required</h2>
+    <p>Please approve or reject the request:</p>
+    <form id="approvalForm">
+        <label for="email">Email:</label><br>
+        <input type="email" id="email" name="email"><br><br>
+        <input type="hidden" id="region" value="region">
+        <input type="hidden" id="instanceid" value="instanceid">
+        <input type="hidden" id="accountid" value="accountid">
+        <label for="decision">Decision:</label>
+        <select id="decision" name="decision">
+            <option value="approve">Approve</option>
+            <option value="reject">Reject</option>
+        </select>
+        <br>
+        <button type="submit">Submit</button>
+    </form>
+    
+    <div id="message"></div> 
+    
+    <script>
+        document.getElementById("approvalForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+            var region = document.getElementById("region").value;
+            var instanceid = document.getElementById("instanceid").value;
+            var accountid = document.getElementById("accountid").value;
+            var decision = document.getElementById("decision").value;
+            var email = document.getElementById("email").value;
+            approveOrReject(region, instanceid, accountid, decision, email);
+        });
+
+        function approveOrReject(region, instanceid, accountid, decision, email) {
+            
+            var url = 'https://fdzt2xl4nyw4yk6uzwa7dzhhru0dnetc.lambda-url.us-east-1.on.aws/'; 
+            var data = JSON.stringify({
+                region: region,
+                instanceid: instanceid,
+                accountid: accountid,
+                decision: decision,
+                email: email
+            });
+            AWS.config.update({
+            accessKeyId: 'ACCESS_KEY',
+            secretAccessKey: 'SECRET_KEY',
+            region: 'us-east-1' // Change to your AWS region
+            });
+            var lambda = new AWS.Lambda();
+            lambda.invoke({
+                FunctionName: 'ec2test', // Replace with your Lambda function name
+                Payload: data // Pass any payload if needed
+            }, function(err, data) {
+                if (err) {
+                    console.error('Error:', error);
+                    alert('Something went wrong. Please reach out to security Engineering team. Please close the tab. Thank you!');
+                } else {
+                    console.log('Success:', data);
+                    alert('Response is captured. Please close the tab and Do not click Anything Again. Thank you!!');
+                }
+            });
+            
+        }
+    </script>
+</body>
+</html>

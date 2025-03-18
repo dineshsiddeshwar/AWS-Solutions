@@ -1,0 +1,17 @@
+{
+    "serviceprovider": "aws",
+    "servicerequirement_name": "AWS::S3::Implementation",
+    "serviceDisplayName": "AWS S3",
+    "id": "AWS_S3_2_1",
+    "label": "Ensure AWS S3 buckets are not publicly accessible via bucket policies (least privilege access)",
+    "description": "Allowing unrestricted access through bucket policies gives everyone the ability to list the objects within the bucket (ListBucket), download objects (GetObject), upload/delete objects (PutObject, DeleteObject), view objects permissions (GetBucketAcl), edit objects permissions (PutBucketAcl) which will result in sensitive data being exposed to Internet. It is mandatory to use bucket policies to limit the access to a particular AWS account (friendly account) instead of providing public access to everyone on the Internet.",
+    "type": "Detective",
+    "implementationProvider": "wiz",
+    "wizNativeType": [
+        "bucketACL"
+    ],
+    "link": "Detective-Pipeline/AWS/AWS_S3/AWS_S3_2_1.rego",
+    "requirementId": [
+        "AWS_S3_2"
+    ]
+}

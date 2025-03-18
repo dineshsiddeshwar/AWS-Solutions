@@ -1,0 +1,32 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+      "storageName": {
+          "defaultValue": "storagetest12121neg",
+          "type": "string"
+      }
+  },
+  "resources": [
+      {          "type": "Microsoft.Storage/storageAccounts",
+          "apiVersion": "2023-01-01", 
+          "name": "[parameters('storageName')]",
+          "location": "eastus",
+          "sku": {
+              "name": "Standard_RAGRS",
+              "tier": "Standard"
+          },
+          "kind": "StorageV2",
+          "properties": {
+              "networkAcls": {
+                  "bypass": "AzureServices",
+                  "virtualNetworkRules": [],
+                  "ipRules": [],
+                  "defaultAction": "Deny"
+              },
+              "supportsHttpsTrafficOnly": true,
+              "accessTier": "Hot"
+          }
+      }
+  ]
+}

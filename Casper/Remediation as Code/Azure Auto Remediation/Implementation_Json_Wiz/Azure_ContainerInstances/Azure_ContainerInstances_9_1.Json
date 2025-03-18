@@ -1,0 +1,17 @@
+{
+    "serviceprovider": "azure",
+    "servicerequirement_name": "Azure::ContainerInstances::Implementation",
+    "serviceDisplayName": "AWS ContainerInstances",
+    "id": "AWS_ContainerInstances_9_1",
+    "label": "Ensure Azure Container Instances use standard organizational Resource tagging method.",
+    "description": "Technology hardware and software must be registered and accurately recorded within the enterprise technology repository and/or asset management systems.",
+    "type": "Detective",
+    "implementationProvider": "wiz",
+    "wizNativeType": [
+        ""
+    ],
+    "link": "link to terrform line/comment where requirement is implemented",
+    "requirementId": [
+        "Azure_ContainerInstances_9"
+    ]
+  }

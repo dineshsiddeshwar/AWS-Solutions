@@ -1,0 +1,413 @@
+{
+	"Version": "2012-10-17",
+	"Statement": [
+		{
+			"Effect": "Deny",
+			"Action": [
+				"ec2:DisassociateIamInstanceProfile",
+				"ec2:EnableVgwRoutePropagation",
+				"ec2:DeleteLocalGatewayRouteTableVpcAssociation",
+				"ec2:DeleteVpnGateway",
+				"ec2:CreateLocalGatewayRouteTableVpcAssociation",
+				"ec2:AssociateClientVpnTargetNetwork",
+				"ec2:DetachVpnGateway",
+				"ec2:ModifyVpnTunnelCertificate",
+				"ec2:CreateClientVpnRoute",
+				"ec2:AttachVpnGateway",
+				"ec2:CreateLocalGatewayRoute",
+				"ec2:RevokeClientVpnIngress",
+				"ec2:ModifyVpnTunnelOptions",
+				"ec2:AuthorizeClientVpnIngress",
+				"ec2:ImportClientVpnClientCertificateRevocationList",
+				"ec2:DeleteClientVpnRoute",
+				"ec2:ApplySecurityGroupsToClientVpnTargetNetwork",
+				"ec2:DeregisterInstanceEventNotificationAttributes",
+				"ec2:DisableVgwRoutePropagation",
+				"ec2:CreateVpnGateway",
+				"ec2:DeleteLocalGatewayRoute",
+				"ec2:TerminateClientVpnConnections",
+				"ec2:DisassociateClientVpnTargetNetwork",
+				"ec2:DisableEbsEncryptionByDefault",
+				"ec2:DeleteVpnConnectionRoute",
+				"ec2:ModifyVpnConnectionOptions",
+				"ec2:TerminateClientVpnConnections",
+				"ec2:GetVpnConnectionDeviceTypes",
+				"ec2:ModifyVpnConnection",
+				"ec2:CreateVpnConnectionRoute",
+				"ec2:DeleteVpnConnection",
+				"ec2:GetVpnConnectionDeviceSampleConfiguration",
+				"ec2:CreateVpnConnection",
+				"ec2:DeleteCustomerGateway",
+				"ec2:CreateCustomerGateway",
+				"iam:*MFADevice",
+				"iam:DeleteAccountPasswordPolicy",
+				"iam:UpdateAccountPasswordPolicy",
+				"iam:AttachUserPolicy",
+				"iam:DeleteUserPolicy",
+				"iam:DetachUserPolicy",
+				"iam:PutUserPolicy",
+				"iam:ChangePassword",
+				"iam:CreateAccountAlias",
+				"iam:CreateLoginProfile",
+				"iam:CreateSAMLProvider",
+				"iam:DeleteInstanceProfile",
+				"iam:DeleteLoginProfile",
+				"elasticmapreduce:PutBlockPublicAccessConfiguration",
+				"ec2:DisableEbsEncryptionByDefault",
+				"ds:UnshareDirectory",
+				"ds:DeleteConditionalForwarder",
+				"ds:DeleteTrust",
+				"ds:UpdateConditionalForwarder",
+				"ds:DeleteDirectory",
+				"sso:Import*",
+				"sso:Delete*",
+				"sso:Update*",
+				"sso:Detach*",
+				"sso:DisassociateDirectory",
+				"sso:Put*",
+				"sso:AssociateDirectory",
+				"sso-directory:Disable*",
+				"sso-directory:Update*",
+				"sso-directory:Delete*",
+				"sso-directory:Create*",
+				"sso-directory:Remove*",
+				"aws-portal:ModifyAccount",
+				"account:CloseAccount",
+				"account:DeleteAlternateContact",
+				"account:Put*",
+				"billing:PutContractInformation",
+				"billing:Update*",
+				"aws-portal:ModifyBilling",
+				"billing:RedeemCredits",
+				"ce:Create*",
+				"ce:Delete*",
+				"ce:ProvideAnomalyFeedback",
+				"ce:StartSavingsPlansPurchaseRecommendationGeneration",
+				"ce:Update*",
+				"cur:PutClassicReportPreferences",
+				"freetier:PutFreeTierAlertPreference",
+				"invoicing:PutInvoiceEmailDeliveryPreferences",
+				"payments:CreatePaymentInstrument",
+				"payments:DeletePaymentInstrument",
+				"payments:MakePayment",
+				"payments:UpdatePaymentPreferences",
+				"tax:BatchPutTaxRegistration",
+				"tax:DeleteTaxRegistration",
+				"tax:PutTaxInheritance",
+				"aws-portal:ModifyPaymentMethods",
+				"account:GetAccountInformation",
+				"securityhub:*Disable*",
+				"securityhub:DeleteInvitations",
+				"securityhub:DeleteMembers",
+				"securityhub:UpdateStandardsControl"
+			],
+			"Resource": "*"
+		},
+		{
+			"Effect": "Deny",
+			"Action": [
+				"iam:DeleteRole",
+				"iam:UpdateRole",
+				"iam:AttachRolePolicy",
+				"iam:DetachRolePolicy",
+				"iam:UpdateAssumeRolePolicy"
+			],
+			"Resource": [
+				"arn:aws:iam::*:role/business_service*"
+			]
+		},
+		{
+			"Effect": "Deny",
+			"Action": "iam:*OpenIDConnectProvider",
+			"NotResource": [
+				"arn:aws:iam::*:oidc-provider/token.actions.githubusercontent.com",
+				"arn:aws:iam::*:oidc-provider/oidc.eks.*.amazonaws.com*"
+			]
+		},
+		{
+			"Effect": "Allow",
+			"Action": "iam:PassRole",
+			"Resource": "*",
+			"Condition": {
+				"StringEquals": {
+					"iam:PassedToService": "opsworks.amazonaws.com"
+				}
+			}
+		},
+		{
+			"Sid": "Statement1",
+			"Effect": "Deny",
+			"Action": [
+				"cloudformation:DeleteChangeSet",
+				"cloudformation:DeleteStack",
+				"cloudformation:DeleteStackInstances",
+				"cloudformation:DeleteStackSet",
+				"cloudformation:UpdateStack",
+				"cloudformation:UpdateStackInstances",
+				"cloudformation:UpdateStackSet",
+				"cloudformation:CancelUpdateStack",
+				"cloudformation:ContinueUpdateRollback",
+				"cloudformation:UpdateTerminationProtection",
+				"cloudformation:CreateStack",
+				"cloudformation:CreateStackSet",
+				"cloudformation:CreateStackInstances"
+			],
+			"Resource": [
+				"arn:aws:cloudformation:*:*:stack/\"StackSet-CustomControlTower-cdf*/*"
+			]
+		},
+		{
+			"Sid": "Statement2",
+			"Effect": "Deny",
+			"Action": [
+				"events:CreateEventBus",
+				"events:DeleteEventBus",
+				"events:ListEventBuses"
+			],
+			"Resource": [
+				"arn:aws:events:*:*:event-bus/TenantAccountBus*"
+			]
+		},
+		{
+			"Sid": "Statement3",
+			"Effect": "Deny",
+			"Action": [
+				"dynamodb:CreateGlobalTable",
+				"dynamodb:CreateTable",
+				"dynamodb:DeleteTable",
+				"dynamodb:UpdateTable",
+				"dynamodb:CreateTableReplica",
+				"dynamodb:ImportTable",
+				"dynamodb:DeleteTableReplica"
+			],
+			"Resource": [
+				"arn:aws:dynamodb:*:*:table/shell-staging-table-provsioning-*",
+				"arn:aws:dynamodb:*:*:table/cdf-*",
+				"arn:aws:dynamodb:*:*:table/StackSet-CustomControlTower-cdf-bulkcerts-*"
+			]
+		},
+		{
+			"Sid": "Statement4",
+			"Effect": "Deny",
+			"Action": [
+				"sns:DeleteTopic",
+				"sns:CreateTopic",
+				"sns:GetTopicAttributes",
+				"sns:ListTopics",
+				"sns:SetTopicAttributes"
+			],
+			"Resource": [
+				"arn:aws:sns:*:*:shell-track-provisioning-status-sns-topic-*",
+				"arn:aws:sns:*:*:StackSet-CustomControlTower-cdf-bulkcerts-*"
+			]
+		},
+		{
+			"Sid": "Statement5",
+			"Effect": "Deny",
+			"Action": [
+				"sqs:CreateQueue",
+				"sqs:DeleteQueue",
+				"sqs:PurgeQueue",
+				"sqs:GetQueueUrl",
+				"sqs:TagQueue",
+				"sqs:UntagQueue",
+				"sqs:SetQueueAttributes"
+			],
+			"Resource": [
+				"arn:aws:sqs:*:*:StackSet-CustomControlTower-cdf-*"
+			]
+		},
+		{
+			"Sid": "Statement6",
+			"Effect": "Deny",
+			"Action": [
+				"s3:CreateBucket",
+				"s3:DeleteBucket",
+				"s3:GetBucketAcl",
+				"s3:PutBucketVersioning",
+				"s3:DeleteBucketPolicy",
+				"s3:PutBucketAcl",
+				"s3:PutBucketPolicy",
+				"s3:ListBucket"
+			],
+			"Resource": [
+				"arn:aws:s3::*:cdf-tenant-"
+			]
+		},
+		{
+			"Sid": "Statement7",
+			"Effect": "Deny",
+			"Action": [
+				"secretsmanager:ListSecrets",
+				"secretsmanager:DeleteSecret",
+				"secretsmanager:DeleteResourcePolicy",
+				"secretsmanager:UpdateSecret",
+				"secretsmanager:UpdateSecretVersionStage",
+				"secretsmanager:PutSecretValue",
+				"secretsmanager:PutResourcePolicy"
+			],
+			"Resource": [
+				"arn:aws:secretsmanager:*:*:secret:shell.ggv2",
+				"arn:aws:secretsmanager:*:*:secret:shell.claim"
+			]
+		},
+		{
+			"Sid": "Statement8",
+			"Effect": "Deny",
+			"Action": [
+				"ssm:DeleteParameters",
+				"ssm:GetParameters",
+				"ssm:DeleteParameter",
+				"ssm:UnlabelParameterVersion",
+				"ssm:PutParameter",
+				"ssm:GetParameter",
+				"ssm:GetParameterHistory",
+				"ssm:GetParametersByPath",
+				"ssm:LabelParameterVersion"
+			],
+			"Resource": [
+				"arn:aws:ssm:*:*:parameter/cdf*"
+			]
+		},
+		{
+			"Sid": "Statement9",
+			"Effect": "Deny",
+			"Action": [
+				"iot:CreatePolicy",
+				"iot:CreatePolicyVersion",
+				"iot:DeletePolicy",
+				"iot:DeletePolicyVersion",
+				"iot:AttachPolicy",
+				"iot:AttachPrincipalPolicy",
+				"iot:DetachPolicy",
+				"iot:DetachPrincipalPolicy",
+				"iot:SetDefaultPolicyVersion",
+				"iot:GetPolicy",
+				"iot:GetPolicyVersion",
+				"iot:CreateRoleAlias",
+				"iot:DeleteRoleAlias",
+				"iot:UpdateRoleAlias"
+			],
+			"Resource": [
+				"arn:aws:iot:*:*:policy/shell-default-ggv2-provisioning-claim-policy*",
+				"arn:aws:iot:*:*:policy/shell-default-ggv2-iot-thing-policy*",
+				"arn:aws:iot:*:*:policy/shell-default-ggv2-client-device-policy",
+				"arn:aws:iot:*:*:policy/GreengrassV2IoTThingPolicy*",
+				"arn:aws:iot:*:*:policy/GreengrassTESCertificatePolicyGreengrassV2TokenExchangeRoleAlias*",
+				"arn:aws:iot:*:*:policy/CDFDevicePolicy",
+				"arn:aws:iot:*:*:policy/shell-dfltggv2prvtmplt*",
+				"arn:aws:iot:*:*:rolealias/shell-default-ggv2core-token-exchange-role-alias*"
+			]
+		},
+		{
+			"Sid": "Statement10",
+			"Effect": "Deny",
+			"Action": [
+				"greengrass:DeleteDeployment",
+				"greengrass:CreateDeployment",
+				"greengrass:CancelDeployment",
+				"greengrass:GetDeployment",
+				"greengrass:ResetDeployments"
+			],
+			"Resource": [
+				"arn:aws:greengrass:*:*:deployments:shell-default-ggv2-dev"
+			]
+		},
+		{
+			"Sid": "Statement11",
+			"Effect": "Deny",
+			"Action": [
+				"iot:DeleteTopicRule",
+				"iot:DeleteTopicRuleDestination",
+				"iot:DisableTopicRule",
+				"iot:EnableTopicRule",
+				"iot:ReplaceTopicRule",
+				"iot:UpdateTopicRuleDestination",
+				"iot:CreateTopicRule",
+				"iot:CreateTopicRuleDestination",
+				"iot:ConfirmTopicRuleDestination",
+				"iot:DeleteThingGroup",
+				"iot:CreateThingGroup",
+				"iot:RemoveThingFromThingGroup",
+				"iot:UpdateThingGroup",
+				"iot:UpdateThingGroupsForThing",
+				"iot:AddThingToThingGroup"
+			],
+			"Resource": [
+				"arn:aws:iot:*:*:rule/IotJobLambdaFunctionJobExecutionIotRule",
+				"arn:aws:iot:*:*:rule/IoTLifecycleConnectRule",
+				"arn:aws:iot:*:*:rule/IoTLifecycleDisconnectRule",
+				"arn:aws:iot:*:*:rule/JobLifecycleMQTTRule",
+				"arn:aws:iot:*:*:rule/PresignedUrlMQTTRule",
+				"arn:aws:iot:*:*:thinggroup/shell-default-ggv2-cores-thinggroup*"
+			]
+		},
+		{
+			"Sid": "Statement12",
+			"Effect": "Deny",
+			"Action": [
+				"lambda:Delete*",
+				"lambda:Get*",
+				"lambda:Update*"
+			],
+			"Resource": [
+				"arn:aws:lambda:*:*:function:cdf-*",
+				"arn:aws:lambda:*:*:layer:*"
+			]
+		},
+		{
+			"Sid": "VisualEditor0",
+			"Effect": "Deny",
+			"Action": [
+				"iot:DeleteCertificate",
+				"iot:DeleteThing",
+				"iot:RegisterCertificate",
+				"iot:DeleteCACertificate"
+			],
+			"Resource": "*"
+		},
+		{
+			"Sid": "iam",
+			"Effect": "Deny",
+			"Action": [
+				"iam:AddRoleToInstanceProfile",
+				"iam:AttachRolePolicy",
+				"iam:CreateInstanceProfile",
+				"iam:CreatePolicy",
+				"iam:CreatePolicyVersion",
+				"iam:CreateRole",
+				"iam:DeleteInstanceProfile",
+				"iam:DeletePolicy",
+				"iam:DeletePolicyVersion",
+				"iam:DeleteRole",
+				"iam:DeleteRolePolicy",
+				"iam:DetachRolePolicy",
+				"iam:GetInstanceProfile",
+				"iam:GetPolicy",
+				"iam:GetRole",
+				"iam:GetRolePolicy",
+				"iam:ListAttachedRolePolicies",
+				"iam:ListInstanceProfiles",
+				"iam:ListInstanceProfilesForRole",
+				"iam:ListRolePolicies",
+				"iam:ListRoles",
+				"iam:ListPolicyVersions",
+				"iam:PassRole",
+				"iam:PutRolePolicy",
+				"iam:RemoveRoleFromInstanceProfile",
+				"iam:TagRole",
+				"iam:UntagRole"
+			],
+			"Resource": [
+				"arn:aws:iam::*:role/shell*",
+				"arn:aws:iam::*:policy/shell*",
+				"arn:aws:iam::*:role/cdf*",
+				"arn:aws:iam::*:policy/cdf*",
+				"arn:aws:iam::*:role/StackSet*",
+				"arn:aws:iam::*:policy/StackSet*",
+				"arn:aws:iam::*:role/cdf-platform-execution-role",
+				"arn:aws:iam::*:role/business_cdf-execution-role"
+			]
+		}
+	]
+}

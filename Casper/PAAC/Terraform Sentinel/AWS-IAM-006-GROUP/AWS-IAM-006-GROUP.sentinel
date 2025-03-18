@@ -1,0 +1,76 @@
+// Description: Ensure IAM policies don't grant access to wildcard Resource
+import "tfplan-functions" as tfplan
+import "tfplan/v2" as plan
+import "types"
+import "strings"
+import "json"
+
+# all the resources of aws_iam_group_policy
+allIamGroupPolicies = filter plan.resource_changes as _, rc {
+    rc.type is "aws_iam_group_policy" 
+}
+
+# Set variable to keep track of violating policies
+violatingPolicyCount = 0
+
+
+# Function for the checking json encoded IAM Group Policy
+jsonEncodedPolicyCheck = func(resources) {
+
+    for resources as address, policy {
+
+        violatingPolicy = false
+
+        getPolicy = policy.change.after["policy"] else false
+
+        if getPolicy is not false {
+
+            if length(getPolicy) > 0 {
+
+                policyObject = json.unmarshal(getPolicy)
+
+                for policyObject.Statement as statement {
+
+                    currentEffect = statement.Effect else false
+                    currentResource = statement.Resource else false
+
+                    if currentEffect is not false and currentResource is not false {
+
+                        if currentEffect == "Allow" {
+
+                            if types.type_of(currentResource) is "string" {
+
+                                if currentResource == "*" {
+                                    violatingPolicy = true
+                                }
+                            } else if types.type_of(currentResource) is "list" {
+
+                                for currentResource as resource {
+                                    if resource == "*" {
+                                        violatingPolicy = true
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            if violatingPolicy == true {
+                violatingPolicyCount += 1
+                print("IAM User policy", address, "has Effect = Allow and Resource = *")
+            }
+        }
+    }
+
+    return violatingPolicyCount
+}
+
+
+jsonEncodedPolicyRule = rule {
+    jsonEncodedPolicyCheck(allIamGroupPolicies) == 0
+}
+
+main = rule {
+   jsonEncodedPolicyRule
+}

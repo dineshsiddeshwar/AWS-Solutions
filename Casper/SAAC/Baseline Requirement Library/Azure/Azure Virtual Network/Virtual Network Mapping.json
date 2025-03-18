@@ -1,0 +1,256 @@
+{ 
+    "serviceprovider": "azure", 
+    "servicerequirement_name": [ 
+        "Azure::Virtual_Network::*" 
+    ], 
+    "service_type":"Networking",
+    "servicedisplay_name": "Virtual networks", 
+    "serviceapproval_status": { 
+        "Prod": "", 
+        "SNP": "", 
+        "NP": "" 
+    }, 
+    "phase": "Service Discovery", 
+    "mapping": [ 
+
+        { 
+            "requirement_name": "Ensure All the Hub Virtual networks are Peered with Virtual network gateway", 
+            "policy": "https://github.com/ey-org/cloudsec-ccm/blob/badd54b0cef57015d1075543bdaad3c9c6c51c88/Baseline%20Requirement%20Library/Azure/Virtual%20Network%20Runbook.md#1-ensure-all-the-hub-virtual-networks-are-peered-with-virtual-network-gateway", 
+            "security_domain": "Network Security", 
+            "ticket_enabled": "false", 
+            "tags": [], 
+            "severity": { 
+                "cvss_score":"7.4",
+                "cvss_severity":"High",
+                "cvss_vector": "#CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:L/I:L/A:L"                      
+            },           
+            "control_mapping": ["CS0012300"], 
+            "implementations": [] 
+        }, 
+        {
+            "requirement_name": "Ensure No public IP's used within the Azure tenant", 
+            "policy": "https://github.com/ey-org/cloudsec-ccm/blob/badd54b0cef57015d1075543bdaad3c9c6c51c88/Baseline%20Requirement%20Library/Azure/Virtual%20Network%20Runbook.md#2-ensure-no-public-ips-used-within-the-azure-tenant", 
+            "security_domain": "Network Security", 
+            "ticket_enabled": "false", 
+            "tags": [], 
+            "severity": { 
+                "cvss_score":"9.1",
+                "cvss_severity":"Critical",
+                "cvss_vector": "#CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:L/I:L/A:H"                 
+            },           
+            "control_mapping": ["CS0012300"], 
+            "implementations": [] 
+        }, 
+        {
+            "requirement_name": "Ensure that Dev/UAT/Prod Hub and spoke VNets are logically separated using azure subscription", 
+            "policy": "https://github.com/ey-org/cloudsec-ccm/blob/badd54b0cef57015d1075543bdaad3c9c6c51c88/Baseline%20Requirement%20Library/Azure/Virtual%20Network%20Runbook.md#3-ensure-that-devuatprod-hub-and-spoke-vnets-are-logically-separated-using-azure-subscription", 
+            "security_domain": "Network Security", 
+            "ticket_enabled": "false", 
+            "tags": [], 
+            "severity": { 
+                "cvss_score":"3.9",
+                "cvss_severity":"Low",
+                "cvss_vector": "#CVSS:3.1/AV:A/AC:H/PR:H/UI:N/S:U/C:L/I:L/A:L"                      
+            },           
+            "control_mapping": ["CS0012300"], 
+            "implementations": [] 
+        },
+        {
+            "requirement_name": "Ensure each applications is segmented with spoke Virtual network and spoke VNet connected to Hub network", 
+            "policy": "https://github.com/ey-org/cloudsec-ccm/blob/badd54b0cef57015d1075543bdaad3c9c6c51c88/Baseline%20Requirement%20Library/Azure/Virtual%20Network%20Runbook.md#4-ensure-each-applications-is-segmented-with-spoke-virtual-network-and-spoke-vnet-connected-to-hub-network", 
+            "security_domain": "Network Security", 
+            "ticket_enabled": "false", 
+            "tags": [], 
+            "severity": { 
+                "cvss_score":"7.5",
+                "cvss_severity":"High",
+                "cvss_vector": "#CVSS:3.1/AV:A/AC:H/PR:H/UI:N/S:C/C:H/I:H/A:L"                      
+            },           
+            "control_mapping": ["CS0012300"], 
+            "implementations": [] 
+        }, 
+        {
+            "requirement_name": "Ensure RDP and SSH connections are restricted", 
+            "policy": "https://github.com/ey-org/cloudsec-ccm/blob/badd54b0cef57015d1075543bdaad3c9c6c51c88/Baseline%20Requirement%20Library/Azure/Virtual%20Network%20Runbook.md#5-ensure-rdp-and-ssh-connections-are-restricted", 
+            "security_domain": "Network Security", 
+            "ticket_enabled": "false", 
+            "tags": [], 
+            "severity": { 
+                "cvss_score":"7.9",
+                "cvss_severity":"High",
+                "cvss_vector": "#CVSS:3.1/AV:N/AC:H/PR:H/UI:N/S:C/C:H/I:H/A:L"                      
+            },           
+            "control_mapping": ["CS0012300"], 
+            "implementations": [] 
+        },             
+        { 
+            "requirement_name": "Ensure virtual network endpoints are used", 
+            "policy": "https://github.com/ey-org/cloudsec-ccm/blob/badd54b0cef57015d1075543bdaad3c9c6c51c88/Baseline%20Requirement%20Library/Azure/Virtual%20Network%20Runbook.md#6-ensure-virtual-network-endpoints-are-used", 
+            "security_domain": "Network Security", 
+                "ticket_enabled": "false", 
+                "tags": [], 
+                "severity": { 
+                    "cvss_score":"7.5",
+                    "cvss_severity":"High",
+                    "cvss_vector": "#CVSS:3.1/AV:A/AC:H/PR:H/UI:N/S:C/C:H/I:H/A:L"                      
+            },           
+                "control_mapping": ["CS0012300"], 
+                "implementations": [] 
+        }, 
+        { 
+            "requirement_name": "Ensure only VNet peering is allowed for VNet to VNet connection", 
+            "policy": "https://github.com/ey-org/cloudsec-ccm/blob/badd54b0cef57015d1075543bdaad3c9c6c51c88/Baseline%20Requirement%20Library/Azure/Virtual%20Network%20Runbook.md#7-ensure-only-vnet-peering-is-allowed-for-vnet-to-vnet-connection", 
+            "security_domain": "Network Security", 
+            "ticket_enabled": "false", 
+            "tags": [], 
+            "severity": { 
+                "cvss_score":"7.5",
+                "cvss_severity":"High",
+                "cvss_vector": "#CVSS:3.1/AV:A/AC:H/PR:H/UI:N/S:C/C:H/I:H/A:L"                    
+            },            
+            "control_mapping": ["CS0012300"], 
+            "implementations": [] 
+        }, 
+        { 
+            "requirement_name": "Ensure VNet administrative tasks are access only by Network engineering team", 
+            "policy": "https://github.com/ey-org/cloudsec-ccm/blob/badd54b0cef57015d1075543bdaad3c9c6c51c88/Baseline%20Requirement%20Library/Azure/Virtual%20Network%20Runbook.md#8-ensure-vnet-administrative-tasks-are-access-only-by-network-engineering-team",
+            "security_domain": "Network Security", 
+            "ticket_enabled": "false", 
+            "tags": [], 
+            "severity": { 
+                "cvss_score":"4.1",
+                "cvss_severity":"Medium",
+                "cvss_vector": "#CVSS:3.1/AV:N/AC:H/PR:H/UI:N/S:U/C:L/I:L/A:L"                      
+            },           
+            "control_mapping": ["CS0012300"], 
+            "implementations": [] 
+        }, 
+        { 
+            "requirement_name": "Ensure audit logging is enabled for Azure resources in virtual network", 
+            "policy": "https://github.com/ey-org/cloudsec-ccm/blob/badd54b0cef57015d1075543bdaad3c9c6c51c88/Baseline%20Requirement%20Library/Azure/Virtual%20Network%20Runbook.md#9-ensure-audit-logging-is-enabled-for-azure-resources-in-virtual-network", 
+            "security_domain": "Security Logging", 
+            "ticket_enabled": "false", 
+            "tags": [], 
+            "severity": { 
+                "cvss_score":"3.9",
+                "cvss_severity":"Low",
+                "cvss_vector": "#CVSS:3.1/AV:L/AC:H/PR:H/UI:N/S:U/C:L/I:L/A:L"                        
+            },           
+            "control_mapping": [""], 
+            "implementations": [] 
+        }, 
+        { 
+            "requirement_name": "Ensure VMProtectionAlerts is enabled for virtual network using Diagnostic logging", 
+            "policy": "https://github.com/ey-org/cloudsec-ccm/blob/badd54b0cef57015d1075543bdaad3c9c6c51c88/Baseline%20Requirement%20Library/Azure/Virtual%20Network%20Runbook.md#10-ensure-vmprotectionalerts-is-enabled-for-virtual-network-using-diagnostic-logging", 
+            "security_domain": "Security Logging", 
+            "ticket_enabled": "false", 
+            "tags": [], 
+            "severity": { 
+                "cvss_score":"3.9",
+                "cvss_severity":"Low",
+                "cvss_vector": "#CVSS:3.1/AV:L/AC:H/PR:H/UI:N/S:U/C:L/I:L/A:L"                        
+            },           
+            "control_mapping": [""], 
+            "implementations": [] 
+        }, 
+        { 
+            "requirement_name": "Ensure NSG flow log data is encrypted using customer managed key", 
+            "policy": "https://github.com/ey-org/cloudsec-ccm/blob/badd54b0cef57015d1075543bdaad3c9c6c51c88/Baseline%20Requirement%20Library/Azure/Virtual%20Network%20Runbook.md#11-ensure-nsg-flow-log-data-is-enabled-and-encrypted-using-customer-managed-key", 
+            "security_domain": "Security Logging", 
+            "ticket_enabled": "false", 
+            "tags": [], 
+            "severity": { 
+                "cvss_score":"4.1",
+                "cvss_severity":"Medium",
+                "cvss_vector": "#CVSS:3.1/AV:N/AC:H/PR:H/UI:N/S:U/C:L/I:L/A:L"                        
+            },           
+            "control_mapping": [""], 
+            "implementations": [] 
+        }, 
+        { 
+            "requirement_name": "Ensure Azure Active Directory single sign-on (SSO) is leveraged for access control", 
+            "policy": "https://github.com/ey-org/cloudsec-ccm/blob/badd54b0cef57015d1075543bdaad3c9c6c51c88/Baseline%20Requirement%20Library/Azure/Virtual%20Network%20Runbook.md#12-ensure-azure-active-directory-single-sign-on-sso-is-leveraged-for-access-control", 
+            "security_domain": "IAM", 
+            "ticket_enabled": "false", 
+            "tags": [], 
+            "severity": { 
+                "cvss_score":"5.1",
+                "cvss_severity":"Medium",
+                "cvss_vector": "#CVSS:3.1/AV:A/AC:H/PR:H/UI:N/S:C/C:L/I:L/A:L"                       
+            },           
+            "control_mapping": ["CS0012298"], 
+            "implementations": [] 
+        }, 
+        { 
+            "requirement_name": "Ensure multi-factor authentication for all Azure Active Directory-based access", 
+            "policy": "https://github.com/ey-org/cloudsec-ccm/blob/badd54b0cef57015d1075543bdaad3c9c6c51c88/Baseline%20Requirement%20Library/Azure/Virtual%20Network%20Runbook.md#13-ensure-multi-factor-authentication-for-all-azure-active-directory-based-access",
+            "security_domain": "IAM", 
+            "ticket_enabled": "false", 
+            "tags": [], 
+            "severity": { 
+                "cvss_score":"7.5",
+                "cvss_severity":"High",
+                "cvss_vector": "#CVSS:3.1/AV:A/AC:L/PR:H/UI:N/S:C/C:H/I:L/A:L"                 
+            },           
+            "control_mapping": ["CS0012298"], 
+            "implementations": [] 
+        }, 
+        { 
+            "requirement_name": "Ensure administrative tasks are performed only in secure and Azure-managed workstations", 
+            "policy": "https://github.com/ey-org/cloudsec-ccm/blob/badd54b0cef57015d1075543bdaad3c9c6c51c88/Baseline%20Requirement%20Library/Azure/Virtual%20Network%20Runbook.md#14-ensure-administrative-tasks-are-performed-only-in-secure-and-azure-managed-workstations", 
+            "security_domain": "IAM", 
+            "ticket_enabled": "false", 
+            "tags": [], 
+            "severity": { 
+                "cvss_score":"5.2",
+                "cvss_severity":"Medium",
+                "cvss_vector": "#CVSS:3.1/AV:L/AC:H/PR:H/UI:N/S:U/C:H/I:L/A:L"                   
+            },           
+            "control_mapping": ["CS0012298"], 
+            "implementations": [] 
+        }, 
+        { 
+            "requirement_name": "Ensure Role-based access control to manage access to resources", 
+            "policy": "https://github.com/ey-org/cloudsec-ccm/blob/badd54b0cef57015d1075543bdaad3c9c6c51c88/Baseline%20Requirement%20Library/Azure/Virtual%20Network%20Runbook.md#15-ensure-role-based-access-control-to-manage-access-to-resources", 
+            "security_domain": "IAM", 
+            "ticket_enabled": "false", 
+            "tags": [], 
+            "severity": { 
+                "cvss_score":"6.8",
+                "cvss_severity":"Medium",
+                "cvss_vector": "#CVSS:3.1/AV:A/AC:H/PR:H/UI:N/S:C/C:H/I:L/A:L"                   
+            },           
+            "control_mapping": ["CS0012298"], 
+            "implementations": [] 
+        }, 
+        { 
+            "requirement_name": "Ensure Encrypt all sensitive information in transit", 
+            "policy": "https://github.com/ey-org/cloudsec-ccm/blob/badd54b0cef57015d1075543bdaad3c9c6c51c88/Baseline%20Requirement%20Library/Azure/Virtual%20Network%20Runbook.md#16-ensure-that-virtual-network-uses-standard-organizational-resource-tagging-method", 
+            "security_domain": "Data Protection", 
+            "ticket_enabled": "false", 
+            "tags": [], 
+            "severity": { 
+                "cvss_score":"7.6",
+                "cvss_severity":"High",
+                "cvss_vector": "#CVSS:3.1/AV:A/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:L"                    
+            },           
+            "control_mapping": ["CS0012261"], 
+            "implementations": [] 
+        }, 
+        { 
+            "requirement_name": "Ensure that virtual network uses standard organizational Resource tagging method",
+            "policy": "https://github.com/ey-org/cloudsec-ccm/blob/badd54b0cef57015d1075543bdaad3c9c6c51c88/Baseline%20Requirement%20Library/Azure/Virtual%20Network%20Runbook.md#17-ensure-that-virtual-network-uses-standard-organizational-resource-tagging-method",
+            "security_domain": "Asset Management", 
+            "ticket_enabled": "false", 
+            "tags": [], 
+            "severity": { 
+                "cvss_score":"3.3",
+                "cvss_severity":"Low",
+                "cvss_vector": "#CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:L/I:N/A:N"                          
+            },           
+            "control_mapping": [""], 
+            "implementations": [] 
+        }
+
+    ]
+}

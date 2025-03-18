@@ -1,0 +1,17 @@
+{
+  "serviceprovider": "azure",
+  "servicerequirement_name": "Azure::VDI::Implementation",
+  "serviceDisplayName": "AWS VDI",
+  "id": "AWS_VDI_7_1",
+  "label": "Ensure Azure Virtual Desktop is constantly monitored using Malware and vulnerability scanning tools",
+  "description": "Malware and Vulnerability management tools must be enabled to continually assesses the resources, subscriptions, and organization for security issues. It aggregates all the findings into a single score which can be used as a benchmark of the Security Posture of the organization.",
+  "type": "Detective",
+  "implementationProvider": "wiz",
+  "wizNativeType": [
+      ""
+  ],
+  "link": "link to terrform line/comment where requirement is implemented",
+  "requirementId": [
+      "Azure_VDI_7"
+  ]
+}

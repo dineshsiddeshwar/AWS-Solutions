@@ -1,0 +1,506 @@
+Description: Template to create resources in Public Production, Public Staging & Public Exception OU
+Parameters:
+  IRMAccount:
+    Type: String
+    Description: IRM IP Account
+  IRMEnvironment:
+    Description: IRM Environment type.
+    Type: String
+    AllowedValues:
+      - prod
+      - uat
+      - dev
+  EnvType:
+    Description: Environment type.
+    Type: String
+    AllowedValues:
+      - prod
+      - acceptance
+      - dev
+  BucketNameWithOutRegion:
+    MinLength: '1'
+    MaxLength: '50'
+    Type: String
+    Description: CI/CD Release bucket
+    ConstraintDescription: Relese S3 Bucket
+  ReleaseID:
+    MinLength: '1'
+    MaxLength: '50'
+    Type: String
+    Description: CI/CD Release ID
+  GridMasterAPIGEE:
+     Description: APIGEE Integration URL Point Shell on-pren Infoblox Gridmaster
+     Type: String
+  APIGEEAuthorizationURL:
+     Description: APIGEE Integration Authorization URL
+     Type: String
+  APIGEEAuthorizationToken:
+     Description: APIGEE Integration Authorization Token
+     Type: String
+  APIGEEAuthorizationTokenExtnl:
+     Description: APIGEE Integration Authorization Token for Extnl
+     Type: String
+  GridMasterAPIVersion:
+     Description: Infoblox GridMaster API Version
+     Type: String
+  ADOReleaseId:
+     Description: DNS Zone Delegation ADO Release Id
+     Type: String
+  ADOAPIURL:
+     Description: DNS Zone Delegation ADO API URL
+     Type: String
+  ADOAuthorizationToken:
+     Description: ADO Authorization Token
+     Type: String
+  GithubAppID:
+     Description: Git Hub API ID
+     Type: String
+  GithubWorkflowID:
+     Description: git hub workflow ID
+     Type: String
+  DNSSecretARN:
+     Description: git hub ssecret arn
+     Type: String
+  DNSTemplateid:
+     Description: git hub snow template id
+     Type: String
+  DNSRepoName:
+     Description: git hub repo name 
+     Type: String
+  DNSOwnerName:
+     Description: git hub owner name
+     Type: String
+  DNSJobStepName:
+     Description: git hub job name and 3 rd step of the run name
+     Type: String
+
+Conditions:
+  CreateRole: !Equals [!Ref 'AWS::Region', us-east-1]
+Resources:
+  GridMasterAPIGEESSM:
+    Condition: CreateRole
+    Type: AWS::SSM::Parameter
+    Properties:
+      Type: String
+      Name: /platform-dns/gridmasterapigee
+      Value: !Ref GridMasterAPIGEE
+  APIGEEAuthorizationURLSSM:
+    Condition: CreateRole
+    Type: AWS::SSM::Parameter
+    Properties:
+      Type: String
+      Name: /platform-dns/APIGEEAuthorizationURL
+      Value: !Ref APIGEEAuthorizationURL
+  APIGEEAuthorizationTokenSSM:
+    Condition: CreateRole
+    Type: AWS::SSM::Parameter
+    Properties:
+      Type: String
+      Name: /platform-dns/APIGEEAuthorizationToken
+      Value: !Ref APIGEEAuthorizationToken
+  APIGEEAuthorizationTokenExtnlSSM:
+    Condition: CreateRole
+    Type: AWS::SSM::Parameter
+    Properties:
+      Type: String
+      Name: /platform-dns/APIGEEAuthorizationTokenExtnl
+      Value: !Ref APIGEEAuthorizationTokenExtnl
+  GridMasterAPIVersionSSM:
+    Condition: CreateRole
+    Type: AWS::SSM::Parameter
+    Properties:
+      Type: String
+      Name: /platform-dns/gmapiversion
+      Value: !Ref GridMasterAPIVersion
+  ADOReleaseIdSSM:
+    Condition: CreateRole
+    Type: AWS::SSM::Parameter
+    Properties:
+      Type: String
+      Name: /platform-dns/ADOReleaseId
+      Value: !Ref ADOReleaseId
+  ADOAPIURLSSM:
+    Condition: CreateRole
+    Type: AWS::SSM::Parameter
+    Properties:
+      Type: String
+      Name: /platform-dns/ADOAPIURL
+      Value: !Ref ADOAPIURL
+  ADOAuthorizationTokenSSM:
+    Condition: CreateRole
+    Type: AWS::SSM::Parameter
+    Properties:
+      Type: String
+      Name: /platform-dns/ADOAuthorizationToken
+      Value: !Ref ADOAuthorizationToken
+  gitHubAPPIDSSM:
+    Condition: CreateRole
+    Type: AWS::SSM::Parameter
+    Properties:
+      Type: String
+      Name: /platform-dns/github-appid
+      Value: !Ref GithubAppID
+  githubWorkflowIdSSM:
+    Condition: CreateRole
+    Type: AWS::SSM::Parameter
+    Properties:
+      Type: String
+      Name: /platform-dns/github-workflowid
+      Value: !Ref GithubWorkflowID
+  dnsecretarnSSM:
+    Condition: CreateRole
+    Type: AWS::SSM::Parameter
+    Properties:
+      Type: String
+      Name: /platform-dns/secretarn
+      Value: !Ref DNSSecretARN
+  dnstemplateidSSM:
+    Condition: CreateRole
+    Type: AWS::SSM::Parameter
+    Properties:
+      Type: String
+      Name: /platform-dns/templateid
+      Value: !Ref DNSTemplateid
+  dnsreponameSSM:
+    Condition: CreateRole
+    Type: AWS::SSM::Parameter
+    Properties:
+      Type: String
+      Name: /platform-dns/reponame
+      Value: !Ref DNSRepoName
+  dnsownernameSSM:
+    Condition: CreateRole
+    Type: AWS::SSM::Parameter
+    Properties:
+      Type: String
+      Name: /platform-dns/ownername
+      Value: !Ref DNSOwnerName
+  dnsjobstepnameSSM:
+    Condition: CreateRole
+    Type: AWS::SSM::Parameter
+    Properties:
+      Type: String
+      Name: /platform-dns/job_step_name
+      Value: !Ref DNSJobStepName
+  ComplianceLoggingPolicy:
+    Condition: CreateRole
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      Description: Policy for Events Rule to send events to IRM IP Account Event Bus
+      Path: '/'
+      ManagedPolicyName: 'platform_compliance_logging_policy'
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Resource:
+              - !Join
+                - ''
+                - - 'arn:aws:events:*:'
+                  - !Ref IRMAccount
+                  - ':event-bus/'
+                  - !Ref IRMEnvironment
+            Action:
+              - 'events:PutEvents'
+  ComplianceLoggingRole:
+    Condition: CreateRole
+    Type: 'AWS::IAM::Role'
+    Properties:
+      Description: Role for EventRule to send events to IRM IP Account Event Bus
+      RoleName: 'platform_compliance_logging_role'
+      Tags:
+        - Value: "yes"
+          Key: platform_donotdelete
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - events.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - !Ref ComplianceLoggingPolicy
+  VPCFlowLogPolicy:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      Description: Policy for Lambda to enable VPC flowlog
+      Path: '/'
+      ManagedPolicyName: !Sub 'platform_enable_flowlog_policy_${AWS::Region}'
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Resource: '*'
+            Action:
+              - 'ec2:CreateFlowLogs'
+              - 'ec2:DescribeFlowLogs'
+              - 'ec2:CreateTags'
+              - 'logs:CreateLogDelivery'
+              -  'ssm:GetParameter'
+              -  'ses:Send*'
+              - 'secretsmanager:GetSecretValue'
+              - 'kms:Decrypt'
+          - Effect: Allow
+            Resource: !Sub 'arn:aws:sns:${AWS::Region}:${AWS::AccountId}:platform_Compliance_Security_Notification'
+            Action:
+              - 'sns:Publish'
+          - Effect: Allow
+            Resource: !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:*'
+            Action:
+              - 'logs:CreateLogGroup'
+              - 'logs:CreateLogStream'
+              - 'logs:PutLogEvents'
+  PlatformOperationRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      Description: Role to perform platform operations
+      RoleName: !Sub 'platform_operations_role_${AWS::Region}'
+      Tags:
+        - Value: "yes"
+          Key: platform_donotdelete
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - !Ref VPCFlowLogPolicy
+  ComplianceLoggingConfigEventRule:
+    Type: "AWS::Events::Rule"
+    Properties:
+      Description: Event rule to send Config Events to IRM IP Account Event Bus
+      EventPattern:
+        source:
+          - aws.config
+      State: ENABLED
+      Name: "platform_compliance_logging_config_events"
+      Targets:
+        - Arn: !Join
+          - ''
+          - - 'arn:aws:events:'
+            - !Ref AWS::Region
+            - ':'
+            - !Ref IRMAccount
+            - ':event-bus/'
+            - !Ref IRMEnvironment
+          Id: IRMEventBus
+          RoleArn: !Sub 'arn:aws:iam::${AWS::AccountId}:role/platform_compliance_logging_role'
+  ComplianceLoggingCloudTrailEventRule:
+    Type: "AWS::Events::Rule"
+    Properties:
+      Description: Event rule to send CloudTrail Events to IRM IP Account Event Bus
+      EventPattern:
+        source:
+          - anything-but:
+            - aws.config
+            - aws.securityhub
+      State: ENABLED
+      Name: "platform_compliance_logging_cloudtrail_events"
+      Targets:
+        - Arn: !Join
+          - ''
+          - - 'arn:aws:events:'
+            - !Ref AWS::Region
+            - ':'
+            - !Ref IRMAccount
+            - ':event-bus/'
+            - !Ref IRMEnvironment
+          Id: IRMEventBus
+          RoleArn: !Sub 'arn:aws:iam::${AWS::AccountId}:role/platform_compliance_logging_role'
+  VPCFlowLogEnableEventRule:
+    Type: "AWS::Events::Rule"
+    Properties:
+      Description: Rule to trigger VPC Flowlog Enable Lambda when VPC is created
+      EventPattern:
+        {
+          "source": [
+            "aws.ec2"
+          ],
+          "detail-type": [
+            "AWS API Call via CloudTrail"
+          ],
+          "detail": {
+            "eventName": [
+              "CreateVpc"
+            ]
+          }
+        }
+      State: ENABLED
+      Name: "platform_vpc_flow_log_enable"
+      Targets:
+        - Arn: !GetAtt FunctionToEnableVPCFlowlogInPublic.Arn
+          Id: "platformEnableVPCFlowlog"
+  FunctionToEnableVPCFlowlogInPublic:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: platform_enable_vpc_flowlog
+      Code:
+        S3Bucket:
+          Fn::Sub:
+            - "${BucketName}${AWS::Region}"
+            - {BucketName: !Ref BucketNameWithOutRegion}
+        S3Key:
+          Fn::Sub:
+            - "${releasefolder}/platform_enable_vpc_flowlog.zip"
+            - {releasefolder: !Ref ReleaseID}
+      Description: Enable VPC FlowLog when a VPC is created
+      Environment:
+        Variables:
+          env: !Ref EnvType
+      Tags:
+        - Value: "yes"
+          Key: platform_donotdelete
+      Handler: platform_enable_vpc_flowlog.lambda_handler
+      MemorySize: 1024
+      Role: !GetAtt PlatformOperationRole.Arn
+      Runtime: python3.8
+      Timeout: 900
+  PermissionForEventsToInvokeLambda:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref FunctionToEnableVPCFlowlogInPublic
+      Action: "lambda:InvokeFunction"
+      Principal: "events.amazonaws.com"
+      SourceArn: !GetAtt VPCFlowLogEnableEventRule.Arn
+  DNSRequestsLambdaLayer:
+    Condition: CreateRole
+    Type: AWS::Lambda::LayerVersion
+    Properties:
+      CompatibleRuntimes:
+        - python3.8
+      Content:
+        S3Bucket:
+          Fn::Sub:
+            - "${BucketName}${AWS::Region}"
+            - {BucketName: !Ref BucketNameWithOutRegion}
+        S3Key:
+          Fn::Sub:
+            - "${releasefolder}/python.zip"
+            - {releasefolder: !Ref ReleaseID}
+      Description: Requests Layer
+      LayerName: DNSRequests
+  
+  DNSCryptographyLambdaLayer:
+    Condition: CreateRole
+    Type: AWS::Lambda::LayerVersion
+    Properties:
+      CompatibleRuntimes:
+        - python3.11
+      Content:
+        S3Bucket:
+          Fn::Sub:
+            - "${BucketName}${AWS::Region}"
+            - {BucketName: !Ref BucketNameWithOutRegion}
+        S3Key:
+          Fn::Sub:
+            - "${releasefolder}/latest_cryptography.zip"
+            - {releasefolder: !Ref ReleaseID}
+      Description: This layer is used for cryptography
+      LayerName: DNScryptography
+  DNSCffiLambdaLayer:
+    Condition: CreateRole
+    Type: AWS::Lambda::LayerVersion
+    Properties:
+      CompatibleRuntimes:
+        - python3.11
+      Content:
+        S3Bucket:
+          Fn::Sub:
+            - "${BucketName}${AWS::Region}"
+            - {BucketName: !Ref BucketNameWithOutRegion}
+        S3Key:
+          Fn::Sub:
+            - "${releasefolder}/latest_cffi.zip"
+            - {releasefolder: !Ref ReleaseID}
+      Description: This layer is used for CFFI
+      LayerName: DNSCffi
+  DNSpyjwtLambdaLayer:
+    Condition: CreateRole
+    Type: AWS::Lambda::LayerVersion
+    Properties:
+      CompatibleRuntimes:
+        - python3.11
+      Content:
+        S3Bucket:
+          Fn::Sub:
+            - "${BucketName}${AWS::Region}"
+            - {BucketName: !Ref BucketNameWithOutRegion}
+        S3Key:
+          Fn::Sub:
+            - "${releasefolder}/latest_pyjwt.zip"
+            - {releasefolder: !Ref ReleaseID}
+      Description: This layer is used for pyjwt
+      LayerName: DNSpyJwt
+
+  DNSZoneLogEnableEventRule:
+    Condition: CreateRole
+    Type: "AWS::Events::Rule"
+    Properties:
+      Description: Rule to triggers when AWS DNS Hosted Zone created or deleted
+      EventPattern:
+        {
+          "detail-type": [
+            "AWS API Call via CloudTrail"
+          ],
+          "source": [
+            "aws.route53"
+          ],
+          "detail": {
+            "eventSource": [
+              "route53.amazonaws.com"
+            ],
+            "eventName": [
+              "CreateHostedZone",
+              "DeleteHostedZone"
+            ]
+          }
+        }
+      State: ENABLED
+      Name: "platform_dns_hosted_zone_log_enable"
+      Targets:
+        - Arn: !GetAtt FunctionDelegateHostedZoneInfoblox.Arn
+          Id: "platformDelegateSubzone"
+  FunctionDelegateHostedZoneInfoblox:
+    Condition: CreateRole
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: platform_public_dns_zonedelegation
+      Layers:
+        - !Ref DNSRequestsLambdaLayer
+        - !Ref DNSpyjwtLambdaLayer
+        - !Ref DNSCffiLambdaLayer
+        - !Ref DNSCryptographyLambdaLayer
+      Code:
+        S3Bucket:
+          Fn::Sub:
+            - "${BucketName}${AWS::Region}"
+            - {BucketName: !Ref BucketNameWithOutRegion}
+        S3Key:
+          Fn::Sub:
+            - "${releasefolder}/platform_public_dns_zonedelegation.zip"
+            - {releasefolder: !Ref ReleaseID}
+      Description: Public Account DNS Hosted Zone delegation to Shell Infoblox
+      Environment:
+        Variables:
+          env: !Ref EnvType
+      Tags:
+        - Value: "yes"
+          Key: platform_donotdelete
+      Handler: platform_public_dns_zonedelegation.lambda_handler
+      MemorySize: 1024
+      Role: !GetAtt PlatformOperationRole.Arn
+      Runtime: python3.8
+      Timeout: 900
+    DependsOn: DNSRequestsLambdaLayer
+  PermissionForEventsToInvokeLambdaDNS:
+    Condition: CreateRole
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref FunctionDelegateHostedZoneInfoblox
+      Action: "lambda:InvokeFunction"
+      Principal: "events.amazonaws.com"
+      SourceArn: !GetAtt DNSZoneLogEnableEventRule.Arn

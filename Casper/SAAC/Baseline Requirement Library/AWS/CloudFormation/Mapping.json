@@ -1,0 +1,115 @@
+{ 
+    "serviceprovider": "aws", 
+    "servicerequirement_name": [ 
+        "AWS::cloudformation::*" 
+    ], 
+    "service_type":"Management & Governance",
+    "servicedisplay_name": "AWS CloudFormation", 
+    "serviceapproval_status": { 
+        "Prod": "approved", 
+        "SNP": "approved", 
+        "NP": "approved" 
+    }, 
+    "phase": "Service Discovery", 
+    "mapping": [ 
+
+        { 
+            "requirement_name": "Ensure an IAM policy is defined with CloudFormation stack to follow the principle of least privilege", 
+            "policy": "", 
+            "security_domain": "Identity and Access Management", 
+            "ticket_enabled": "false", 
+            "tags": [], 
+            "severity": { 
+                "cvss_score":"5.1",
+                "cvss_severity":"Medium",
+                "cvss_vector": "#CVSS:3.1/AV:A/AC:H/PR:H/UI:N/S:C/C:L/I:L/A:L"                      
+            },           
+            "control_mapping": ["CS0012298"], 
+            "implementations": [] 
+        }, 
+        { 
+            "requirement_name": "Ensure deletion policy attribute is set in stack", 
+            "policy": "", 
+            "security_domain": "Data Protection", 
+            "ticket_enabled": "false", 
+            "tags": [], 
+            "severity": { 
+                "cvss_score":"2.7",
+                "cvss_severity":"Low",
+                "cvss_vector": "#CVSS:3.1/AV:P/AC:H/PR:H/UI:N/S:U/C:N/I:L/A:L"                      
+            },           
+            "control_mapping": ["CS0012168"], 
+            "implementations": [] 
+        }, 
+        { 
+            "requirement_name": "Ensure CloudFormation template is not configured without a stack policy and stack termination protection is enabled", 
+            "policy": "", 
+            "security_domain": "Identity and Access Management", 
+            "ticket_enabled": "false", 
+            "tags": [], 
+            "severity": { 
+                "cvss_score":"1.9",
+                "cvss_severity":"Low",
+                "cvss_vector": "#CVSS:3.1/AV:P/AC:H/PR:H/UI:N/S:C/C:N/I:N/A:L"                      
+            },           
+            "control_mapping": ["CS0012298"], 
+            "implementations": [] 
+        }, 
+        { 
+            "requirement_name": "Ensure to detect drift on CloudFormation", 
+            "policy": "", 
+            "security_domain": "Configuration Management", 
+            "ticket_enabled": "false", 
+            "tags": [], 
+            "severity": { 
+                "cvss_score":"3.4",
+                "cvss_severity":"Low",
+                "cvss_vector": "#CVSS:3.1/AV:A/AC:H/PR:L/UI:R/S:U/C:L/I:L/A:N"                      
+            },           
+            "control_mapping": ["Place holder"], 
+            "implementations": [] 
+        }, 
+        { 
+            "requirement_name": "Ensure to enable CloudFormation stack notifications", 
+            "policy": "", 
+            "security_domain": "Security Information and event management", 
+            "ticket_enabled": "false", 
+            "tags": [], 
+            "severity": { 
+                "cvss_score":"1.9",
+                "cvss_severity":"Low",
+                "cvss_vector": "#CVSS:3.1/AV:P/AC:H/PR:H/UI:N/S:C/C:N/I:N/A:L"                      
+            },           
+            "control_mapping": ["CS0012233"], 
+            "implementations": [] 
+        }, 
+        { 
+            "requirement_name": "Ensure CloudTrail logging is enabled for CloudFormation", 
+            "policy": "", 
+            "security_domain": "Security Information and event management", 
+            "ticket_enabled": "false", 
+            "tags": [], 
+            "severity": { 
+                "cvss_score":"1.9",
+                "cvss_severity":"Low",
+                "cvss_vector": "#CVSS:3.1/AV:P/AC:H/PR:H/UI:N/S:C/C:N/I:N/A:L"                     
+            },           
+            "control_mapping": ["CS0012233"], 
+            "implementations": [] 
+        }, 
+        { 
+            "requirement_name": "Ensure resource tagging is added to CloudFormation", 
+            "policy": "", 
+            "security_domain": "Asset Management", 
+            "ticket_enabled": "false", 
+            "tags": [], 
+            "severity": { 
+                "cvss_score":"3.3",
+                "cvss_severity":"Low",
+                "cvss_vector": "#CVSS:3.1/AV:P/AC:H/PR:H/UI:N/S:C/C:L/I:N/A:L"                      
+            },           
+            "control_mapping": ["CS0012128"], 
+            "implementations": [] 
+        }
+    ]
+}  

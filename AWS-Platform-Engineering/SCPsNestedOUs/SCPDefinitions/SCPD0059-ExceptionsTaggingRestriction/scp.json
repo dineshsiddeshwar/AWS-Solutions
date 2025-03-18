@@ -1,0 +1,143 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": [
+        "ec2:CreateTags",
+        "ec2:DeleteTags",
+        "s3:DeleteObjectTagging",
+        "s3:PutBucketTagging",
+        "s3:ReplicateTags",
+        "s3:PutObjectVersionTagging",
+        "s3:PutObjectTagging",
+        "s3:DeleteObjectVersionTagging",
+        "rds:AddTagsToResource",
+        "rds:RemoveTagsFromResource",
+        "dynamodb:TagResource",
+        "dynamodb:UntagResource",
+        "states:UntagResource",
+        "states:TagResource",
+        "sns:TagResource",
+        "sns:UntagResource",
+        "sqs:TagQueue",
+        "sqs:UntagQueue",
+        "backup:TagResource",
+        "backup:UntagResource",
+        "lambda:TagResource",
+        "lambda:UntagResource",
+        "redshift:DeleteTags",
+        "redshift:CreateTags",
+        "logs:TagLogGroup",
+        "logs:UntagLogGroup",
+        "events:TagResource",
+        "events:UntagResource",
+        "cloudwatch:UntagResource",
+        "cloudwatch:TagResource"
+      ],
+      "Effect": "Deny",
+      "Resource": [
+        "*"
+      ],
+      "Condition": {
+        "ForAnyValue:StringEqualsIgnoreCase": {
+          "aws:TagKeys": [
+            "platform*",
+            "Adhoc_TOE_Complaint_OS_Flavours",
+            "Adhoc_AMI_Owner_Account",
+            "wiz"
+          ]
+        },
+        "ArnNotLike": {
+          "aws:PrincipalARN": [
+            "arn:aws:iam::*:role/platform*",
+            "arn:aws:iam::*:role/*Wiz*",
+            "arn:aws:iam::*:role/aws-reserved/sso.amazonaws.com/*platform*",
+            "arn:aws:iam::*:role/*AWSControlTower*",
+            "arn:aws:iam::master_account_id:role/aws-service-role/stacksets.cloudformation.amazonaws.com/AWSServiceRoleForCloudFormationStackSetsOrgAdmin*",
+            "arn:aws:iam::*:role/stacksets-exec*",
+            "arn:aws:iam::*:role/aws-controltower*"
+          ]
+        }
+      }
+    },
+    {
+      "Action": [
+        "ssm:CreateMaintenanceWindow",
+        "ssm:CreatePatchBaseline",
+        "ec2:DeleteFlowLogs"
+      ],
+      "Effect": "Deny",
+      "Resource": "*",
+      "Condition": {
+        "ArnNotLike": {
+          "aws:PrincipalARN": [
+            "arn:aws:iam::*:role/platform*",
+            "arn:aws:iam::*:role/aws-reserved/sso.amazonaws.com/*platform*",
+            "arn:aws:iam::*:role/*AWSControlTower*",
+            "arn:aws:iam::master_account_id:role/aws-service-role/stacksets.cloudformation.amazonaws.com/AWSServiceRoleForCloudFormationStackSetsOrgAdmin*",
+            "arn:aws:iam::*:role/stacksets-exec*",
+            "arn:aws:iam::*:role/aws-controltower*"
+          ]
+        },
+        "StringEquals": {
+          "aws:resourceTag/platform_donotdelete": [
+            "yes"
+          ]
+        }
+      }
+    },
+    {
+      "Action": "cloudformation:*",
+      "Effect": "Deny",
+      "Resource": [
+        "arn:aws:cloudformation:*:*:stack/platform*",
+        "arn:aws:cloudformation:*:*:stack/StackSet-platform*",
+        "arn:aws:cloudformation:*:*:stack/awsconfigconforms-OrgConformsPack-Platform*"
+      ],
+      "Condition": {
+        "ArnNotLike": {
+          "aws:PrincipalARN": [
+            "arn:aws:iam::*:role/platform*",
+            "arn:aws:iam::*:role/*Wiz*",
+            "arn:aws:iam::*:role/aws-reserved/sso.amazonaws.com/*platform*",
+            "arn:aws:iam::*:role/*AWSControlTower*",
+            "arn:aws:iam::master_account_id:role/aws-service-role/stacksets.cloudformation.amazonaws.com/AWSServiceRoleForCloudFormationStackSetsOrgAdmin*",
+            "arn:aws:iam::*:role/stacksets-exec*",
+            "arn:aws:iam::*:role/aws-controltower*"
+          ]
+        }
+      }
+    },
+    {
+      "Action": [
+        "ec2:DeleteTags"
+      ],
+      "Effect": "Deny",
+      "Resource": [
+        "*"
+      ],
+      "Condition": {
+        "ForAnyValue:StringEqualsIgnoreCase": {
+          "aws:TagKeys": [
+            "platform_default_patch_schedule",
+            "platform_cust_patch_schedule_01",
+            "platform_cust_patch_schedule_02",
+            "platform_maintenance_window",
+            "platform_install_patch",
+            "PatchGroup"
+          ]
+        },
+        "ArnNotLike": {
+          "aws:PrincipalARN": [
+            "arn:aws:iam::*:role/platform*",
+            "arn:aws:iam::*:role/aws-reserved/sso.amazonaws.com/*platform*",
+            "arn:aws:iam::*:role/*AWSControlTower*",
+            "arn:aws:iam::master_account_id:role/aws-service-role/stacksets.cloudformation.amazonaws.com/AWSServiceRoleForCloudFormationStackSetsOrgAdmin*",
+            "arn:aws:iam::*:role/stacksets-exec*",
+            "arn:aws:iam::*:role/aws-controltower*"
+          ]
+        }
+      }
+    }
+  ]
+}

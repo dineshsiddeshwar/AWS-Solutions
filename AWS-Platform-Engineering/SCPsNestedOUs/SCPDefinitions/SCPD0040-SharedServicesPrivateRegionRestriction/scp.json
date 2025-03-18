@@ -1,0 +1,30 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Deny",
+      "Action": "*",
+      "Resource": "*",
+      "Condition": {
+        "StringNotEquals": {
+          "aws:RequestedRegion": [
+            "us-east-1",
+            "eu-west-1",
+            "ap-southeast-1"
+          ]
+        },
+        "ArnNotLike": {
+          "aws:PrincipalARN": [
+            "arn:aws:iam::*:role/platform*",
+            "arn:aws:iam::*:role/*Wiz*",
+            "arn:aws:iam::*:role/aws-reserved/sso.amazonaws.com/*platform*",
+            "arn:aws:iam::*:role/*AWSControlTower*",
+            "arn:aws:iam::master_account_id:role/aws-service-role/stacksets.cloudformation.amazonaws.com/AWSServiceRoleForCloudFormationStackSetsOrgAdmin*",
+            "arn:aws:iam::*:role/stacksets-exec*",
+            "arn:aws:iam::*:role/aws-controltower*"
+          ]
+        }
+      }
+    }
+  ]
+}

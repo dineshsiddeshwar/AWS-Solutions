@@ -1,0 +1,13 @@
+# Imports common-functions
+import "tfplan-functions" as tfplan
+
+# Get all AWS Instance
+awsInstances = tfplan.find_resources("aws_instance")
+
+# Return all the instances with public ip associated
+violating_resources = tfplan.filter_attribute_is_not_value(awsInstances, "associate_public_ip_address", false, true)
+
+# Main rule
+main = rule {
+    length(violating_resources["messages"]) is 0
+}

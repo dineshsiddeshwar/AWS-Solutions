@@ -1,0 +1,17 @@
+{
+    "serviceprovider": "azure",
+    "servicerequirement_name": "Azure::Databricks::Implementation",
+    "serviceDisplayName": "AWS Databricks",
+    "id": "AWS_Databricks_3_1",
+    "label": "Ensure Diagnostic Settings are enabled in Azure Databricks",
+    "description": "This control is to check whether Azure Databricks is enabled with end-to-end diagnostic logs of activities performed by Azure Databricks users, allowing the enterprise to monitor detailed Azure Databricks usage patterns.",
+    "type": "Detective",
+    "implementationProvider": "wiz",
+    "wizNativeType": [
+        ""
+    ],
+    "link": "link to terrform line/comment where requirement is implemented",
+    "requirementId": [
+        "Azure_Databricks_3"
+    ]
+  }

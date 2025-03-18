@@ -1,0 +1,150 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "VisualEditor0",
+            "Effect": "Deny",
+            "Action": [
+                "lambda:Delete*",
+                "lambda:Add*",
+                "lambda:Remove*",
+                "lambda:EnableReplication",
+                "lambda:DisableReplication",
+                "s3:Delete*",
+                "s3:BypassGovernanceRetention",
+                "s3:ObjectOwnerOverrideToBucketOwner",
+                "controltower:CreateManagedAccount",
+                "controltower:DeleteLandingZone",
+                "controltower:DeregisterManagedAccount",
+                "controltower:DeregisterOrganizationalUnit",
+                "controltower:DisableControl",
+                "controltower:DisableGuardrail",
+                "controltower:EnableControl",
+                "controltower:EnableGuardrail",
+                "controltower:ManageOrganizationalUnit",
+                "controltower:SetupLandingZone",
+                "controltower:UpdateAccountFactoryConfig",
+                "sso:*",
+                "cloudwatch:DeleteAlarms",
+                "cloudwatch:DeleteAnomalyDetector",
+                "cloudwatch:DeleteDashboards",
+                "cloudwatch:DeleteInsightRules",
+                "cloudwatch:DeleteMetricStream",
+                "cloudwatch:DisableAlarmActions",
+                "cloudwatch:DisableInsightRules",
+                "cloudwatch:EnableAlarmActions",
+                "cloudwatch:EnableInsightRules",
+                "cloudwatch:Link",
+                "cloudwatch:PutAnomalyDetector",
+                "cloudwatch:PutCompositeAlarm",
+                "cloudwatch:PutDashboard",
+                "cloudwatch:PutInsightRule",
+                "cloudwatch:PutManagedInsightRules",
+                "cloudwatch:PutMetricAlarm",
+                "cloudwatch:PutMetricData",
+                "cloudwatch:PutMetricStream",
+                "cloudwatch:SetAlarmState",
+                "cloudwatch:StartMetricStreams",
+                "cloudwatch:StopMetricStreams",
+                "dynamodb:*",
+                "organizations:CreateOrganization",
+                "organizations:CreateOrganizationalUnit",
+                "organizations:DeleteOrganization",
+                "organizations:DeleteOrganizationalUnit",
+                "organizations:DeletePolicy",
+                "organizations:DeclineHandshake",
+                "organizations:DeleteResourcePolicy",
+                "organizations:DeregisterDelegatedAdministrator",
+                "organizations:DisableAWSServiceAccess",
+                "organizations:EnableAWSServiceAccess",
+                "organizations:EnablePolicyType",
+                "organizations:EnableAllFeatures",
+                "organizations:LeaveOrganization",
+                "organizations:RemoveAccountFromOrganization"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "cloudformation:CreateStack",
+                "cloudformation:CreateStackSet",
+                "cloudformation:CreateUploadBucket",
+                "s3:PutObject",
+                "cloudformation:CreateStackInstances",
+                "cloudshell:CreateSession",
+                "cloudshell:CreateEnvironment",
+                "cloudshell:GetFileDownloadUrls",
+                "cloudshell:GetFileUploadUrls",
+                "cloudshell:StartEnvironment",
+                "cloudshell:GetEnvironmentStatus",
+                "cloudshell:PutCredentials"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "VisualEditor2",
+            "Effect": "Deny",
+            "Action": [
+                "sso:ProvisionPermissionSet",
+                "sso:StartSSO",
+                "sso:DeleteProfile",
+                "sso:CreateAccountAssignment",
+                "sso:DeleteAccountAssignment",
+                "sso:AssociateProfile",
+                "sso:UpdateProfile",
+                "sso:CreateProfile"
+            ],
+            "Resource": [
+                "arn:aws:sso:::account/${payer_account_id}",
+                "arn:aws:sso:::account/${shared_services_account_id}",
+                "arn:aws:sso:::account/${log_archive_account_id}",
+                "arn:aws:sso:::account/${audit_account_id}"
+            ]
+        },
+        {
+            "Sid": "VisualEditor3",
+            "Effect": "Deny",
+            "Action": [
+                "sso:ProvisionPermissionSet",
+                "sso:DeleteInlinePolicyFromPermissionSet",
+                "sso:PutInlinePolicyToPermissionSet",
+                "sso:DeletePermissionSet",
+                "sso:DetachManagedPolicyFromPermissionSet",
+                "sso:AttachManagedPolicyToPermissionSet",
+                "sso:UpdatePermissionSet"
+            ],
+            "Resource": [
+                "arn:aws:sso:::permissionSet/ssoins-7223f85a78ca6f59/${platform_operator}",
+                "arn:aws:sso:::permissionSet/ssoins-7223f85a78ca6f59/${platform_ContributorExternal}",
+                "arn:aws:sso:::permissionSet/ssoins-7223f85a78ca6f59/${platform_DashboardExternal}",
+                "arn:aws:sso:::permissionSet/ssoins-7223f85a78ca6f59/${platform_PIMCognitoAccess}"
+            ]
+        },
+        {
+            "Sid": "VisualEditor4",
+            "Effect": "Deny",
+            "Action": [
+                "organizations:AttachPolicy",
+                "organizations:DetachPolicy",
+                "organizations:UpdatePolicy"
+            ],
+            "NotResource": [
+                "arn:aws:organizations::${payer_account_id}:ou/${ou_id}/${migration_ou_id}"
+            ],
+            "Condition": {
+                "StringNotEquals": {
+                    "aws:ResourceTag/migration_ou_region_whitelisting": [
+                        "yes"
+                    ]
+                }
+            }
+        },
+        {
+            "Sid": "VisualEditor5",
+            "Effect": "Deny",
+            "Action": "iam:CreateLoginProfile",
+            "Resource": "*"
+        }
+    ]
+}

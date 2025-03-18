@@ -1,0 +1,17 @@
+{
+    "serviceprovider": "azure",
+    "servicerequirement_name": "Azure::ContainerRegistry::Implementation",
+    "serviceDisplayName": "AWS ContainerRegistry",
+    "id": "AWS_ContainerRegistry_10_1",
+    "label": "Ensure content trust is enabled in Azure Container Registry",
+    "description": "Consumers of the data must be able to verify both the publisher (source) of the data, as well as ensure it's not been modified after it was published (integrity). As an image publisher, content trust allows to sign the images to be pushed to container registry. Consumers of images (people or systems pulling images from your registry) must be configured to pull only signed images. When an image consumer pulls a signed image, their Docker client verifies the integrity of the image. In this model, consumers are assured that the signed images in the registry were indeed published by authorized person, and that they've not been modified since being published.Content trust works with the tags in a repository. Image repositories can contain images with both signed and unsigned tags.",
+    "type": "Detective",
+    "implementationProvider": "wiz",
+    "wizNativeType": [
+        ""
+    ],
+    "link": "link to terrform line/comment where requirement is implemented",
+    "requirementId": [
+        "Azure_ContainerRegistry_10"
+    ]
+  }

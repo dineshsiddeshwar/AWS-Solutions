@@ -1,0 +1,69 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Parameters:
+  S3BucketName:
+    Type: String
+    Description: S3 Bucket Name
+  FolderName:
+    Type: String
+    Description: Folder Name
+
+Resources:
+  SSMStackSetRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: !Sub 'platform_stackset_ssm_tag_role_${AWS::Region}'
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonEC2FullAccess
+        - arn:aws:iam::aws:policy/AmazonSSMFullAccess
+
+  FunctionToTagSSMCompliantInstances:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: platform-TagSSMCompliantInstances
+      Code:
+        S3Bucket:
+          Fn::Sub:
+              - "${S3BucketName}${AWS::Region}"
+              - {S3BucketName: !Ref S3BucketName}
+        S3Key:
+          Fn::Sub:
+              - "${releasefolder}/Platform-TagSSMCompliantInstances.zip"
+              - {releasefolder: !Ref FolderName}
+      Description: Tag the EC2 instances based on SSM Agent installation state
+      Handler: Platform-TagSSMCompliantInstances.lambda_handler
+      MemorySize: 1024
+      Role: !GetAtt SSMStackSetRole.Arn
+      Runtime: python3.8
+      Timeout: 900
+
+  ScheduledRuleTagSSM:
+    Type: "AWS::Events::Rule"
+    Properties:
+      Name: platform-TagSSMCompliantInstancesSchedule
+      Description: "Scheduled Rule for every 30 minutes"
+      ScheduleExpression: "rate(30 minutes)"
+      State: "ENABLED"
+      Targets:
+        - Arn: !GetAtt FunctionToTagSSMCompliantInstances.Arn
+          Id: "TargetFunctionV1"
+
+  PermissionForPatchReporthourlyscheduler:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref FunctionToTagSSMCompliantInstances
+      Action: "lambda:InvokeFunction"
+      Principal: "events.amazonaws.com"
+      SourceArn:
+        Fn::GetAtt:
+          - "ScheduledRuleTagSSM"
+          - "Arn"

@@ -1,0 +1,17 @@
+{
+    "serviceprovider": "aws",
+    "servicerequirement_name": "AWS::VPC::Implementation",
+    "serviceDisplayName": "AWS VPC",
+    "id": "AWS_VPC_6_1",
+    "label": "Ensure flow logs are enabled",
+    "description": "",
+    "type": "Detective",
+    "implementationProvider": "wiz",
+    "wizNativeType": [
+        "vpc"
+    ],
+    "link": "",
+    "requirementId": [
+        "AWS_VPC_6"
+    ]
+}

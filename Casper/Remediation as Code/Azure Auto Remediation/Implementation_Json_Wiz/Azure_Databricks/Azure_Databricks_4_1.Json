@@ -1,0 +1,17 @@
+{
+    "serviceprovider": "azure",
+    "servicerequirement_name": "Azure::Databricks::Implementation",
+    "serviceDisplayName": "AWS Databricks",
+    "id": "AWS_Databricks_4_1",
+    "label": "Ensure secure cluster connectivity is enabled",
+    "description": "This control is to check whether Azure Databricks workspace is deployed in private subnets without any inbound access to organization network. Clusters will utilize a secure connectivity mechanism to communicate with the Azure Databricks infrastructure, without requiring public IP addresses for the nodes.",
+    "type": "Detective",
+    "implementationProvider": "wiz",
+    "wizNativeType": [
+        ""
+    ],
+    "link": "link to terrform line/comment where requirement is implemented",
+    "requirementId": [
+        "Azure_Databricks_4"
+    ]
+  }

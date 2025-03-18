@@ -1,0 +1,19 @@
+{
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": "sns:Publish",
+            "Resource": "arn:aws:sns:*:${account_id}:GroupsNewTopic"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "sns:CreateTopic",
+                "sns:ListTopics",
+                "sns:SetTopicAttributes",
+                "sns:DeleteTopic"
+            ],
+            "Resource": "*"
+        }
+    ]
+}

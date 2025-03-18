@@ -1,0 +1,17 @@
+{
+    "serviceprovider": "aws",
+    "servicerequirement_name": "AWS::S3::Implementation",
+    "serviceDisplayName": "AWS S3",
+    "id": "AWS_S3_18_1",
+    "label": "Ensure organization backup plans have a compliant lifecycle configuration enabled",
+    "description": "Ensure organization backup plans have a compliant lifecycle configuration enabled.",
+    "type": "Detective",
+    "implementationProvider": "wiz",
+    "wizNativeType": [
+        "bucket"
+    ],
+    "link": "Detective-Pipeline/AWS/AWS_S3/AWS_S3_18_1.rego",
+    "requirementId": [
+        "AWS_S3_18"
+    ]
+}

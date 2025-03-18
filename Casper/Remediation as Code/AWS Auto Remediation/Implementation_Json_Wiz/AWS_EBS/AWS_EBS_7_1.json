@@ -1,0 +1,17 @@
+{
+    "serviceprovider": "aws",
+    "servicerequirement_name": "AWS::EBS::Implementation",
+    "serviceDisplayName": "AWS EBS",
+    "id": "AWS_EBS_7_1",
+    "label": "Ensure EBS Volume is attached",
+    "description": "",
+    "type": "Detective",
+    "implementationProvider": "wiz",
+    "wizNativeType": [
+        ""
+    ],
+    "link": "Detective-Pipeline/AWS/EBS/AWS_EBS_7_1.rego",
+    "requirementId": [
+        "AWS_EBS_7"
+    ]
+}

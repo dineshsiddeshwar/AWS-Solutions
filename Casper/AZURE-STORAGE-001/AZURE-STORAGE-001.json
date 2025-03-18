@@ -1,0 +1,55 @@
+{
+    "properties": {
+        "displayName": "AZURE-STORAGE-001",
+        "policyType": "BuiltIn",
+        "description": "Azure Storage should not bypass network Acls",
+        "metadata": {
+            "version": "1.0.0",
+            "category": "Azure Storage"
+        },
+        "parameters": {
+            "AZURE-STORAGE-001-effect": {
+                "type": "String",
+                "metadata": {
+                    "displayName": "AZURE-STORAGE-001-effect",
+                    "description": "Effect of the policy"
+                },
+                "allowedValues": [
+                    "Audit",
+                    "Deny",
+                    "Disabled"
+                ],
+                "defaultValue": "Audit"
+            },
+            "disallowedBypassValues": {
+                "type": "Array",
+                "metadata": {
+                    "description": "Disallowed Values"
+                },
+                "defaultValue": [
+                    "AzureServices",
+                    "Logging",
+                    "Metrics"
+                ]
+            }
+        },
+        "mode": "All",
+        "policyRule": {
+            "if": {
+                "allOf": [
+                    {
+                        "field": "type",
+                        "equals": "Microsoft.Storage/storageAccounts"
+                    },
+                    {
+                        "field": "Microsoft.Storage/storageAccounts/networkAcls.bypass",
+                        "in": "[parameters('disallowedBypassValues')]"
+                    }
+                ]
+            },
+            "then": {
+                "effect": "[parameters('AZURE-STORAGE-001-effect')]"
+            }
+        }
+    }
+}

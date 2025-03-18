@@ -1,0 +1,1 @@
+az role definition create --role-definition '@CK_ROLE_Azure CLI for storage_Definition.json'

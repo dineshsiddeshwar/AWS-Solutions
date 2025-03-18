@@ -1,0 +1,43 @@
+{
+  "serviceprovider": "azure",
+  "servicerequirement_name": "Azure::Virtual_Machine::Implementation",
+  "serviceDisplayName": "Virtual Machine Implementaion",
+  "mappings": [
+    {
+      "id": "AZVM001-D01",
+      "label": "Virtual Machine should use private link",
+      "description": "wiz policy to monitor if Storage accounts should use private link",
+      "type": "Detective",
+      "implementationProvider": "wiz",
+      "link": "https://github.com/ey-org/cloudsec-ccm/blob/master/Monitoring%20and%20Remediation/Wiz/Azure/Storage%20Account/Storage%20accounts%20should%20use%20private%20link.rego",
+      "requirementId": ["AZVM001"]
+    },
+    {
+      "id": "AZVM002-D02",
+      "label": "NSG for VM subnet has NSG flow log enabled in network watcher",
+      "description": "NSG for VM subnet has NSG flow log enabled in network watcher2",
+      "type": "Detective",
+      "implementationProvider": "wiz",
+      "link": "https://github.com/ey-org/cloudsec-ccm/blob/master/Monitoring%20and%20Remediation/Wiz/Azure/Storage%20Account/Secure%20transfer%20to%20storage%20accounts%20should%20be%20enabled.rego",
+      "requirementIds": ["AZVM002"]
+    },
+    {
+      "id": "AZVM002-P02",
+      "label": "Azure policy for NSG for VM subnet has NSG flow log enabled in network watcher",
+      "description": "Azure policy for NSG for VM subnet has NSG flow log enabled in network watcher",
+      "type": "Preventive",
+      "implementationProvider": "Azure",
+      "link": "",
+      "requirementIds": ["AZVM002"]
+    },
+    {
+      "id": "AZVM002-I02",
+      "label": "NSG for VM subnet has NSG flow log enabled in network watcher using IAC",
+      "description": "NSG for VM subnet has NSG flow log enabled in network watcher using IAC",
+      "type": "IAC",
+      "implementationProvider": "Terraform",
+      "link": "link to terrform line/comment where requirement is implemented",
+      "requirementIds": ["AZVM002"]
+    }
+  ]
+}

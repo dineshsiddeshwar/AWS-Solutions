@@ -1,0 +1,17 @@
+{
+    "serviceprovider": "azure",
+    "servicerequirement_name": "Azure::ContainerRegistry::Implementation",
+    "serviceDisplayName": "AWS ContainerRegistry",
+    "id": "AWS_ContainerRegistry_3_1",
+    "label": "Ensure Azure container Registry implements Role Based Access Control",
+    "description": "Cloud products and services must be deployed on private subnets and public access must be disabled for these services.",
+    "type": "Detective",
+    "implementationProvider": "wiz",
+    "wizNativeType": [
+        ""
+    ],
+    "link": "link to terrform line/comment where requirement is implemented",
+    "requirementId": [
+        "Azure_ContainerRegistry_3"
+    ]
+  }

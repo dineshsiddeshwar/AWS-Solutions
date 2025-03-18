@@ -1,0 +1,1191 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: CloudWatch Event rule for Custome AMI Tagging
+Parameters:
+  S3BucketName:
+    Type: String
+    Description: S3 Bucket Name
+  FolderName:
+    Type: String
+    Description: Folder Name
+  masteraccount:
+    Description: Payer Account ID 
+    Type: String
+  DataScanning:
+    AllowedValues:
+      - Enabled
+      - Disabled
+    Default: Disabled
+    Description: Enable data scanning
+    Type: String
+  ExternalId:
+    AllowedPattern: '\S{8}-\S{4}-\S{4}-\S{4}-\S{12}'
+    Description: >-
+      Enter External ID, this is a nonce that will be used by our service to
+      assume the WizScannerRole above
+    Type: String
+  OrchestratorAccountID:
+    AllowedPattern: '[0-9]+'
+    Description: >-
+      Enter the account ID where the Wiz orchestrator will reside on, if you
+      don't wish to deploy your own orchestrator cluster leave as default
+    Type: String
+  RolePrefix:
+    Default: ''
+    Description: >-
+      Enter the suffix role name that will be installed on your account, the
+      default is WizScannerRole (which is great)
+    Type: String
+  ServerlessScanning:
+    AllowedValues:
+      - Enabled
+      - Disabled
+    Default: Enabled
+    Description: Enable serverless scanning
+    Type: String
+  RoleARN:
+    Default: ''
+    Description: 'Enter Role ARN, leave empty for default'
+    Type: String
+  WizRoleNameChild:
+    Default: DEV-WizAccess-Role
+    Description: >-
+      Enter the role name that will be installed on your account, the default is
+      WizAccess-Role
+    Type: String
+  DynatraceRoleNameChild:
+    Default: Dynatrace_monitoring_role
+    Description: >-
+      Enter the role name that will be installed on your account, the default is
+      Dynatrace_monitoring_role
+    Type: String
+  DynatraceAccountID:
+    AllowedPattern: '[0-9]+'
+    Description: >-
+      Enter the dynatrace account id
+    Type: String
+  PayerAccountEventBusName:
+    Type: String
+    Description: Name of the Event Bus for root Monitoring in Payer Account 
+
+    
+Conditions:
+  DataScanningEnabled: !Equals 
+    - !Ref DataScanning
+    - Enabled
+  ServerlessScanningEnabled: !Equals 
+    - !Ref ServerlessScanning
+    - Enabled
+  RoleParamIsProvided: !Not 
+    - !Equals 
+      - !Ref RoleARN
+      - ''
+  Standard: !Equals 
+    - !Ref 'AWS::Partition'
+    - aws
+  CreateIAMRole: !Equals [!Ref 'AWS::Region', us-east-1]
+Resources:
+  # --------------------------------------------------------------------------------------------------------------------------------------------------------
+  # CloudWatch Event rules which will trigger lambda function
+  # --------------------------------------------------------------------------------------------------------------------------------------------------------
+  ScheduledRuleForAMItagging:
+    Type: "AWS::Events::Rule"
+    Properties:
+      Name: platform_Tag-Custome-AMI
+      Description: "While creating AMI, This rule will trigger"
+      EventPattern:
+        source:
+          - aws.ec2
+        detail-type:
+          - AWS API Call via CloudTrail
+        detail:
+          eventName:
+          - CreateImage
+          - ImportImage
+          - CopyImage
+      State: "ENABLED"
+      Targets:
+        - Arn: !GetAtt FunctionToCreatesnap.Arn
+          Id: "TargetFunctionV1"
+
+  # --------------------------------------------------------------------------------------------------------------------------------------------------------
+  # Permission to be added to the lambda for FunctionToTagAMIs
+  # --------------------------------------------------------------------------------------------------------------------------------------------------------
+  PermissionForEventsToInvokeLambdaTagAMIs:
+    Type: "AWS::Lambda::Permission"
+    Properties:
+      FunctionName: !GetAtt FunctionToCreatesnap.Arn
+      Action: "lambda:InvokeFunction"
+      Principal: "events.amazonaws.com"
+      SourceArn: !GetAtt ScheduledRuleForAMItagging.Arn
+  # --------------------------------------------------------------------------------------------------------------------------------------------------------
+  # IAM Role for lambda
+  # --------------------------------------------------------------------------------------------------------------------------------------------------------
+  CustomAMIStackSetRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: !Sub 'platform_custom_ami_tagging_role_${AWS::Region}' 
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      Path: /
+      Policies:
+        - PolicyName: platform_custom_ami_tagging_inlinepolicy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                  - ec2:DescribeTags
+                  - ec2:CreateTags
+                  - ec2:DescribeImageAttribute
+                  - ec2:DescribeImages
+                Resource: '*'
+  # --------------------------------------------------------------------------------------------------------------------------------------------------------
+  # Lambda function to tag the AMIs
+  # --------------------------------------------------------------------------------------------------------------------------------------------------------
+  FunctionToCreatesnap:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: platform_Custome-AMI-Tagging
+      Code:
+        ZipFile: |
+                import boto3
+                def lambda_handler(event, context):
+                    try:
+                      session=boto3.session.Session()
+                      ec2_client=session.client('ec2')
+                      ssm_store = ["platform_image_whitelist","yes"]
+                      image_id= event["detail"]["responseElements"]["imageId"]
+                      ec2_client.create_tags(Resources=[image_id], Tags=[{'Key': ssm_store[0], 'Value': ssm_store[1]}])
+                    except Exception as exception:
+                      print(exception)
+      Description: Custome AMI Tagging 
+      Handler: index.lambda_handler
+      MemorySize: 128
+      Role: !GetAtt CustomAMIStackSetRole.Arn
+      Runtime: python3.8
+      Timeout: 900
+  # --------------------------------------------------------------------------------------------------------------------------------------------------------
+  # Lambda function remediate RDS non-compliant w.r.t backup of 35 days
+  # --------------------------------------------------------------------------------------------------------------------------------------------------------
+  RDSComplianceBackupRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: !Sub 'platform_rds_backup_compliance_${AWS::Region}'
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      Path: /
+      Policies:
+        - PolicyName: !Sub 'platform_rds_backup_compliance_inlinepolicy_${AWS::Region}'
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - rds:DescribeDB*
+                  - rds:DescribeDBInstances
+                  - rds:ModifyDBInstance
+                  - rds:ModifyDBCluster
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                  - lambda:ListFunctions
+                  - lambda:GetFunction
+                  - lambda:InvokeAsync
+                  - lambda:InvokeFunction
+                  - lambda:DeleteFunction
+                  - lambda:CreateFunction
+                Resource: '*'
+  
+  FunctionPlatformRDSInstanceUpdate:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        S3Bucket:
+          Fn::Sub:
+              - "${S3BucketName}${AWS::Region}"
+              - {S3BucketName: !Ref S3BucketName}
+        S3Key:
+          Fn::Sub:
+            - "${releasefolder}/platform_update_rds_instance_backup.zip"
+            - {releasefolder: !Ref FolderName}
+      FunctionName: platform_update_rds_instance_backup
+      Tags:
+        - Value: "yes"
+          Key: platform_donotdelete
+      Handler: platform_update_rds_instance_backup.lambda_handler
+      Role: !GetAtt RDSComplianceBackupRole.Arn
+      Timeout: 900
+      MemorySize: 186
+      Runtime: python3.8
+
+  SchedulePlatformRDSInstanceUpdate:
+    Type: "AWS::Events::Rule"
+    Properties:
+      Name: platform-RDSinstanceUpdate
+      Description: "Triggered on rds instance creation"
+      State: "ENABLED"
+      EventPattern:
+        source:
+          - aws.rds
+        detail-type:
+          - RDS DB Instance Event
+        detail.EventID:
+          - RDS-EVENT-0005
+          - RDS-EVENT-0043
+      Targets:
+        - Arn: !GetAtt FunctionPlatformRDSInstanceUpdate.Arn
+          Id: "TargetFunctionV1"
+
+  PermissionForRDSBackup:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref FunctionPlatformRDSInstanceUpdate
+      Action: "lambda:InvokeFunction"
+      Principal: "events.amazonaws.com"
+      SourceArn:
+        Fn::GetAtt:
+          - "SchedulePlatformRDSInstanceUpdate"
+          - "Arn"  
+
+  FunctionPlatformRDSClusterUpdate:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        S3Bucket:
+          Fn::Sub:
+              - "${S3BucketName}${AWS::Region}"
+              - {S3BucketName: !Ref S3BucketName}
+        S3Key:
+          Fn::Sub:
+            - "${releasefolder}/platform_update_rds_cluster_backup.zip"
+            - {releasefolder: !Ref FolderName}
+      FunctionName: platform_update_rds_cluster_backup
+      Tags:
+        - Value: "yes"
+          Key: platform_donotdelete
+      Handler: platform_update_rds_cluster_backup.lambda_handler
+      Role: !GetAtt RDSComplianceBackupRole.Arn
+      Timeout: 900
+      MemorySize: 186
+      Runtime: python3.8
+
+  SchedulePlatformRDSClusterUpdate:
+    Type: "AWS::Events::Rule"
+    Properties:
+      Name: platform-RDSclusterUpdate
+      Description: "Triggered on rds cluster creation"
+      State: "ENABLED"
+      EventPattern:
+        source:
+          - aws.rds
+        detail-type:
+          - RDS DB Cluster Event
+        detail.EventID:
+          - RDS-EVENT-0170
+      Targets:
+        - Arn: !GetAtt FunctionPlatformRDSClusterUpdate.Arn
+          Id: "TargetFunctionV1"
+
+  PermissionForRDSClusterBackup:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref FunctionPlatformRDSClusterUpdate
+      Action: "lambda:InvokeFunction"
+      Principal: "events.amazonaws.com"
+      SourceArn:
+        Fn::GetAtt:
+          - "SchedulePlatformRDSClusterUpdate"
+          - "Arn"  
+
+  RDSComplianceRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: !Sub 'platform_rds_compliance_remediation_role_${AWS::Region}'
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - config.amazonaws.com
+                - ssm.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      Path: /
+      Policies:
+        - PolicyName: !Sub 'platform_rds_compliance_remediation_policy_${AWS::Region}'
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - rds:DescribeDB*
+                  - rds:DescribeDBInstances
+                  - rds:ModifyDBInstance
+                  - rds:ModifyDBCluster
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                  - lambda:ListFunctions
+                  - lambda:GetFunction
+                  - lambda:InvokeAsync
+                  - lambda:InvokeFunction
+                  - lambda:DeleteFunction
+                  - lambda:CreateFunction
+                Resource: '*'
+
+#------------------------------------------------------------------------------------
+# OIDC remediation 
+  AdminRestrictionPolicyprivate:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      Description: Policy for Lambda to perform actions in Audit Account
+      Path: '/'
+      ManagedPolicyName: !Sub 'platform_admin_restriction_private_${AWS::Region}'
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Deny
+            Action:
+            - ec2:CreateVpc
+            - ec2:CreateSubnet
+            - ec2:CreateRouteTable
+            - ec2:CreateRoute
+            - ec2:AssociateRouteTable
+            - ec2:ModifyVpcAttribute
+            - ec2:DeleteInternetGateway
+            - ec2:*DeleteRoute*
+            - ec2:CreateRoute
+            - ec2:DisassociateAddress
+            - ec2:DisassociateRouteTable
+            - ec2:DisassociateSubnetCidrBlock
+            - ec2:AssociateSubnetCidrBlock
+            - ec2:*VpcCidrBlock
+            - ec2:DisassociateIamInstanceProfile
+            - ec2:EnableVgwRoutePropagation
+            - ec2:ReplaceRoute
+            - ec2:ReplaceRouteTableAssociation
+            - ec2:CreateTransitGateway
+            - ec2:DeleteTransitGatewayRouteTable
+            - ec2:CreateTransitGatewayRouteTable
+            - ec2:CreateVpcEndpoint*
+            - ec2:DeleteVpcEndpoint*
+            - ec2:ModifyVpcEndpoint*
+            - ec2:RejectVpcEndpoint*
+            - ec2:StartVpcEndpoint*
+            - ec2:*VpcPeeringConnection
+            - ec2:*VpnEndpoint*
+            - ec2:DeleteTransitGateway*
+            - ec2:DeregisterTransitGateway*
+            - ec2:DisableTransitGateway*
+            - ec2:DisassociateTransitGateway*
+            - ec2:EnableTransitGateway*
+            - ec2:ExportTransitGateway*
+            - ec2:ModifyTransitGateway*
+            - ec2:RegisterTransitGateway*
+            - ec2:RejectTransitGateway*
+            - ec2:ReplaceTransitGateway*
+            - ec2:DeleteInternetGateway
+            - ec2:AttachInternetGateway
+            - ec2:CreateEgressOnlyInternetGateway
+            - ec2:CreateInternetGateway
+            - ec2:DeleteEgressOnlyInternetGateway
+            - ec2:DetachInternetGateway
+            - ec2:DeleteLocalGatewayRouteTableVpcAssociation
+            - ec2:DeleteVpnGateway
+            - ec2:CreateLocalGatewayRouteTableVpcAssociation
+            - ec2:AssociateClientVpnTargetNetwork
+            - ec2:ReplaceNetworkAcl*
+            - ec2:ReplaceNetworkAcl*
+            - ec2:CreateNetworkAcl*
+            - ec2:DeleteNetworkAcl*
+            - ec2:DetachVpnGateway
+            - ec2:CreateDefaultVpc
+            - ec2:DeleteDhcpOptions
+            - ec2:CreateNatGateway*
+            - ec2:DeleteNatGateway*
+            - ec2:*VpnConnection*
+            - ec2:MoveAddressToVpc
+            - ec2:CreateDefaultSubnet
+            - ec2:ModifyVpnTunnelCertificate
+            - ec2:AssociateDhcpOptions
+            - ec2:CreateClientVpnRoute
+            - ec2:AttachVpnGateway
+            - ec2:CreateLocalGatewayRoute
+            - ec2:RevokeClientVpnIngress
+            - ec2:ModifyVpnTunnelOptions
+            - ec2:AuthorizeClientVpnIngress
+            - ec2:ImportClientVpnClientCertificateRevocationList
+            - ec2:*CustomerGateway*
+            - ec2:DeleteClientVpnRoute
+            - ec2:*ClassicLink*
+            - ec2:ModifyVpcTenancy
+            - ec2:ApplySecurityGroupsToClientVpnTargetNetwork
+            - ec2:DeleteSubnet
+            - ec2:DeregisterInstanceEventNotificationAttributes
+            - ec2:DisableVgwRoutePropagation
+            - ec2:AssociateRouteTable
+            - ec2:CreateVpnGateway
+            - ec2:DeleteLocalGatewayRoute
+            - ec2:DeleteVpc
+            - ec2:TerminateClientVpnConnections
+            - ec2:DisassociateClientVpnTargetNetwork
+            - ec2:DisableEbsEncryptionByDefault
+            - s3:PutBucketPublicAccessBlock
+            - ec2:AllocateAddress
+            - iam:*MFADevice
+            - iam:DeleteAccountPasswordPolicy
+            - iam:UpdateAccountPasswordPolicy
+            - iam:*GroupPolicy
+            - iam:AttachUserPolicy
+            - iam:DeleteUserPolicy
+            - iam:DetachUserPolicy
+            - iam:PutUserPolicy
+            - iam:ChangePassword
+            - iam:CreateAccountAlias
+            - iam:CreateLoginProfile
+            - iam:CreateSAMLProvider
+            - iam:DeleteGroupPolicy
+            - iam:DeleteLoginProfile
+            - elasticmapreduce:PutBlockPublicAccessConfiguration
+            - ec2:DisableEbsEncryptionByDefault
+            - ds:UnshareDirectory
+            - ds:DeleteConditionalForwarder
+            - ds:DeleteTrust
+            - ds:UpdateConditionalForwarder
+            - ds:DeleteDirectory
+            - sso:Import*
+            - sso:Delete*
+            - sso:Update*
+            - sso:Detach*
+            - sso:DisassociateDirectory
+            - sso:Put*
+            - sso:AssociateDirectory
+            - sso-directory:Disable*
+            - sso-directory:Update*
+            - sso-directory:Delete*
+            - sso-directory:Create*
+            - sso-directory:Remove*
+            - aws-portal:ModifyAccount
+            - account:CloseAccount
+            - account:DeleteAlternateContact
+            - account:Put*
+            - billing:PutContractInformation
+            - billing:Update*
+            - aws-portal:ModifyBilling
+            - billing:RedeemCredits
+            - ce:Create*
+            - ce:Delete*
+            - ce:ProvideAnomalyFeedback
+            - ce:StartSavingsPlansPurchaseRecommendationGeneration
+            - ce:Update*
+            - cur:PutClassicReportPreferences
+            - freetier:PutFreeTierAlertPreference
+            - invoicing:PutInvoiceEmailDeliveryPreferences
+            - payments:CreatePaymentInstrument
+            - payments:DeletePaymentInstrument
+            - payments:MakePayment
+            - payments:UpdatePaymentPreferences
+            - tax:BatchPutTaxRegistration
+            - tax:DeleteTaxRegistration
+            - tax:PutTaxInheritance
+            - aws-portal:ModifyPaymentMethods
+            - account:GetAccountInformation
+            - securityhub:*Disable*
+            - securityhub:DeleteInvitations
+            - securityhub:DeleteMembers
+            - securityhub:UpdateStandardsControl
+            - ssm-guiconnect:StartConnection
+            - ssm-guiconnect:GetConnection
+            - ssm-guiconnect:CancelConnection
+            Resource: "*"
+          - Effect: Deny
+            Action:
+            - ec2:RunInstances
+            Condition:
+              Bool:
+                ec2:AssociatePublicIpAddress: 'true'
+            Resource: arn:aws:ec2:*:*:network-interface/*
+          - Effect: Deny
+            Action:
+            - iam:DeleteRole
+            - iam:UpdateRole
+            - iam:AttachRolePolicy
+            - iam:DetachRolePolicy
+            - iam:UpdateAssumeRolePolicy
+            Resource:
+            - arn:aws:iam::*:role/business_service*
+          - Effect: Deny
+            Action: iam:*OpenIDConnectProvider
+            NotResource:
+            - arn:aws:iam::*:oidc-provider/token.actions.githubusercontent.com
+            - arn:aws:iam::*:oidc-provider/oidc.eks.*.amazonaws.com*
+
+  AdminRestrictionPolicypublic:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      Description: Policy for Lambda to perform actions in Audit Account
+      Path: '/'
+      ManagedPolicyName: !Sub 'platform_admin_restriction_public_${AWS::Region}'
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Deny
+            Action:
+            - ec2:DisassociateIamInstanceProfile
+            - ec2:EnableVgwRoutePropagation
+            - ec2:DeleteLocalGatewayRouteTableVpcAssociation
+            - ec2:DeleteVpnGateway
+            - ec2:CreateLocalGatewayRouteTableVpcAssociation
+            - ec2:AssociateClientVpnTargetNetwork
+            - ec2:DetachVpnGateway
+            - ec2:*VpnConnection*
+            - ec2:ModifyVpnTunnelCertificate
+            - ec2:CreateClientVpnRoute
+            - ec2:AttachVpnGateway
+            - ec2:CreateLocalGatewayRoute
+            - ec2:RevokeClientVpnIngress
+            - ec2:ModifyVpnTunnelOptions
+            - ec2:AuthorizeClientVpnIngress
+            - ec2:ImportClientVpnClientCertificateRevocationList
+            - ec2:*CustomerGateway*
+            - ec2:DeleteClientVpnRoute
+            - ec2:ApplySecurityGroupsToClientVpnTargetNetwork
+            - ec2:DeregisterInstanceEventNotificationAttributes
+            - ec2:DisableVgwRoutePropagation
+            - ec2:CreateVpnGateway
+            - ec2:DeleteLocalGatewayRoute
+            - ec2:TerminateClientVpnConnections
+            - ec2:DisassociateClientVpnTargetNetwork
+            - ec2:DisableEbsEncryptionByDefault
+            - iam:*MFADevice
+            - iam:DeleteAccountPasswordPolicy
+            - iam:UpdateAccountPasswordPolicy
+            - iam:AttachUserPolicy
+            - iam:DeleteUserPolicy
+            - iam:DetachUserPolicy
+            - iam:PutUserPolicy
+            - iam:ChangePassword
+            - iam:CreateAccountAlias
+            - iam:CreateLoginProfile
+            - iam:CreateSAMLProvider
+            - iam:DeleteInstanceProfile
+            - iam:DeleteLoginProfile
+            - elasticmapreduce:PutBlockPublicAccessConfiguration
+            - ec2:DisableEbsEncryptionByDefault
+            - ds:UnshareDirectory
+            - ds:DeleteConditionalForwarder
+            - ds:DeleteTrust
+            - ds:UpdateConditionalForwarder
+            - ds:DeleteDirectory
+            - sso:Import*
+            - sso:Delete*
+            - sso:Update*
+            - sso:Detach*
+            - sso:DisassociateDirectory
+            - sso:Put*
+            - sso:AssociateDirectory
+            - sso-directory:Disable*
+            - sso-directory:Update*
+            - sso-directory:Delete*
+            - sso-directory:Create*
+            - sso-directory:Remove*
+            - aws-portal:ModifyAccount
+            - account:CloseAccount
+            - account:DeleteAlternateContact
+            - account:Put*
+            - billing:PutContractInformation
+            - billing:Update*
+            - aws-portal:ModifyBilling
+            - billing:RedeemCredits
+            - ce:Create*
+            - ce:Delete*
+            - ce:ProvideAnomalyFeedback
+            - ce:StartSavingsPlansPurchaseRecommendationGeneration
+            - ce:Update*
+            - cur:PutClassicReportPreferences
+            - freetier:PutFreeTierAlertPreference
+            - invoicing:PutInvoiceEmailDeliveryPreferences
+            - payments:CreatePaymentInstrument
+            - payments:DeletePaymentInstrument
+            - payments:MakePayment
+            - payments:UpdatePaymentPreferences
+            - tax:BatchPutTaxRegistration
+            - tax:DeleteTaxRegistration
+            - tax:PutTaxInheritance
+            - aws-portal:ModifyPaymentMethods
+            - account:GetAccountInformation
+            - securityhub:*Disable*
+            - securityhub:DeleteInvitations
+            - securityhub:DeleteMembers
+            - securityhub:UpdateStandardsControl
+            Resource: "*"
+          - Effect: Deny
+            Action:
+            - iam:DeleteRole
+            - iam:UpdateRole
+            - iam:AttachRolePolicy
+            - iam:DetachRolePolicy
+            - iam:UpdateAssumeRolePolicy
+            Resource:
+            - arn:aws:iam::*:role/business_service*
+          - Effect: Deny
+            Action: iam:*OpenIDConnectProvider
+            NotResource:
+            - arn:aws:iam::*:oidc-provider/token.actions.githubusercontent.com
+            - arn:aws:iam::*:oidc-provider/oidc.eks.*.amazonaws.com*
+          - Effect: Allow
+            Action: iam:PassRole
+            Resource: "*"
+            Condition:
+              StringEquals:
+                iam:PassedToService: opsworks.amazonaws.com
+
+#------------------------------------------------------------------------------------
+# Wiz Access Roles and Policy Creation in Child accounts
+
+  ScannerRole:
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: 'sts:AssumeRole'
+            Condition:
+              StringEquals:
+                'sts:ExternalId': !Ref ExternalId
+            Effect: Allow
+            Principal:
+              AWS: !Sub 'arn:${AWS::Partition}:iam::${OrchestratorAccountID}:root'
+        Version: 2012-10-17
+      ManagedPolicyArns:
+        - !Sub 'arn:${AWS::Partition}:iam::aws:policy/job-function/ViewOnlyAccess'
+      RoleName: !Sub '${RolePrefix}-WizScannerRole_${AWS::Region}'
+    Type: 'AWS::IAM::Role'
+  WizDataScanningPolicy:
+    Condition: DataScanningEnabled
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action:
+              - 'redshift:DeleteClusterSnapshot'
+              - 'redshift:AuthorizeSnapshotAccess'
+              - 'redshift:RevokeSnapshotAccess'
+            Condition:
+              StringEquals:
+                'aws:ResourceTag/wiz': auto-gen-snapshot
+            Effect: Allow
+            Resource: '*'
+          - Action:
+              - 'redshift:CreateTags'
+            Effect: Allow
+            Resource: !Sub 'arn:${AWS::Partition}:redshift:*:*:snapshot:*/*'
+          - Action:
+              - 'redshift:DescribeClusterSnapshots'
+              - 'redshift:DescribeClusters'
+            Effect: Allow
+            Resource: '*'
+          - Action:
+              - 'redshift:CreateClusterSnapshot'
+            Condition:
+              StringEquals:
+                'aws:RequestTag/wiz': auto-gen-snapshot
+            Effect: Allow
+            Resource: '*'
+          - Action:
+              - 'rds:DescribeDBClusters'
+              - 'rds:DescribeDBClusterSnapshots'
+              - 'rds:DescribeDBInstances'
+              - 'rds:DescribeDBSnapshots'
+              - 'rds:DescribeDBSubnetGroups'
+              - 'rds:ListTagsForResource'
+              - 'rds:AddTagsToResource'
+            Effect: Allow
+            Resource: '*'
+          - Action:
+              - 'rds:DeleteDBClusterSnapshot'
+              - 'rds:CopyDBClusterSnapshot'
+              - 'rds:ModifyDBClusterSnapshotAttribute'
+            Effect: Allow
+            Resource: !Sub 'arn:${AWS::Partition}:rds:*:*:cluster-snapshot:wiz-autogen-*'
+          - Action:
+              - 'rds:DeleteDBSnapshot'
+              - 'rds:CopyDBSnapshot'
+              - 'rds:ModifyDBSnapshotAttribute'
+            Effect: Allow
+            Resource: !Sub 'arn:${AWS::Partition}:rds:*:*:snapshot:wiz-autogen-*'
+          - Action:
+              - 'rds:CreateDBClusterSnapshot'
+              - 'rds:CreateDBSnapshot'
+            Condition:
+              StringEquals:
+                'rds:req-tag/wiz': auto-gen-snapshot
+            Effect: Allow
+            Resource: '*'
+          - Action:
+              - 's3:GetObject'
+              - 's3:ListBucket'
+            Effect: Allow
+            Resource: '*'
+          - Action:
+              - 'kms:CreateGrant'
+              - 'kms:ReEncrypt*'
+            Condition:
+              StringLike:
+                'kms:ViaService': rds.*.amazonaws.com
+            Effect: Allow
+            Resource: '*'
+        Version: 2012-10-17
+      PolicyName: WizDataScanningPolicy
+      Roles:
+        - !Ref ScannerRole
+    Type: 'AWS::IAM::Policy'
+  WizScannerPolicy:
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action:
+              - 'ecr:BatchGetImage'
+              - 'ecr:DescribeImages'
+              - 'ecr:GetAuthorizationToken'
+              - 'ecr:GetDownloadUrlForLayer'
+              - 'ecr:ListTagsForResource'
+              - 'ecr:GetRegistryPolicy'
+              - 'ecr-public:DescribeImages'
+              - 'ecr-public:ListTagsForResource'
+              - 'ecr-public:GetAuthorizationToken'
+            Effect: Allow
+            Resource: '*'
+          - Action:
+              - 'ec2:CopySnapshot'
+              - 'ec2:CreateSnapshot'
+              - 'kms:CreateKey'
+              - 'kms:DescribeKey'
+              - 'ec2:GetEbsEncryptionByDefault'
+              - 'ec2:DescribeSnapshots'
+            Effect: Allow
+            Resource: '*'
+          - Action:
+              - 'ec2:CreateTags'
+            Effect: Allow
+            Resource: !Sub 'arn:${AWS::Partition}:ec2:*::snapshot/*'
+          - Action: 'kms:CreateAlias'
+            Effect: Allow
+            Resource:
+              - !Sub 'arn:${AWS::Partition}:kms:*:*:alias/wizKey'
+              - !Sub 'arn:${AWS::Partition}:kms:*:*:key/*'
+          - Action:
+              - 'kms:CreateGrant'
+              - 'kms:ReEncryptFrom'
+            Condition:
+              StringLike:
+                'kms:ViaService': ec2.*.amazonaws.com
+            Effect: Allow
+            Resource: '*'
+          - Action:
+              - 'kms:GetKeyPolicy'
+              - 'kms:PutKeyPolicy'
+            Condition:
+              StringEquals:
+                'aws:ResourceTag/wiz': auto-gen-cmk
+            Effect: Allow
+            Resource: '*'
+          - Action:
+              - 'ec2:DeleteSnapshot'
+              - 'ec2:ModifySnapshotAttribute'
+            Condition:
+              StringEquals:
+                'ec2:ResourceTag/wiz': auto-gen-snapshot
+            Effect: Allow
+            Resource: '*'
+        Version: 2012-10-17
+      PolicyName: WizScannerPolicy
+      Roles:
+        - !Ref ScannerRole
+    Type: 'AWS::IAM::Policy'
+  WizServerlessScanningPolicy:
+    Condition: ServerlessScanningEnabled
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action:
+              - 'lambda:GetFunction'
+              - 'lambda:GetLayerVersion'
+              - 'ecr:BatchGetImage'
+              - 'ecr:GetAuthorizationToken'
+              - 'ecr:GetDownloadUrlForLayer'
+              - 'ecr-public:GetAuthorizationToken'
+            Effect: Allow
+            Resource: '*'
+        Version: 2012-10-17
+      PolicyName: WizServerlessScanningPolicy
+      Roles:
+        - !Ref ScannerRole
+    Type: 'AWS::IAM::Policy'
+
+  AccessRole:
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: 'sts:AssumeRole'
+            Condition:
+              StringEquals:
+                'sts:ExternalId': !Ref ExternalId
+            Effect: Allow
+            Principal:
+              AWS: !If 
+                - RoleParamIsProvided
+                - !Ref RoleARN
+                - !If 
+                  - Standard
+                  - 'arn:aws:iam::197171649850:root'
+                  - 'arn:aws-us-gov:iam::399027795803:root'
+        Version: 2012-10-17
+      ManagedPolicyArns:
+        - !Sub 'arn:${AWS::Partition}:iam::aws:policy/job-function/ViewOnlyAccess'
+        - !Sub 'arn:${AWS::Partition}:iam::aws:policy/SecurityAudit'
+      RoleName: !Sub '${WizRoleNameChild}_${AWS::Region}'
+    Type: 'AWS::IAM::Role'
+  WizFullPolicy:
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action:
+              - 'acm:GetCertificate'
+              - 'apigateway:GET'
+              - 'backup:DescribeGlobalSettings'
+              - 'backup:GetBackupVaultAccessPolicy'
+              - 'backup:GetBackupVaultNotifications'
+              - 'backup:ListBackupVaults'
+              - 'backup:ListTags'
+              - 'cloudtrail:GetInsightSelectors'
+              - 'cloudtrail:ListTrails'
+              - 'codebuild:BatchGetProjects'
+              - 'codebuild:GetResourcePolicy'
+              - 'codebuild:ListProjects'
+              - 'cognito-identity:DescribeIdentityPool'
+              - 'connect:ListInstances'
+              - 'connect:ListInstanceAttributes'
+              - 'connect:ListInstanceStorageConfigs'
+              - 'connect:ListSecurityKeys'
+              - 'connect:ListLexBots'
+              - 'connect:ListLambdaFunctions'
+              - 'connect:ListApprovedOrigins'
+              - 'connect:ListIntegrationAssociations'
+              - 'dynamodb:DescribeExport'
+              - 'dynamodb:DescribeKinesisStreamingDestination'
+              - 'dynamodb:ListExports'
+              - 'ec2:GetEbsEncryptionByDefault'
+              - 'ec2:SearchTransitGatewayRoutes'
+              - 'ecr:BatchGetImage'
+              - 'ecr:GetAuthorizationToken'
+              - 'ecr:GetDownloadUrlForLayer'
+              - 'ecr:GetRegistryPolicy'
+              - 'ecr-public:ListTagsForResource'
+              - 'eks:ListTagsForResource'
+              - 'elasticfilesystem:DescribeAccessPoints'
+              - 'elasticfilesystem:DescribeFileSystemPolicy'
+              - 'elasticmapreduce:GetAutoTerminationPolicy'
+              - 'elasticmapreduce:GetManagedScalingPolicy'
+              - 'glacier:GetDataRetrievalPolicy'
+              - 'glacier:GetVaultLock'
+              - 'glue:GetConnection'
+              - 'glue:GetSecurityConfiguration'
+              - 'glue:GetTags'
+              - 'health:DescribeAffectedAccountsForOrganization'
+              - 'health:DescribeAffectedEntities'
+              - 'health:DescribeAffectedEntitiesForOrganization'
+              - 'health:DescribeEntityAggregates'
+              - 'health:DescribeEventAggregates'
+              - 'health:DescribeEventDetails'
+              - 'health:DescribeEventDetailsForOrganization'
+              - 'health:DescribeEventTypes'
+              - 'health:DescribeEvents'
+              - 'health:DescribeEventsForOrganization'
+              - 'health:DescribeHealthServiceStatusForOrganization'
+              - 'kafka:ListClusters'
+              - 'kendra:DescribeDataSource'
+              - 'kendra:DescribeIndex'
+              - 'kendra:ListDataSources'
+              - 'kendra:ListIndices'
+              - 'kendra:ListTagsForResource'
+              - 'kinesisanalytics:ListApplications'
+              - 'kinesisanalytics:DescribeApplication'
+              - 'kinesisanalytics:ListTagsForResource'
+              - 'kinesisvideo:ListStreams'
+              - 'kinesisvideo:ListTagsForStream'
+              - 'kinesisvideo:GetDataEndpoint'
+              - 'kms:GetKeyRotationStatus'
+              - 'kms:ListResourceTags'
+              - 'lambda:GetFunction'
+              - 'lambda:GetLayerVersion'
+              - 'profile:GetDomain'
+              - 'profile:ListDomains'
+              - 'profile:ListIntegrations'
+              - 's3:GetBucketNotification'
+              - 's3:GetMultiRegionAccessPointPolicy'
+              - 's3:ListMultiRegionAccessPoints'
+              - 'ses:DescribeActiveReceiptRuleSet'
+              - 'ses:GetAccount'
+              - 'ses:GetConfigurationSet'
+              - 'ses:GetConfigurationSetEventDestinations'
+              - 'ses:GetDedicatedIps'
+              - 'ses:GetEmailIdentity'
+              - 'ses:ListConfigurationSets'
+              - 'ses:ListDedicatedIpPools'
+              - 'ses:ListReceiptFilters'
+              - 'voiceid:DescribeDomain'
+              - 'wafv2:GetLoggingConfiguration'
+              - 'wafv2:GetWebACLForResource'
+              - 'wisdom:GetAssistant'
+              - 'macie2:ListFindings'
+              - 'macie2:GetFindings'
+              - 'identitystore:List*'
+              - 'identitystore:Describe*'
+              - 'sso-directory:Describe*'
+              - 'sso-directory:ListMembersInGroup'
+            Effect: Allow
+            Resource: '*'
+          - Action:
+              - 's3:GetObject'
+              - 's3:GetBucketLocation'
+              - 's3:GetObjectTagging'
+              - 's3:ListBucket'
+            Effect: Allow
+            Resource:
+              - !Sub 'arn:${AWS::Partition}:s3:::*terraform*'
+              - !Sub 'arn:${AWS::Partition}:s3:::*tfstate*'
+              - !Sub 'arn:${AWS::Partition}:s3:::*tf?state*'
+              - !Sub 'arn:${AWS::Partition}:s3:::*cloudtrail*'
+              - !Sub 'arn:${AWS::Partition}:s3:::elasticbeanstalk-*'
+            Sid: WizAccessS3
+        Version: 2012-10-17
+      PolicyName: WizFullPolicy
+      Roles:
+        - !Ref AccessRole
+    Type: 'AWS::IAM::Policy'
+
+#------------------------------------------------------------------------------------
+# Dynatrace Roles and Policy Creation in Child accounts
+
+  DynatraceMonitoringRole:
+    Type: 'AWS::IAM::Role'
+    Condition: CreateIAMRole
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: 'sts:AssumeRole'
+            Condition:
+              StringEquals:
+                'sts:ExternalId': '9f0ace73-5c27-4247-95c4-26cd51d42e00'
+            Effect: Allow
+            Principal:
+              AWS: !If
+                - RoleParamIsProvided
+                - !Ref RoleARN
+                - !If 
+                  - Standard
+                  - !Sub 'arn:aws:iam::${DynatraceAccountID}:role/Dynatrace_ActiveGate_role'
+                  - !Sub 'arn:aws:iam::${masteraccount}:root'
+        Version: 2012-10-17
+      RoleName: !Ref DynatraceRoleNameChild
+
+  Dynatracemonitoringpolicy:
+    Type: 'AWS::IAM::Policy'
+    Condition: CreateIAMRole
+    Properties:
+      PolicyName: Dynatrace_monitoring_policy
+      PolicyDocument:
+        Statement:
+          - Action:
+              - 'sts:AssumeRole'
+              - 'acm-pca:ListCertificateAuthorities'
+              - 'apigateway:GET'
+              - 'apprunner:ListServices'
+              - 'appstream:DescribeFleets'
+              - 'appsync:ListGraphqlApis'
+              - 'athena:ListWorkGroups'
+              - 'autoscaling:DescribeAutoScalingGroups'
+              - 'cloudformation:ListStackResources'
+              - 'cloudfront:ListDistributions'
+              - 'cloudhsm:DescribeClusters'
+              - 'cloudsearch:DescribeDomains'
+              - 'cloudwatch:GetMetricData'
+              - 'cloudwatch:GetMetricStatistics'
+              - 'cloudwatch:ListMetrics'
+              - 'codebuild:ListProjects'
+              - 'datasync:ListTasks'
+              - 'dax:DescribeClusters'
+              - 'directconnect:DescribeConnections'
+              - 'dms:DescribeReplicationInstances'
+              - 'dynamodb:ListTables'
+              - 'dynamodb:ListTagsOfResource'
+              - 'ec2:DescribeAvailabilityZones'
+              - 'ec2:DescribeInstances'
+              - 'ec2:DescribeNatGateways'
+              - 'ec2:DescribeSpotFleetRequests'
+              - 'ec2:DescribeTransitGateways'
+              - 'ec2:DescribeVolumes'
+              - 'ec2:DescribeVpnConnections'
+              - 'ecs:ListClusters'
+              - 'eks:ListClusters'
+              - 'elasticache:DescribeCacheClusters'
+              - 'elasticbeanstalk:DescribeEnvironmentResources'
+              - 'elasticbeanstalk:DescribeEnvironments'
+              - 'elasticfilesystem:DescribeFileSystems'
+              - 'elasticloadbalancing:DescribeInstanceHealth'
+              - 'elasticloadbalancing:DescribeListeners'
+              - 'elasticloadbalancing:DescribeLoadBalancers'
+              - 'elasticloadbalancing:DescribeRules'
+              - 'elasticloadbalancing:DescribeTags'
+              - 'elasticloadbalancing:DescribeTargetHealth'
+              - 'elasticmapreduce:ListClusters'
+              - 'elastictranscoder:ListPipelines'
+              - 'es:ListDomainNames'
+              - 'events:ListEventBuses'
+              - 'firehose:ListDeliveryStreams'
+              - 'fsx:DescribeFileSystems'
+              - 'gamelift:ListFleets'
+              - 'glue:GetJobs'
+              - 'inspector:ListAssessmentTemplates'
+              - 'kafka:ListClusters'
+              - 'kinesis:ListStreams'
+              - 'kinesisanalytics:ListApplications'
+              - 'kinesisvideo:ListStreams'
+              - 'lambda:ListFunctions'
+              - 'lambda:ListTags'
+              - 'lex:GetBots'
+              - 'logs:DescribeLogGroups'
+              - 'mediaconnect:ListFlows'
+              - 'mediaconvert:DescribeEndpoints'
+              - 'mediapackage-vod:ListPackagingConfigurations'
+              - 'mediapackage:ListChannels'
+              - 'mediatailor:ListPlaybackConfigurations'
+              - 'opsworks:DescribeStacks'
+              - 'qldb:ListLedgers'
+              - 'rds:DescribeDBClusters'
+              - 'rds:DescribeDBInstances'
+              - 'rds:DescribeEvents'
+              - 'rds:ListTagsForResource'
+              - 'redshift:DescribeClusters'
+              - 'robomaker:ListSimulationJobs'
+              - 'route53:ListHostedZones'
+              - 'route53resolver:ListResolverEndpoints'
+              - 's3:ListAllMyBuckets'
+              - 'sagemaker:ListEndpoints'
+              - 'sns:ListTopics'
+              - 'sqs:ListQueues'
+              - 'storagegateway:ListGateways'
+              - 'sts:GetCallerIdentity'
+              - 'swf:ListDomains'
+              - 'tag:GetResources'
+              - 'tag:GetTagKeys'
+              - 'transfer:ListServers'
+              - 'workmail:ListOrganizations'
+              - 'workspaces:DescribeWorkspaces'
+            Resource: '*'
+            Effect: Allow
+            Sid: Dynamonitoring
+        Version: 2012-10-17
+      Roles:
+        - !Ref DynatraceMonitoringRole
+#------------------------------------------------------------------------------------
+# IAM Key Rotation Notification Roles and Policy Creation in Child accounts
+
+  ASAIAMAssumedRole:
+    Type: AWS::IAM::Role
+    Condition: CreateIAMRole
+    Properties:
+      RoleName: platform_iam_key_rotation_evaluation_lambda_assumed_role
+      Description: !Sub "IAM Assume Role used by ${masteraccount}'s IAM-Access-Key-Rotation-Evaluation-Function Lambda. This role is used to inspect IAM Keys that are violating the company's key rotation policy."
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            AWS:
+              - !Sub arn:${AWS::Partition}:iam::${masteraccount}:role/platform_iam_key_rotation_evaluation_lambda_execution_role
+          Action: sts:AssumeRole
+      Policies:
+          - PolicyName: AllowRotationEvaluationFunctionPermissions
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - iam:List*
+                    - iam:GetAccessKeyLastUsed
+                    - iam:GetUser
+                  Resource: "*"
+      Path: /
+  
+  EventDeliveryRole:
+    Type: 'AWS::IAM::Role'
+    Condition: CreateIAMRole
+    Properties:
+      RoleName: platform_root_monitoring_iam_role
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: events.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      Path: /      
+      Policies:
+        - PolicyName: platform_event_bus_delivery_role_policy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'events:PutEvents'
+                Resource: !Sub
+                  - >-
+                    arn:aws:events:${AWS::Region}:${masteraccount}:event-bus/${EventBusName}
+                  - EventBusName: !Ref PayerAccountEventBusName
+      Tags:
+         - Value: 'yes'
+           Key: platform_donotdelete
+
+  EventsRule:
+    Type: 'AWS::Events::Rule'
+    Condition: CreateIAMRole
+    Properties:
+      Description: Events rule for monitoring root API activity
+      EventPattern:
+        detail-type:
+          - AWS Console Sign In via CloudTrail
+        detail:
+          userIdentity:
+            type:
+              - Root
+      Name: platform_root_activity_monitor_rule
+      State: ENABLED
+      Targets:
+        - Arn: !Sub
+            - >-
+              arn:aws:events:${AWS::Region}:${masteraccount}:event-bus/${EventBusName}
+            - EventBusName: !Ref PayerAccountEventBusName
+          Id: MemberAccountEvent
+          RoleArn: !GetAtt
+            - EventDeliveryRole
+            - Arn
+    DependsOn: EventDeliveryRole
+    

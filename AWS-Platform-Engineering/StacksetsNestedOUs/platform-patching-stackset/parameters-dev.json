@@ -1,0 +1,66 @@
+[
+    {
+      "ParameterKey": "releses3bucket",
+      "ParameterValue": "azure-devops-da2.0-release-dev-us-east-1"
+    },
+    {
+        "ParameterKey": "FolderName",
+        "ParameterValue": "ReleaseNumber"
+    },
+    {
+        "ParameterKey": "BucketNameWithOutRegion",
+        "ParameterValue": "azure-devops-da2.0-stackset-dev-"
+    },
+    {
+        "ParameterKey": "Prod",
+        "ParameterValue": "ou-93cv-deu05lj5"
+    },
+    {
+        "ParameterKey": "NonProd",
+        "ParameterValue": "ou-93cv-9rufgzcq"
+    },
+    {
+        "ParameterKey": "RESPCMigration",
+        "ParameterValue": "ou-93cv-kz8l46qu"
+    },
+    {
+        "ParameterKey": "Exceptions",
+        "ParameterValue": "ou-93cv-8dwgtjru"
+    },
+    {
+      "ParameterKey": "ResouceSyncBucketName",
+      "ParameterValue": "ssm-resource-sync-us-east-1-364355817034"
+    },
+    {
+      "ParameterKey": "ExecutionLogsBucketName",
+      "ParameterValue": "ssm-execution-logs-us-east-1-364355817034"
+    },
+    {
+      "ParameterKey": "PatchingTemplateStackAccountId",
+      "ParameterValue": "364355817034"
+    },
+    {
+      "ParameterKey": "PatchingTemplateStackRegion",
+      "ParameterValue": "us-east-1"
+    },
+    {
+      "ParameterKey": "ManagedInstanceDataEncryptionKey",
+      "ParameterValue": "arn:aws:kms:us-east-1:364355817034:key/8a8c5135-e3bd-4b6a-b5f8-b56782438278"
+    },
+    {
+      "ParameterKey": "BaselineOverrideBucket",
+      "ParameterValue": "arn:aws:s3:::patch-baseline-override-us-east-1-364355817034"
+    },
+    {
+      "ParameterKey": "ServiceCatalogLaunchRoleName",
+      "ParameterValue": "platform-service-catalog-launch-role"
+    },
+    {
+      "ParameterKey": "CronValue",
+      "ParameterValue": "cron(0 0 5 ? * WED *)"
+    },
+    {
+      "ParameterKey": "MasterAccountId",
+      "ParameterValue": "364355817034"
+    }
+]

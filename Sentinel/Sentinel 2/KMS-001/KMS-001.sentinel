@@ -1,0 +1,13 @@
+#import common functions
+import "tfplan-functions" as tfplan
+
+# Get all kms key
+allKmsKey = tfplan.find_resources("aws_kms_key")
+
+# Return all the AWS Kms Key which doesn't have key rotation enable
+violating_resources = tfplan.filter_attribute_is_not_value(allKmsKey,"enable_key_rotation",true,true)
+
+# Main rule
+main = rule {
+    length(violating_resources["messages"]) is 0
+}

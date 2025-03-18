@@ -1,0 +1,209 @@
+{
+    "serviceprovider": "azure",
+    "servicerequirement_name": [
+        "Azure::Service Hardening &control::*"
+    ],
+    "serviceType": "Hardening &control",
+
+    "Mappings": [
+        {
+            "id": "4.1.1",
+            "version": "0.0.1",
+            "label": "Deploy Premium SKU instances",
+            "description": "Deploy Premium SKUinstances of the services to obtain the requiredlevelof security auditing, system telemetry,authentication and access controls."
+              
+            ],
+       
+        },
+        {
+            "id": "4.1.2",
+            "version": "0.0.1",
+            "label": "Segment Production and Non-production Service Bus deployments",
+            "description": "lmplement separate subscriptions and/ or management groups for andwithin development, test,and production to segment data repositories, distribute data allowances,and establish permission boundaries",
+           
+        },
+		{
+		id": "4.1.3",
+            "version": "0.0.1",
+            "label": "Deploy Application Gateway per configuration standards"
+			"description": "Follow Azure's recommended configurations for AzureApplication Gateway deployments.See Annendix B for details."
+		}
+		
+		{
+		id": "4.1.4",
+            "version": "0.0.1",
+            "label": "Manage Azure Secrets Securely"
+			"description": " Use Azure Key vault to securely store secret, keys and SSL certificates. Azure application Gateway supports integration with keys vault for server certificates that are attached to HTTPS-enabled listners. This support is limited to Application gateway v2 SKU  "
+		}
+		
+		{
+		id": "4.1.5",
+            "version": "0.0.1",
+            "label": "Enforce Systems Configuration using Azure policy"
+			"description": " Use Azure policy[audit],[deny], and [deploy if not exist] to enforce systems configurations for Application Gateway deployments" 
+		}
+		
+		{
+		
+		id": "4.1.6",
+            "version": "0.0.1",
+            "label": "Configure Customs Error Pages"
+			"description": "Create custom error pages instead of displaying default error pages".
+		}
+		
+		
+		 
+		 {
+            "id": "4.2.1",
+            "version": "0.0.1",
+            "label": "Implement  Least  Privilege Roie Based Access control (RBAC) for Privilege access",
+            "description": "Controls (RBAC) for privileged access"	"Limit ability to perform privileged service  configuration and access operations over the service and underlying data following principle of
+least privilege by segregating access into custom Role Based Access Control(RBAC) roles",
+           
+        }
+		 
+		 
+		 {
+            "id": "4.2.2",
+            "version": "0.0.1",
+            "label": "Leverage a central identity source for user authentication",
+            "description": "Implement Active Directory-backedlogin to enable Single Sign-On (SSO) and seamless controlover user access to data.",
+        },
+		
+ {
+            "id": "4.2.3",
+            "version": "0.0.1",
+            "label": "Leverage managed roles oridentities for programmatic access ",
+            "description": "Leverage the managed identities featureinActive Directory to provide anidentity for applications (non-humans) to use when accessing Azure Relay. Azure Relay itself can natively authenticate to other Azure services/resources.	",
+        },		
+		 
+		{ 
+		 
+           "id": "4.2.4",
+            "version": "0.0.1",
+            "label": "Configure Mutual Authentication for highly sensetive connections to Managed Services"
+            "description": " Configure Mutual Authentication as an added layer of protection for confidential or highly sensitive request to services. Mutual Authentication allows the application gateway to authenticate the client sending requests using certificate ensuring that the user is on a secure device". 
+			}
+			
+			
+			{ 
+		 
+           "id": "4.3.1",
+            "version": "0.0.1",
+            "label": "Encrypt Sensetive Data-In-Transit"
+            "description": " Configure end-to-end encryption with a minimum of TLS 1.2 for Azure application Gateway by uploading a PFX certificate, as well as Backend authentication certificates or Trusted root certificates".
+			
+			}
+			
+		{
+            "id": "4.3.2",
+            "label": "Isolate Sensetive Data on Application Gateway Subnets",
+            "description": "Implement seperate subscriptions and/or management groups for development, test and production. Ensure that all virtual network Azure Application Gateway subnet deployment have a Network Security group (NSG) applied with network access controls specific to the application's trusted ports and sources".
+			}
+        
+	{
+            "id": "4.3.3",
+            "label": "Rewrite Application headers",
+            "description": "HTTP headers allow a client and server to pass additional information with a request or response . And security- related headers field like HSTS, X-XSS-Protection, X-Frame-Options. Content security policy , CORS removing response header field that might reveal sensetive information and removing port information from X-forwarded -For headers".
+}
+             {
+			 
+			 "id": "4.4.1",
+            "label": "Deploy Azure Relay resource in private VNets",
+            "description": "Deploying resources in a private VNets provide the ability for network customization in accordance with Blackrock policy for enhanced network security , controls and visiblity":			
+			}
+
+              {
+
+             "id": "4.4.2",
+            "label": "Protect Application Gateway resources using gateway resources using network security group ",
+            "description": "Configure Network Security Group (NSG) rules to specify egress traffic restrictions on theVNet subnet Azure App Gateway resources are deployed to.",
+
+		    
+               }
+			   
+			   {
+                "id": "4.4.3",
+            "label": "Leverage private Link endpoint for azure app gateway connectivity ",
+            "description": "Leverage Private Link endpoint to connect privately and securely to Azure application gateway services.This ensures that all workload data is being accessed securely over Azure network backbone with default data exfiltration protection in place",
+}
+
+
+{
+             id": "4.4.4",
+            "label": "Enable Logging and Monitoring for Network Security group ",
+            "description": " For the network security group (NSG) associated with Azure apllication gateway subnets,enable NSG flow logs and send logs into a storage account to allow for traffic auditing",
+}
+            {
+
+             id": "4.4.5",
+            "label": "Deploy Web Application Firewall in front of critical web application  ",
+            "description": "Deploy Azure Web application Firewall in front of critical web application to provide additional inspection of incoming traffic.",
+}
+
+{	
+	 id": "4.4.6",
+            "label": "Enable DDos Stanndard Protection  ",
+            "description": "Enable DDos Stanndard protection on virtual Network associated with production instances of application gateway , by creating and applying a DDos protection plan in Azure ",		
+			}
+			{
+			 id": "4.4.7",
+            "label": "Configure Azure Firewall with App Gateway to secure inbound/ outbound traffic ",
+            "description": "Control description: Implement an azure Firewall using Vnet Integration to centrally create, enforce, and log network traffic flowing inbound/outbound application gateway. Azure firewall and NSGs should be used complimentary to each other to create a layered approach in securing the network environment ",
+			}
+			{
+			
+			 id": "4.4.8",
+            "label": "Segment Production and Non-production Application Gateway deployment ",
+            "description": "Implement seperate subscriptions and/or management group for development,test, and production deployments. Use a combination of virtual network, network security group, Firewall Service and private site access to isolate and segment apps ",
+		    }
+			
+			{
+			"id": "4.5.1",
+            "label": "Adhere to Blackrock tagging standards and requirements",
+            "description": "Apply tags to Azure resources giving metadata to logically organize them into a taxonomy.",
+			}
+			{
+			
+			"id": "4.6.1",
+            "label": "Enable audit logging ",
+            "description": " Enable Azure activity diagnostic settings and send the logs to a log analytics workspace , Azure event,hub or Azure storage account to monitor activity on Azure application gateway and related resources ",
+}
+
+{
+
+"id": "4.6.2",
+            "label": "Centralize log delievery",
+            "description": "Configure log ingestion to Azure Monitor, or a third-party plateform, for log aggregation and correlation ",
+            "controlMappings": [],			
+			}
+			
+			
+			{		
+		"id": "4.6.3",
+            "label": "Monitor security compliance",
+            "description": "Contigure Dome9 CloudGuard to monitor for adherence with security  requirements  outlined in this standard. Define custom rules as necessary to detect non-compliant activity and configuration as defined in Appendix B   ",
+}
+	{		
+	"id": "4.6.4",
+            "label": "Monitor Back-end Health",
+            "description": " To view back-end health of an existing application gateway in the Azure portal, select Monitoring Backend health. If a member of the back-end pool has a health status of unknown , ensure that access to the back end is not blocked by an NSG rule , a user-defined route (UDR) , or a custom DNS in the virtual network"		
+			}
+{
+"id": "4.6.4",
+            "label": "Enable Alerts",
+            "description": " Enable alerts in Azure Monitor to stay informed on anomalous activity within Application Gateway".
+			
+
+}
+}		 
+		 
+		 
+		 
+		 
+		
+		
+		
+		
+		
+		

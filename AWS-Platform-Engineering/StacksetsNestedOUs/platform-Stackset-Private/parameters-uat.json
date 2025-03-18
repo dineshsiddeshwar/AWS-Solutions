@@ -1,0 +1,34 @@
+[
+    {
+        "ParameterKey": "releses3bucket",
+        "ParameterValue": "azure-devops-da2.0-release-uat-us-east-1"
+    },
+    {
+        "ParameterKey": "FolderName",
+        "ParameterValue": "ReleaseNumber"
+    },
+    {
+        "ParameterKey": "ProdHybrid",
+        "ParameterValue": "ou-qkhr-oonpepuu"
+    },
+    {
+        "ParameterKey": "ProdPrivate",
+        "ParameterValue": "ou-qkhr-9b3put9a"
+    },
+    {
+        "ParameterKey": "NonProdHybrid",
+        "ParameterValue": "ou-qkhr-7z3edvcr"
+    },
+    {
+        "ParameterKey": "NonProdPrivate",
+        "ParameterValue": "ou-qkhr-ggjzn6tp"
+    },
+    {
+        "ParameterKey": "IRMAccount",
+        "ParameterValue": "990427602202"
+    },
+    {
+        "ParameterKey": "IRMEnvironment",
+        "ParameterValue": "uat"
+    }
+]

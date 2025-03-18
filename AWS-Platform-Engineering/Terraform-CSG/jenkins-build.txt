@@ -1,0 +1,9 @@
+#################Jenkins-build#######################
+
+--> In build process usually we have two UI builds, one is dev & other is prod. (angualr have two diff builds) -> If developer wants to do entire trace 
+of build , we need to take dev as angular build, for analysing issues with respective to developers.
+
+--> In prod build , we cannot see full trace of build logs, bcoz while building it will compress the files
+
+-> Proform-OAuth:- In ejnkins, we have job Proform-OAuth 
+

@@ -1,0 +1,20 @@
+{
+    "statement": [
+      {
+        "actions": [
+          "sts:AssumeRole"
+        ],
+        "effect": "Allow",
+        "principals": [
+          {
+            "identifiers": [
+              "elasticloadbalancing.amazonaws.com"
+            ],
+            "type": "Service"
+          }
+        ],
+        "sid": "trustedassumepolicy"
+      }
+    ],
+    "version": "2012-10-17"
+  }

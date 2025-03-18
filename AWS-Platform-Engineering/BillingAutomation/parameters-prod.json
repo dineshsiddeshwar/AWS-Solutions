@@ -1,0 +1,9 @@
+{
+    "Lambda" :{
+    "function_name" : ["platform_billing_automation_lambda","platform_cost_tracker_lambda"]
+    },
+    "S3": {
+        "ListOfBuckets" : ["platform-da2-billing-automation-604596384198"],"ListOfBucketsWithBlockPublicAccess" : ["platform-da2-billing-automation-604596384198"]
+    }
+
+}

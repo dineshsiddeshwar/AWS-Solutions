@@ -1,0 +1,13 @@
+# import common functions
+import "tfplan-functions" as tfplan
+
+# Get all AWS RDS Instances
+allRdsInstances = tfplan.find_resources("aws_db_instance")
+
+# Return all the RDS Instances which doesn't have auto-minor-version-upgrade enabled
+violating_resources = tfplan.filter_attribute_is_not_value(allRdsInstances,"auto_minor_version_upgrade",true, true)
+
+# Main rule
+main = rule {
+    length(violating_resources["messages"]) is 0
+}

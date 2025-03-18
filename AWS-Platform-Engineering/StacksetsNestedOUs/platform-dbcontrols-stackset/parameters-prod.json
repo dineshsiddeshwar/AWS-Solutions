@@ -1,0 +1,58 @@
+[
+  {
+    "ParameterKey": "releses3bucket",
+    "ParameterValue": "azure-devops-da2.0-release-prod-us-east-1"
+  },
+  {
+    "ParameterKey": "FolderName",
+    "ParameterValue": "ReleaseNumber"
+  },
+  {
+    "ParameterKey": "auditaccount",
+    "ParameterValue": "056670755576"
+  },
+  {
+    "ParameterKey": "masteraccount",
+    "ParameterValue": "604596384198"
+  },
+  {
+    "ParameterKey": "platformagentbucket",
+    "ParameterValue": "platform-da2-installation-packages-prod"
+  },
+  {
+      "ParameterKey": "Prod",
+      "ParameterValue": "ou-sdpg-m0bmjby4"
+  },
+  {
+      "ParameterKey": "NonProd",
+      "ParameterValue": "ou-sdpg-fcd0ld6e"
+  },
+  {
+      "ParameterKey": "SharedServices",
+      "ParameterValue": "ou-sdpg-ppkzmljz"
+  },
+  {
+      "ParameterKey": "RESPCMigration",
+      "ParameterValue": "ou-sdpg-vc3iqnav"
+  },
+  {
+      "ParameterKey": "Exceptions",
+      "ParameterValue": "ou-sdpg-r1y7t298"
+  },
+  {
+    "ParameterKey": "ScoreCardDBTableName",
+    "ParameterValue": "ScoreCardTable"
+  },
+  {
+    "ParameterKey": "ScoreCardBucketName",
+    "ParameterValue": "platform-db-controls-scorecard-prod"
+  },
+  {
+    "ParameterKey": "BucketNameWithOutRegion",
+    "ParameterValue": "azure-devops-da2.0-stackset-prod-"
+  },
+  {
+    "ParameterKey": "platformScoreCardFunctionName",
+    "ParameterValue": "platform_ScoreCardVPCBoundLambda"
+  }
+]

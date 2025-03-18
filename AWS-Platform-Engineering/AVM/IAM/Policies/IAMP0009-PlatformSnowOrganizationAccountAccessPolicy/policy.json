@@ -1,0 +1,49 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Action": [
+                "ec2:Describe*",
+                "ec2:List*",
+                "organizations:Describe*",
+                "organizations:List*",
+                "config:Select*",
+                "config:Batch*",
+                "config:Describe*",
+                "config:List*",
+                "ssm:List*",
+                "ssm:Get*",
+                "ssm:Describe*",
+                "tag:Get*"
+            ],
+            "Resource": "*",
+            "Effect": "Allow",
+            "Sid": "ServiceNowUserReadOnlyAccess"
+        },
+        {
+            "Action": [
+                "ssm:SendCommand"
+            ],
+            "Resource": [
+                "arn:aws:ec2:*:*:instance/*",
+                "arn:aws:ssm:*:*:document/platform_SG-AWS-RunShellScript",
+                "arn:aws:ssm:*:*:document/platform_SG-AWS-RunPowerShellScript"
+            ],
+            "Effect": "Allow",
+            "Sid": "SendCommandAccess"
+        },
+        {
+            "Action": [
+                "s3:GetObject",
+                "s3:GetBucketLocation",
+                "s3:ListBucket",
+                "s3:DeleteObject"
+            ],
+            "Resource": [
+                "arn:aws:s3:::central-bucket-snow-sg*"
+            ],
+            "Effect": "Allow",
+            "Sid": "S3BucketAccess"
+        }
+    ]
+}

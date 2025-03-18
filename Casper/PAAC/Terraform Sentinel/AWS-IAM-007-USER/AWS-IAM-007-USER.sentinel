@@ -1,0 +1,68 @@
+# Ensure IAM policy attached to a user doesn't have iam:* permission
+
+# This policy works for IAM policy attached to a user defined via the jsonencode function
+
+# Import common-functions/tfplan-functions/tfplan-functions.sentinel
+# with alias "plan"
+import "tfplan-functions" as plan
+import "types" # Import the types library
+import "json" # Import the json library
+
+# Get all resources for IAM policy attached to a user
+allIamPolicies = plan.find_resources("aws_iam_user_policy")
+
+# Set variable to keep track of violating policies
+violatingPolicyCount = 0
+
+# Loop through each policy
+for allIamPolicies as address, policy {
+
+    violatingPolicy = false # Reset to false for each policy resource 
+    
+    getPolicy = policy.change.after["policy"] else false
+    
+    if getPolicy is not false {
+        
+        if length(getPolicy) > 0 {
+            
+            policyObject = json.unmarshal(getPolicy) # Convert the policy to a JSON object
+            
+            for policyObject.Statement as statement { # Loop through each statement in the policy
+                
+                currentEffect = statement.Effect else false
+                currentAction = statement.Action else false
+                
+                if currentEffect is not false and currentAction is not false {
+                    
+                    if currentEffect == "Allow" {
+
+                        if types.type_of(currentAction) is "string" {
+                        
+                            if currentAction == "*" or currentAction == "iam:*" {
+                                violatingPolicy = true
+                            }
+
+                        } else if types.type_of(currentAction) is "list" {
+
+                            for currentAction as action {
+                                if action == "*" or action == "iam:*" {
+                                    violatingPolicy = true
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            if violatingPolicy == true {
+                violatingPolicyCount += 1
+                print ("IAM user policy", address, "has Effect = Allow with not compliant action * or iam:*")
+            }
+        }
+    }
+}
+
+# Main rule
+main = rule {
+    violatingPolicyCount == 0
+}

@@ -1,0 +1,13 @@
+{
+    "serviceprovider": "aws",
+    "servicerequirement_name": "AWS::IAM::Implementation",
+    "serviceDisplayName": "AWS IAM",
+    "id": "AWS_IAM_28_1",
+    "label": "Ensure no inactive users < 30 days",
+    "description": "Ensure there are no inactive users for more than 30 days",
+    "type": "Detective",
+    "implementationProvider": "wiz",
+    "wizNativeType": ["user"],
+    "link": "Detective-Pipeline/AWS/AWS_IAM/AWS_IAM_28_1.rego",
+    "requirementId": ["AWS_IAM_28"]
+}

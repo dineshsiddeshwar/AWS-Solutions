@@ -1,0 +1,17 @@
+{
+  "serviceprovider": "azure",
+  "servicerequirement_name": "Azure::VDI::Implementation",
+  "serviceDisplayName": "AWS VDI",
+  "id": "AWS_VDI_11_1",
+  "label": "Ensure that Azure Active Directory is selected as the domain to join in the Azure VM",
+  "description": "Azure Active Directory authentication is a mechanism to connect to Microsoft Azure SQL Database and SQL Data Warehouse by using identities in Azure Active Directory (Azure AD). With Azure AD authentication, identities of database users and other Microsoft services can be managed in one central location. Central ID management provides a single place to manage database users and simplifies permission management. Azure AD-only auth feature must be enabled in the Azure portal thereby disabling the SQL Authentication for the SQL VM.",
+  "type": "Detective",
+  "implementationProvider": "wiz",
+  "wizNativeType": [
+      ""
+  ],
+  "link": "link to terrform line/comment where requirement is implemented",
+  "requirementId": [
+      "Azure_VDI_11"
+  ]
+}

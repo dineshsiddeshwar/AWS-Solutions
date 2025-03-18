@@ -1,0 +1,84 @@
+terraform_version = "1.5.5"
+
+planned_values = {
+	"outputs": {},
+	"resources": {
+		"aws_lb_target_group.ip-type-target": {
+			"address":        "aws_lb_target_group.ip-type-target",
+			"depends_on":     [],
+			"deposed_key":    "",
+			"index":          null,
+			"mode":           "managed",
+			"module_address": "",
+			"name":           "ip-type-target",
+			"provider_name":  "registry.terraform.io/hashicorp/aws",
+			"tainted":        false,
+			"type":           "aws_lb_target_group",
+			"values": {
+				"connection_termination":             false,
+				"deregistration_delay":               "300",
+				"lambda_multi_value_headers_enabled": false,
+				"name":              "tf-elbv2-target-group",
+				"name_prefix":       null,
+				"port":              null,
+				"protocol":          null,
+				"proxy_protocol_v2": false,
+				"slow_start":        0,
+				"tags":              null,
+				"target_type":       "alb",
+				"vpc_id":            null,
+			},
+		},
+	},
+}
+
+variables = {}
+
+resource_changes = {
+	"aws_lb_target_group.ip-type-target": {
+		"address": "aws_lb_target_group.ip-type-target",
+		"change": {
+			"actions": [
+				"create",
+			],
+			"after": {
+				"connection_termination":             false,
+				"deregistration_delay":               "300",
+				"lambda_multi_value_headers_enabled": false,
+				"name":              "tf-elbv2-target-group",
+				"name_prefix":       null,
+				"port":              null,
+				"protocol":          null,
+				"proxy_protocol_v2": false,
+				"slow_start":        0,
+				"tags":              null,
+				"target_type":       "alb",
+				"vpc_id":            null,
+			},
+			"after_unknown": {
+				"arn":                               true,
+				"arn_suffix":                        true,
+				"health_check":                      true,
+				"id":                                true,
+				"ip_address_type":                   true,
+				"load_balancing_algorithm_type":     true,
+				"load_balancing_cross_zone_enabled": true,
+				"preserve_client_ip":                true,
+				"protocol_version":                  true,
+				"stickiness":                        true,
+				"tags_all":                          true,
+				"target_failover":                   true,
+			},
+			"before": null,
+		},
+		"deposed":        "",
+		"index":          null,
+		"mode":           "managed",
+		"module_address": "",
+		"name":           "ip-type-target",
+		"provider_name":  "registry.terraform.io/hashicorp/aws",
+		"type":           "aws_lb_target_group",
+	},
+}
+
+output_changes = {}

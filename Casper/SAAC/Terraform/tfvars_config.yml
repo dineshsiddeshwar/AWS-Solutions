@@ -1,0 +1,23 @@
+formatter: "tfvars hcl"
+
+sort:
+  enabled: false
+
+output:
+  file: "terraform.tfvars"
+  mode: replace
+
+settings:
+  anchor: false
+  color: true
+  default: false
+  description: true
+  escape: true
+  hide-empty: true
+  html: true
+  indent: 2
+  lockfile: true
+  read-comments: true
+  required: true
+  sensitive: true
+  type: true

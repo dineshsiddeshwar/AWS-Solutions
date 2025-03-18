@@ -1,0 +1,70 @@
+[
+  {
+    "ParameterKey": "releses3bucket",
+    "ParameterValue": "azure-devops-da2.0-release-dev-us-east-1"
+  },
+  {
+    "ParameterKey": "FolderName",
+    "ParameterValue": "ReleaseNumber"
+  },
+  {
+    "ParameterKey": "PrivateException",
+    "ParameterValue": "ou-93cv-3o8ln75z"
+  },
+  {
+    "ParameterKey": "PrivateProduction",
+    "ParameterValue": "ou-93cv-2ph2c0tc"
+  },
+  {
+    "ParameterKey": "HybridAccount",
+    "ParameterValue": "ou-93cv-o3i3n5qr"
+  },
+  {
+    "ParameterKey": "PrivateStaging",
+    "ParameterValue": "ou-93cv-chay3epk"
+  },
+  {
+    "ParameterKey": "PublicException",
+    "ParameterValue": "ou-93cv-y1nb1t78"
+  },
+  {
+    "ParameterKey": "PublicProduction",
+    "ParameterValue": "ou-93cv-fag0s09t"
+  },
+  {
+    "ParameterKey": "PublicStaging",
+    "ParameterValue": "ou-93cv-g1h2soie"
+  },
+  {
+    "ParameterKey": "Migration",
+    "ParameterValue": "ou-93cv-es78cli7"
+  },
+  {
+    "ParameterKey": "ManagedServicesBeAgile",
+    "ParameterValue": "ou-93cv-l9id6b28"
+  },
+  {
+    "ParameterKey": "DataManagement",
+    "ParameterValue": "ou-93cv-08v7arsy"
+  },
+  {
+    "ParameterKey": "masteraccount",
+    "ParameterValue": "364355817034"
+  }, 
+  {
+    "ParameterKey": "CoreOU",
+    "ParameterValue": "ou-93cv-7y1rnfmx"
+  },
+  {
+    "ParameterKey": "SharedServicesOU",
+    "ParameterValue": "ou-93cv-tnic0w76"
+  },
+  {
+    "ParameterKey": "ScoreCardDBTableName",
+    "ParameterValue": "ScoreCardTable"
+  },
+  {
+    "ParameterKey": "BucketNameWithOutRegion",
+    "ParameterValue": "azure-devops-da2.0-stackset-dev-"
+  }
+]

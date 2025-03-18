@@ -1,0 +1,107 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Module invokes a custom lambda that trigger the PIM step function workflow
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      -
+        Label:
+          default: "PIM SSO Access Request Details"
+        Parameters:
+          - Account
+          - Email
+          - Role
+          - Duration
+          - Justification
+          - SnowID
+
+    ParameterLabels:
+      Account:
+        default: "Select AWS@Shell Account:"
+      Email:
+        default: "Enter Shell Email:"
+      Role:
+        default: "Select Permission type:"
+      Duration:
+        default: "Enter Session Duration in Hours:"
+      Justification:
+        default: "Enter Business Justification:"
+      SnowID:
+        default: "Enter ServiceNow ID:"
+
+Parameters:
+  Duration:
+    Description: Time in hours for which privilege elevation is required.
+    Type: Number
+    MinValue: 1
+    MaxValue: 9
+    ConstraintDescription: Duration must be between 1 to 9
+    AllowedValues:
+      - 1
+      - 2
+      - 3
+      - 4
+      - 5
+      - 6
+      - 7
+      - 8
+      - 9
+  Justification:
+    Description: Business Justification for privilege elevation request
+    Type: String 
+    ConstraintDescription: Justification must be between 6 and 120 characters in length
+    MinLength: 6
+    MaxLength: 120
+  Role:
+     Description: PIM requested permission set that can be assumed for priviledge elevation
+     Type: String
+     MinLength: 1
+     MaxLength: 50
+     ConstraintDescription: Please select a valid Role to be assumed
+     AllowedValues:
+      - platform_ContributorExternal
+  Email:
+     Description: PIM requester username
+     Type: String
+     ConstraintDescription: Please enter a valid SSO User Email
+     AllowedPattern: "^[\\w-\\+]+(\\.[\\w]+)*@[\\w-]+(\\.[\\w]+)*(\\.[a-z]{2,})$"
+  Account: 
+     Description: Target Account for PIM elevation
+     Type: String
+     MinLength: 1
+     MaxLength: 50
+     ConstraintDescription: Please Select a valid Shell@AWS account number
+     AllowedValues:
+      - Shell-Platform-Audit
+      - Shell-Platform-LogArchive
+      - Shell-Platform-Payer
+      - Shell-Platform-SharedServices
+  SnowID: 
+     Description: PIM request ServiceNow ID
+     MinLength: 1
+     MaxLength: 50
+     ConstraintDescription: Please enter a valid ServiceNow ID
+     Type: String
+    
+Mappings: 
+  Accounts:
+    Shell-Platform-Audit: 
+      accountId: '{{resolve:ssm:audit_account}}'
+    Shell-Platform-LogArchive: 
+      accountId: '{{resolve:ssm:logging_account}}'
+    Shell-Platform-Payer: 
+      accountId: '{{resolve:ssm:master_account}}'
+    Shell-Platform-SharedServices: 
+      accountId: '{{resolve:ssm:shared_services_account_id}}'
+    
+Resources:
+  CustomResourceLambda:
+    Type: 'Custom::InvokeStateMachine'
+    Properties:
+      ServiceToken: !ImportValue PIMInvokeLambdaArn
+      Duration: !Ref Duration
+      Justification: !Ref Justification
+      Email: !Ref Email 
+      Role: !Ref Role
+      Account: !FindInMap [Accounts, !Ref Account, accountId]
+      AccountName: !Ref Account
+      SnowID: !Ref SnowID

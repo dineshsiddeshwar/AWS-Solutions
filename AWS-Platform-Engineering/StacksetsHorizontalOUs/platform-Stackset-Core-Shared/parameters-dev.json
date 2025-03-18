@@ -1,0 +1,30 @@
+[
+    {
+      "ParameterKey": "releses3bucket",
+      "ParameterValue": "azure-devops-da2.0-release-dev-us-east-1"
+    },
+    {
+        "ParameterKey": "FolderName",
+        "ParameterValue": "ReleaseNumber"
+    },
+    {
+        "ParameterKey": "CoreOU",
+        "ParameterValue": "ou-93cv-7y1rnfmx"
+    },
+    {
+        "ParameterKey": "SharedServicesOU",
+        "ParameterValue": "ou-93cv-tnic0w76"
+    },
+    {
+        "ParameterKey": "IRMAccount",
+        "ParameterValue": "990427602202"
+    },
+    {
+        "ParameterKey": "IRMEnvironment",
+        "ParameterValue": "dev"
+    },
+    {
+        "ParameterKey": "AuditAccount",
+        "ParameterValue": "798863762543"
+    }
+]

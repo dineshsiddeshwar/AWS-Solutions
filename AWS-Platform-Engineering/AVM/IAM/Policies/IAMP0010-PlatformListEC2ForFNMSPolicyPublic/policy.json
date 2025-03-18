@@ -1,0 +1,30 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Action": [
+                "ec2:DescribeHosts",
+                "ec2:DescribeInstances",
+                "iam:ListAccountAliases",
+                "ec2:DescribeReservedInstances"
+            ],
+            "Resource": "*",
+            "Effect": "Allow",
+            "Sid": "ListEC2FNMSPvt"
+        },
+        {
+            "Action": [
+                "iam:GetRole",
+                "iam:GetPolicyVersion",
+                "iam:GetPolicy",
+                "iam:ListAttachedRolePolicies"
+            ],
+            "Resource": [
+                "arn:aws:iam::443534543078:role/*",
+                "arn:aws:iam::443534543078:policy/*"
+            ],
+            "Effect": "Allow",
+            "Sid": "ReadRoleForFNMSPvt"
+        }
+    ]
+}

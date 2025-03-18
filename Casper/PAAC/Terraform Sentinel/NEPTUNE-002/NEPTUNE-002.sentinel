@@ -1,0 +1,15 @@
+# Imports common-functions
+import "tfplan-functions" as tfplan
+
+# Get all Neptune Cluster
+allNeptuneCluster = tfplan.find_resources("aws_neptune_cluster")
+
+# Return all the neptune cluster with cloudwatch_logs_exports disabled
+# cloudwatch_logs_exports is disabled if 1. attribute 'enable_cloudwatch_logs_exports' is missing in terraform configuration
+#                                        2. enable_cloudwatch_logs_exports = []
+violating_resources = tfplan.filter_attribute_is_value(allNeptuneCluster, "enable_cloudwatch_logs_exports", "null", true)
+
+# Main rule
+main = rule {
+    length(violating_resources["messages"]) is 0
+}

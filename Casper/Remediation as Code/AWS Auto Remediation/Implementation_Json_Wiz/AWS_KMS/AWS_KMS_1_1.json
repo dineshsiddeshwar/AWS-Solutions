@@ -1,0 +1,13 @@
+{
+    "serviceprovider": "aws",
+    "servicerequirement_name": "AWS::KMS::Implementation",
+    "serviceDisplayName": "AWS KMS",
+    "id": "AWS_KMS_1_1",
+    "label": "Ensure automatic key rotation for customer managed CMK",
+    "description": "Ensure automatic Key rotation is enabled to rotate customer managed CMK",
+    "type": "Detective",
+    "implementationProvider": "wiz",
+    "wizNativeType": ["customKeyStore"],
+    "link": "Detective-Pipeline/AWS/AWS_KMS/AWS_KMS_1_1.rego",
+    "requirementId": ["AWS_KMS_1"]
+}

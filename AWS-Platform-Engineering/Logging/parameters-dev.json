@@ -1,0 +1,19 @@
+{
+    "IAM" :{
+    "ListOfPlatformIAMRoles" : ["Platform_LogAdmin","platform_service_cloudhealth","Platform_Splunk","ServiceNow_ITOM_Discovery_Child_Role"],
+    "ListOfPlatformIAMPolicies" :["platform_log_admin","platform_splunk","platform_cloud_health_policy","ServiceNow_ITOM_Discovery_Child_Policy"],
+    "PlatformInstanceProfile" : "Platfomr-LoggingAccount-ServiceNowITOMDiscoveryChildInstanceProfile-wLJFxJIqOrGz"
+    },
+    "Lambda" :{
+    "function_name" : ["platform_config_cloudtrail"]
+    },
+    "sqs" :{
+        "queue_name" : ["platform-da2-central-config-cloudtrail-dev-queue","platform-da2-central-config-dev-queue","platform-da2-central-securityhub-dev-queue","platform-da2-central-vpcflowlogs-dev-queue"]
+    },
+    "S3" :{
+        "bucket_name" : ["platform-da2-central-s3accesslogs-dev","platform-da2-central-cloudtrail-dev","platform-da2-central-config-dev","platform-da2-central-vpcflowlogs-dev"]
+    },
+    "account_id" : "792457875881"
+
+}
+ 

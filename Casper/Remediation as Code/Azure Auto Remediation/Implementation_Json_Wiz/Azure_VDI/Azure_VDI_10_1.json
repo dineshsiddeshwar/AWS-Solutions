@@ -1,0 +1,17 @@
+{
+  "serviceprovider": "azure",
+  "servicerequirement_name": "Azure::VDI::Implementation",
+  "serviceDisplayName": "AWS VDI",
+  "id": "AWS_VDI_10_1",
+  "label": "Ensure the new deployments are tested in validation host pool",
+  "description": "A validation host pool must be created where the service updates are applied first and monitor the service updates before updating the standard or non-validation environment. Without a validation host pool, changes that introduce errors may not be discovered which could result in downtime for users in the standard environment.",
+  "type": "Detective",
+  "implementationProvider": "wiz",
+  "wizNativeType": [
+      ""
+  ],
+  "link": "link to terrform line/comment where requirement is implemented",
+  "requirementId": [
+      "Azure_VDI_10"
+  ]
+}

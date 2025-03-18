@@ -1,0 +1,80 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": [
+        "guardduty:DeclineInvitations",
+        "guardduty:Delete*",
+        "guardduty:Disassociate*",
+        "guardduty:InviteMembers",
+        "guardduty:StopMonitoringMembers",
+        "guardduty:UnarchiveFindings",
+        "guardduty:Update*",
+        "iam:UpdateUser",
+        "iam:UpdateGroup",
+        "iam:DeleteUser",
+        "iam:CreateUser"
+      ],
+      "Effect": "Deny",
+      "Resource": "*",
+      "Condition": {
+        "ArnNotLike": {
+          "aws:PrincipalARN": [
+            "arn:aws:iam::*:role/platform*",
+            "arn:aws:iam::*:role/aws-reserved/sso.amazonaws.com/*platform*",
+            "arn:aws:iam::*:role/*AWSControlTower*",
+            "arn:aws:iam::master_account_id:role/aws-service-role/stacksets.cloudformation.amazonaws.com/AWSServiceRoleForCloudFormationStackSetsOrgAdmin*",
+            "arn:aws:iam::*:role/stacksets-exec*",
+            "arn:aws:iam::*:role/aws-controltower*"
+          ]
+        }
+      }
+    },
+
+    {
+      "Action": [
+        "cloudwatch:DeleteAlarms",
+        "cloudwatch:DescribeAlarmHistory",
+        "cloudwatch:DescribeAlarms",
+        "cloudwatch:DescribeAlarmsForMetric",
+        "cloudwatch:DisableAlarmActions",
+        "cloudwatch:EnableAlarmActions",
+        "cloudwatch:PutMetricAlarm",
+        "cloudwatch:PutCompositeAlarm",
+        "cloudwatch:SetAlarmState"
+      ],
+      "Effect": "Deny",
+      "Resource": [
+        "arn:aws:cloudwatch:*:*:alarm:platform*"
+      ],
+      "Condition": {
+        "ArnNotLike": {
+          "aws:PrincipalARN": [
+            "arn:aws:iam::*:role/platform*",
+            "arn:aws:iam::*:role/aws-reserved/sso.amazonaws.com/*platform*",
+            "arn:aws:iam::*:role/*AWSControlTower*",
+            "arn:aws:iam::master_account_id:role/aws-service-role/stacksets.cloudformation.amazonaws.com/AWSServiceRoleForCloudFormationStackSetsOrgAdmin*",
+            "arn:aws:iam::*:role/stacksets-exec*",
+            "arn:aws:iam::*:role/aws-controltower*"
+          ]
+        }
+      }
+    },
+    {
+      "Sid": "SendToThoseBelongingInOrg",
+      "Effect": "Deny",
+      "Action": [
+        "ec2:CreateVpcPeeringConnection"
+      ],
+      "Resource": "arn:aws:ec2:*:*:vpc-peering-connection/*"
+    },
+    {
+      "Sid": "AcceptOnlyThatOriginateFromOrg",
+      "Effect": "Deny",
+      "Action": [
+        "ec2:AcceptVpcPeeringConnection"
+      ],
+      "Resource": "arn:aws:ec2:*:*:vpc-peering-connection/*"
+    }
+  ]
+}

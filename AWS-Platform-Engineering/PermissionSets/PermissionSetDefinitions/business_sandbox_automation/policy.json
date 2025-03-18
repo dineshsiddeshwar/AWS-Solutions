@@ -1,0 +1,338 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Action": [
+                "ec2:*",
+                "elasticloadbalancing:*",
+                "kms:*",
+                "ssm:DescribeInstanceInformation",
+                "ssm:GetConnectionStatus",
+                "ssm:StartSession",
+                "ssm:TerminateSession",
+                "ssm:ResumeSession",
+                "ssm:SendCommand",
+                "cloudwatch:*",
+                "autoscaling:*",
+                "resource-groups:*",
+                "tag:*",
+                "sqs:*",
+                "lambda:*",
+                "logs:*",
+                "s3:*",
+                "s3-object-lambda:*",
+                "sns:*",
+                "iam:*",
+                "eks:*",
+                "rds:*"
+            ],
+            "Effect": "Allow",
+            "Resource": "*",
+            "Condition": {
+                "StringEquals": {
+                    "aws:RequestedRegion": "us-east-1"
+                }
+            }
+        },
+        {
+            "Effect": "Allow",
+            "Action": "iam:CreateServiceLinkedRole",
+            "Resource": "*",
+            "Condition": {
+                "StringEquals": {
+                    "iam:AWSServiceName": [
+                        "autoscaling.amazonaws.com",
+                        "ec2scheduled.amazonaws.com",
+                        "elasticloadbalancing.amazonaws.com",
+                        "spot.amazonaws.com",
+                        "spotfleet.amazonaws.com",
+                        "transitgateway.amazonaws.com",
+                        "replication.dynamodb.amazonaws.com",
+                        "dax.amazonaws.com",
+                        "dynamodb.application-autoscaling.amazonaws.com",
+                        "contributorinsights.dynamodb.amazonaws.com",
+                        "kinesisreplication.dynamodb.amazonaws.com"
+                    ]
+                }
+            }
+        },
+        {
+            "Action": [
+                "dynamodb:*",
+                "dax:*",
+                "application-autoscaling:DeleteScalingPolicy",
+                "application-autoscaling:DeregisterScalableTarget",
+                "application-autoscaling:DescribeScalableTargets",
+                "application-autoscaling:DescribeScalingActivities",
+                "application-autoscaling:DescribeScalingPolicies",
+                "application-autoscaling:PutScalingPolicy",
+                "application-autoscaling:RegisterScalableTarget",
+                "resource-groups:ListGroups",
+                "resource-groups:ListGroupResources",
+                "resource-groups:GetGroup",
+                "resource-groups:GetGroupQuery",
+                "resource-groups:DeleteGroup",
+                "resource-groups:CreateGroup",
+                "tag:GetResources"
+            ],
+            "Effect": "Allow",
+            "Resource": "*",
+            "Condition": {
+                "StringEquals": {
+                    "aws:RequestedRegion": "us-east-1"
+                }
+            }
+        },
+        {
+            "Effect": "Deny",
+            "Action": [
+                "s3:DeleteObjectVersion",
+                "s3:RestoreObject",
+                "s3:DeleteBucketPolicy",
+                "s3:PutEncryptionConfiguration",
+                "s3:ReplicateObject",
+                "s3:PutObject",
+                "s3:ObjectOwnerOverrideToBucketOwner",
+                "s3:DeleteBucketWebsite",
+                "s3:PutBucketRequestPayment",
+                "s3:PutObjectVersionAcl",
+                "s3:PutBucketAcl",
+                "s3:PutBucketPolicy",
+                "s3:DeleteObject",
+                "s3:DeleteBucket",
+                "s3:PutBucketVersioning",
+                "s3:PutObjectAcl",
+                "s3:ReplicateDelete"
+            ],
+            "Resource": [
+                "arn:aws:s3:::tfe-localexec-bucket1b/*",
+                "arn:aws:s3:::tfe-localexec-bucket1a/*",
+                "arn:aws:s3:::aws-cloudtrail-logs-920897381718-7259f7f2/*",
+                "arn:aws:s3:::cf-templates-aie1e97gwd9e-us-east-1/*",
+                "arn:aws:s3:::sandbox-backend-bucket/*",
+                "arn:aws:s3:::apd-sandbox-backend-bucket/*",
+                "arn:aws:s3:::terraform-enterprise-poc-s3bucket1a/*",
+                "arn:aws:s3:::terraform-enterprise-poc-s3bucket2a/*",
+                "arn:aws:s3:::tfbackend-example-iiac-consumer/*",
+                "arn:aws:s3:::aws-cloudtrail-logs-920897381718-7259f7f2",
+                "arn:aws:s3:::cf-templates-aie1e97gwd9e-us-east-1",
+                "arn:aws:s3:::sandbox-backend-bucket",
+                "arn:aws:s3:::apd-sandbox-backend-bucket",
+                "arn:aws:s3:::terraform-enterprise-poc-s3bucket1a",
+                "arn:aws:s3:::terraform-enterprise-poc-s3bucket2a",
+                "arn:aws:s3:::tfbackend-example-iiac-consumer",
+                "arn:aws:s3:::tfe-localexec-bucket1a",
+                "arn:aws:s3:::tfe-localexec-bucket1b"
+            ],
+            "Condition": {
+                "StringEquals": {
+                    "aws:RequestedRegion": "us-east-1"
+                }
+            }
+        },
+        {
+            "Effect": "Deny",
+            "Action": [
+                "events:DeleteRule",
+                "events:EnableRule",
+                "events:DisableRule"
+            ],
+            "Resource": [
+                "arn:aws:events:*:920897381718:rule/[*/]*",
+                "arn:aws:events:*:844926498845:rule/[*/]*"
+            ],
+            "Condition": {
+                "StringEquals": {
+                    "aws:RequestedRegion": "us-east-1"
+                }
+            }
+        },
+        {
+            "Effect": "Deny",
+            "Action": [
+                "iam:UpdateUser",
+                "iam:DeleteUser",
+                "iam:GetUser",
+                "iam:CreateUser",
+                "iam:CreateAccessKey"
+            ],
+            "Resource": [
+                "arn:aws:iam::920897381718:user/*",
+                "arn:aws:iam::844926498845:user/*"
+            ]
+        },
+        {
+            "Effect": "Deny",
+            "Action": [
+                "lambda:UpdateFunctionEventInvokeConfig",
+                "ec2:DeleteSubnet",
+                "lambda:InvokeFunction",
+                "ec2:CreateKeyPair",
+                "lambda:UpdateFunctionConfiguration",
+                "lambda:InvokeAsync",
+                "ec2:DeleteRouteTable",
+                "lambda:UpdateAlias",
+                "lambda:UpdateFunctionCode",
+                "ec2:DeleteSecurityGroup",
+                "ec2:DeleteNatGateway",
+                "ec2:DeleteInternetGateway",
+                "lambda:DeleteFunctionEventInvokeConfig",
+                "lambda:DeleteFunction",
+                "lambda:PublishVersion",
+                "ec2:DeleteVpc",
+                "lambda:DeleteFunctionConcurrency",
+                "ec2:DeleteKeyPair"
+            ],
+            "Resource": [
+                "arn:aws:ec2:us-east-1:920897381718:key-pair/*",
+                "arn:aws:ec2:us-east-1:844926498845:key-pair/*",
+                "arn:aws:ec2:us-east-1:920897381718:route-table/rtb-06b713ed221002e70",
+                "arn:aws:ec2:us-east-1:920897381718:route-table/rtb-05b0f47b39a2b3cd7",
+                "arn:aws:ec2:us-east-1:844926498845:route-table/rtb-08ec2e7f96f391c58",
+                "arn:aws:ec2:us-east-1:844926498845:route-table/rtb-0a9115b77c000fa36",
+                "arn:aws:ec2:us-east-1:920897381718:natgateway/nat-0fd74c8df2e608852",
+                "arn:aws:ec2:us-east-1:844926498845:natgateway/nat-031a1a993c22e418e",
+                "arn:aws:ec2:us-east-1:920897381718:internet-gateway/igw-0c52de334caf7b8c1",
+                "arn:aws:ec2:us-east-1:844926498845:internet-gateway/igw-05a29719dc100812d",
+                "arn:aws:ec2:us-east-1:920897381718:vpc/vpc-07a63deab862c6cfe",
+                "arn:aws:ec2:us-east-1:844926498845:vpc/vpc-0ec7f6dca31dff3c4",
+                "arn:aws:ec2:us-east-1:920897381718:security-group/sg-0e647942d70cc1c93",
+                "arn:aws:ec2:us-east-1:920897381718:security-group/sg-039d210f8431d76d7",
+                "arn:aws:ec2:us-east-1:844926498845:security-group/sg-03081fdb572797e76",
+                "arn:aws:ec2:us-east-1:844926498845:security-group/sg-0d3f0192cee9c63ae",
+                "arn:aws:ec2:us-east-1:920897381718:subnet/subnet-03a3db30f4215621c",
+                "arn:aws:ec2:us-east-1:920897381718:subnet/subnet-0871476168d512c75",
+                "arn:aws:ec2:us-east-1:920897381718:subnet/subnet-07cb96cfc738694c3",
+                "arn:aws:ec2:us-east-1:844926498845:subnet/subnet-00e18e1995a5e1556",
+                "arn:aws:ec2:us-east-1:844926498845:subnet/subnet-0b712430b08092bd8",
+                "arn:aws:ec2:us-east-1:844926498845:subnet/subnet-0777732620ddc5f0b",
+                "arn:aws:lambda:us-east-1:920897381718:function:Sandbox_Auto_Tagging",
+                "arn:aws:lambda:us-east-1:920897381718:function:Sandbox-Auto-Tagging-01",
+                "arn:aws:lambda:us-east-1:844926498845:function:Sandbox_Auto_Tagging",
+                "arn:aws:lambda:us-east-1:844926498845:function:Sandbox-Auto-Tagging-01"
+            ],
+            "Condition": {
+                "StringEquals": {
+                    "aws:RequestedRegion": "us-east-1"
+                }
+            }
+        },
+        {
+            "Effect": "Deny",
+            "Action": [
+                "ec2:DisassociateIamInstanceProfile",
+                "ec2:EnableVgwRoutePropagation",
+                "ec2:DeleteLocalGatewayRouteTableVpcAssociation",
+                "ec2:DeleteVpnGateway",
+                "ec2:CreateLocalGatewayRouteTableVpcAssociation",
+                "ec2:AssociateClientVpnTargetNetwork",
+                "ec2:DetachVpnGateway",
+                "ec2:*VpnConnection*",
+                "ec2:ModifyVpnTunnelCertificate",
+                "ec2:CreateClientVpnRoute",
+                "ec2:AttachVpnGateway",
+                "ec2:CreateLocalGatewayRoute",
+                "ec2:RevokeClientVpnIngress",
+                "ec2:ModifyVpnTunnelOptions",
+                "ec2:AuthorizeClientVpnIngress",
+                "ec2:ImportClientVpnClientCertificateRevocationList",
+                "ec2:*CustomerGateway*",
+                "ec2:DeleteClientVpnRoute",
+                "ec2:ApplySecurityGroupsToClientVpnTargetNetwork",
+                "ec2:DeregisterInstanceEventNotificationAttributes",
+                "ec2:DisableVgwRoutePropagation",
+                "ec2:CreateVpnGateway",
+                "ec2:DeleteLocalGatewayRoute",
+                "ec2:TerminateClientVpnConnections",
+                "ec2:DisassociateClientVpnTargetNetwork",
+                "ec2:DisableEbsEncryptionByDefault",
+                "iam:*MFADevice",
+                "iam:DeleteAccountPasswordPolicy",
+                "iam:DeleteAccountPasswordPolicy",
+                "iam:*OpenIDConnectProvider",
+                "iam:AttachUserPolicy",
+                "iam:DeleteUserPolicy",
+                "iam:DetachUserPolicy",
+                "iam:PutUserPolicy",
+                "iam:ChangePassword",
+                "iam:CreateAccountAlias",
+                "iam:CreateLoginProfile",
+                "iam:CreateSAMLProvider",
+                "iam:DeleteInstanceProfile",
+                "iam:DeleteLoginProfile",
+                "elasticmapreduce:PutBlockPublicAccessConfiguration",
+                "ec2:DisableEbsEncryptionByDefault",
+                "ds:UnshareDirectory",
+                "ds:DeleteConditionalForwarder",
+                "ds:DeleteTrust",
+                "ds:UpdateConditionalForwarder",
+                "ds:DeleteDirectory",
+                "sso:Import*",
+                "sso:Delete*",
+                "sso:Update*",
+                "sso:Detach*",
+                "sso:DisassociateDirectory",
+                "sso:Put*",
+                "sso:AssociateDirectory",
+                "sso-directory:Disable*",
+                "sso-directory:Update*",
+                "sso-directory:Delete*",
+                "sso-directory:Create*",
+                "sso-directory:Remove*",
+                "aws-portal:ModifyAccount",
+                "account:CloseAccount",
+                "account:DeleteAlternateContact",
+                "account:Put*",
+                "billing:PutContractInformation",
+                "billing:Update*",
+                "aws-portal:ModifyBilling",
+                "billing:RedeemCredits",
+                "ce:Create*",
+                "ce:Delete*",
+                "ce:ProvideAnomalyFeedback",
+                "ce:StartSavingsPlansPurchaseRecommendationGeneration",
+                "ce:Update*",
+                "cur:PutClassicReportPreferences",
+                "freetier:PutFreeTierAlertPreference",
+                "invoicing:PutInvoiceEmailDeliveryPreferences",
+                "payments:CreatePaymentInstrument",
+                "payments:DeletePaymentInstrument",
+                "payments:MakePayment",
+                "payments:UpdatePaymentPreferences",
+                "tax:BatchPutTaxRegistration",
+                "tax:DeleteTaxRegistration",
+                "tax:PutTaxInheritance",
+                "aws-portal:ModifyPaymentMethods",
+                "account:GetAccountInformation",
+                "securityhub:*Disable*",
+                "securityhub:DeleteInvitations",
+                "securityhub:DeleteMembers",
+                "securityhub:UpdateStandardsControl"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Effect": "Deny",
+            "Action": [
+                "iam:DeleteRole",
+                "iam:UpdateRole",
+                "iam:AttachRolePolicy",
+                "iam:DetachRolePolicy",
+                "iam:UpdateAssumeRolePolicy"
+            ],
+            "Resource": [
+                "arn:aws:iam::*:role/business_service*"
+            ]
+        },
+        {
+            "Effect": "Allow",
+            "Action": "iam:PassRole",
+            "Resource": "*",
+            "Condition": {
+                "StringEquals": {
+                    "iam:PassedToService": "opsworks.amazonaws.com"
+                }
+            }
+        }
+    ]
+}

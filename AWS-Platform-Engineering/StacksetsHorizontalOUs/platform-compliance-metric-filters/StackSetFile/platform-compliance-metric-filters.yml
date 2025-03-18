@@ -1,0 +1,900 @@
+Description: Template to create the Metric Filters for Security & Complaince Framework in Business Account
+Parameters:
+  S3BucketName:
+    Type: String
+    Description: S3 Bucket Name
+
+  FolderName:
+    Type: String
+    Description: Folder Name
+
+  RecurringScheduleCron:
+    Type: String
+    Description: Cron expression for scheduling the Security Hub summary email.
+    Default: "cron(0 10 ? * MON *)"  #00:00
+
+
+
+Conditions:
+  CreateResources: !Equals [!Ref 'AWS::Region', us-east-1]
+Resources:
+#----------------------------------------------------------------------------------------------------------------------
+  ComplianceMetricFilterStackSetRole:
+    Condition: CreateResources
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: !Sub 'platform_stackset_compliance_metric_filter_${AWS::Region}'
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      Path: /
+      Policies:
+        - PolicyName: platform_stackset_compliance_metric_inlinepolicy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents   
+                Resource: '*'
+#----------------------------------------------------------------------------------------------------------------------
+   
+  MetricFilterWaitLambdaLayer:
+    Condition: CreateResources
+    Type: AWS::Lambda::LayerVersion
+    Properties:
+      CompatibleRuntimes:
+        - python3.8
+      Content:
+        S3Bucket:
+          Fn::Sub:
+              - "${S3BucketName}${AWS::Region}"
+              - {S3BucketName: !Ref S3BucketName}
+        S3Key:
+          Fn::Sub:
+              - "${releasefolder}/python.zip"
+              - {releasefolder: !Ref FolderName}
+      Description: Wait Lambda Function - Lambda Layer for Requests module
+      LayerName: platform_metric_filter_lambda_layer
+
+#----------------------------------------------------------------------------------------------------------------------
+  MetricFilterWaitLambda:
+    Condition: CreateResources
+    Type: 'AWS::Lambda::Function'
+    Properties:
+      Description: Lambda function to Sleep for 10 minutes
+      Code:
+        S3Bucket:
+          Fn::Sub:
+            - "${S3BucketName}${AWS::Region}"
+            - {S3BucketName: !Ref S3BucketName}
+        S3Key:
+          Fn::Sub:
+            - "${releasefolder}/platform_security_metric_filter_wait_function.zip"
+            - {releasefolder: !Ref FolderName}
+      FunctionName: platform_security_metric_filter_wait_function
+      Layers:
+        - !Ref MetricFilterWaitLambdaLayer
+      Tags:
+        - Value: 'yes'
+          Key: platform_donotdelete
+      Handler: platform_security_metric_filter_wait_function.lambda_handler
+      Role: !GetAtt ComplianceMetricFilterStackSetRole.Arn
+      MemorySize: 256
+      Timeout: 650
+      Runtime: python3.8
+#======================================================================================================================
+  # Lambda functions to Send securityHub Summary Email
+#----------------------------------------------------------------------------------------------------------------------
+  PlatformSecurityHubRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: !Sub 'platform_security_hub_report_role'
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+                - events.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AWSSecurityHubFullAccess
+        - arn:aws:iam::aws:policy/CloudWatchEventsFullAccess
+        - arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess
+        - arn:aws:iam::aws:policy/AmazonSNSFullAccess
+        - arn:aws:iam::aws:policy/AWSLambda_FullAccess
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+  
+  SendSecurityHubSummaryEmailLambda:
+    Condition: CreateResources
+    Type: 'AWS::Lambda::Function'
+    Properties:
+      Description: Lambda function to send weekly SecurityHub reports to Custodian
+      Code:
+        S3Bucket:
+          Fn::Sub:
+            - "${S3BucketName}${AWS::Region}"
+            - {S3BucketName: !Ref S3BucketName}
+        S3Key:
+          Fn::Sub:
+            - "${releasefolder}/platform_send_weekly_sh_report.zip"
+            - {releasefolder: !Ref FolderName}
+      FunctionName: platform_send_weekly_sh_report
+      Layers:
+        - !Ref MetricFilterWaitLambdaLayer
+      Tags:
+        - Value: 'yes'
+          Key: platform_donotdelete
+      Handler: platform_send_weekly_sh_report.lambda_handler
+      Role: !GetAtt PlatformSecurityHubRole.Arn
+      MemorySize: 256
+      Timeout: 650
+      Runtime: python3.8
+
+  SecurityHubSummaryEmailSchedule:
+    Type: "AWS::Events::Rule"
+    Properties:
+      Name: SecurityHubSummaryEmailSchedule
+      Description: Triggers the Recurring Security Hub summary email
+      ScheduleExpression:
+        Ref: RecurringScheduleCron
+      Targets:
+        - Arn:
+            Fn::GetAtt:
+              - SendSecurityHubSummaryEmailLambda
+              - Arn
+          Id: '1'
+
+  CloudWatchSchedulePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName:
+        Fn::GetAtt:
+          - SendSecurityHubSummaryEmailLambda
+          - Arn
+      Principal: events.amazonaws.com
+      SourceArn:
+        Fn::GetAtt:
+          - SecurityHubSummaryEmailSchedule
+          - Arn
+#==================================================================================================================
+
+  CallMetricFilterWaitLambda1:
+    Condition: CreateResources
+    Type: 'Custom::MetricFilterWaitLambda'
+    Properties:
+      ServiceToken: !GetAtt MetricFilterWaitLambda.Arn
+
+#----------------------------------------------------------------------------------------------------------------------
+  CallMetricFilterWaitLambda2:
+    Condition: CreateResources
+    DependsOn: CallMetricFilterWaitLambda1
+    Type: 'Custom::MetricFilterWaitLambda'
+    Properties:
+      ServiceToken: !GetAtt MetricFilterWaitLambda.Arn
+
+#----------------------------------------------------------------------------------------------------------------------
+#   MetricFilterUnAuthorizedActivity:
+#     DependsOn: CallMetricFilterWaitLambda2
+#     Type: AWS::Logs::MetricFilter
+#     Condition: CreateResources
+#     Properties:
+#       LogGroupName: 'aws-controltower/CloudTrailLogs'
+#       FilterPattern: '{(($.errorCode="*UnauthorizedOperation") || ($.errorCode="AccessDenied*")) && ($.eventName!="GetBucketLogging")}'
+#       MetricTransformations:
+#         - MetricValue: '1'
+#           MetricNamespace: LogMetrics
+#           MetricName: UnauthorizedAPIActivity
+#     Metadata:
+#       Comment: Metric Filter for CIS-3.1-Ensure a log metric filter and alarm exist for unauthorized API calls
+
+#   AlarmUnAuthorizedActivity:
+#     Type: AWS::CloudWatch::Alarm
+#     Condition: CreateResources
+#     DependsOn:
+#       - CallMetricFilterWaitLambda2
+#       - MetricFilterUnAuthorizedActivity
+#     Properties:
+#       AlarmName: platform_Unauthorized_API_Activity_Notification
+#       AlarmDescription: Alarm if Multiple unauthorized actions or logins attempted
+#       MetricName: UnauthorizedAPIActivity
+#       Namespace: LogMetrics
+#       Statistic: Sum
+#       Period: 60
+#       EvaluationPeriods: 1
+#       Threshold: 1
+#       TreatMissingData: notBreaching
+#       AlarmActions:
+#         - !Sub 'arn:aws:sns:${AWS::Region}:${AWS::AccountId}:platform_Compliance_Security_Notification'
+#       ComparisonOperator: GreaterThanOrEqualToThreshold
+#     Metadata:
+#       Comment: Alarm for CIS-3.1-Ensure a log metric filter and alarm exist for unauthorized API calls
+
+# #----------------------------------------------------------------------------------------------------------------------
+#   MetricFilterSignInWithoutMFA:
+#     DependsOn: CallMetricFilterWaitLambda2
+#     Type: AWS::Logs::MetricFilter
+#     Condition: CreateResources
+#     Properties:
+#       LogGroupName: 'aws-controltower/CloudTrailLogs'
+#       FilterPattern: '{($.eventName="ConsoleLogin") && ($.additionalEventData.MFAUsed !="Yes") && ($.userIdentity.sessionContext.sessionIssuer.arn !="*sso.amazonaws.com*")}'
+#       MetricTransformations:
+#         - MetricValue: '1'
+#           MetricNamespace: LogMetrics
+#           MetricName: SignInWithoutMFAActivity
+#     Metadata:
+#       Comment: Metric Filter for CIS-3.2-Ensure a log metric filter and alarm exist for Management Console sign-in without MFA
+
+#   AlarmSignInWithoutMFA:
+#     Type: AWS::CloudWatch::Alarm
+#     Condition: CreateResources
+#     DependsOn:
+#       - CallMetricFilterWaitLambda2
+#       - MetricFilterSignInWithoutMFA
+#     Properties:
+#       AlarmName: platform_Sign_In_Without_MFA_Activity_Notification
+#       AlarmDescription: Alarm if Management Console sign-in without MFA attempted
+#       MetricName: SignInWithoutMFAActivity
+#       Namespace: LogMetrics
+#       Statistic: Sum
+#       Period: 60
+#       EvaluationPeriods: 1
+#       Threshold: 1
+#       TreatMissingData: notBreaching
+#       AlarmActions:
+#         - !Sub 'arn:aws:sns:${AWS::Region}:${AWS::AccountId}:platform_Compliance_Security_Notification'
+#       ComparisonOperator: GreaterThanOrEqualToThreshold
+#     Metadata:
+#       Comment: Alarm for CIS-3.2-Ensure a log metric filter and alarm exist for Management Console sign-in without MFA
+
+# ----------------------------------------------------------------------------------------------------------------------
+#   MetricFilterRootAccountUsage:
+#     DependsOn: CallMetricFilterWaitLambda2
+#     Type: AWS::Logs::MetricFilter
+#     Condition: CreateResources
+#     Properties:
+#       LogGroupName: 'aws-controltower/CloudTrailLogs'
+#       FilterPattern: '{$.userIdentity.type="Root" && $.userIdentity.invokedBy NOT EXISTS && $.eventType !="AwsServiceEvent"}'
+#       MetricTransformations:
+#         - MetricValue: '1'
+#           MetricNamespace: LogMetrics
+#           MetricName: RootAccountUsageActivity
+#     Metadata:
+#       Comment: Metric Filter for CIS-3.3-Ensure a log metric filter and alarm exist for usage of "root" account
+
+#   AlarmRootAccountUsage:
+#     Type: AWS::CloudWatch::Alarm
+#     Condition: CreateResources
+#     DependsOn:
+#       - CallMetricFilterWaitLambda2
+#       - MetricFilterRootAccountUsage
+#     Properties:
+#       AlarmName: platform_Root_Account_Usage_Activity_Notification
+#       AlarmDescription: Alarm if Root Account Usage Activity attempted
+#       MetricName: RootAccountUsageActivity
+#       Namespace: LogMetrics
+#       Statistic: Sum
+#       Period: 60
+#       EvaluationPeriods: 1
+#       Threshold: 1
+#       TreatMissingData: notBreaching
+#       AlarmActions:
+#         - !Sub 'arn:aws:sns:${AWS::Region}:${AWS::AccountId}:platform_Compliance_Security_Notification'
+#       ComparisonOperator: GreaterThanOrEqualToThreshold
+#     Metadata:
+#       Comment: Alarm for CIS-3.3-Ensure a log metric filter and alarm exist for usage of "root" account
+
+#----------------------------------------------------------------------------------------------------------------------
+#  MetricFilterIAMPolicyChanges:
+#    DependsOn: CallMetricFilterWaitLambda2
+#    Type: AWS::Logs::MetricFilter
+#    Condition: CreateResources
+#    Properties:
+#      LogGroupName: 'aws-controltower/CloudTrailLogs'
+#      FilterPattern: '{($.eventName=DeleteGroupPolicy) || ($.eventName=DeleteRolePolicy) || ($.eventName=DeleteUserPolicy) || ($.eventName=PutGroupPolicy) || ($.eventName=PutRolePolicy) || ($.eventName=PutUserPolicy) || ($.eventName=CreatePolicy) || ($.eventName=DeletePolicy) || ($.eventName=CreatePolicyVersion) || ($.eventName=DeletePolicyVersion) || ($.eventName=AttachRolePolicy) || ($.eventName=DetachRolePolicy) || ($.eventName=AttachUserPolicy) || ($.eventName=DetachUserPolicy) || ($.eventName=AttachGroupPolicy) || ($.eventName=DetachGroupPolicy)}'
+#      MetricTransformations:
+#        - MetricValue: '1'
+#          MetricNamespace: LogMetrics
+#          MetricName: IAMPolicyChangesActivity
+#    Metadata:
+#      Comment: Metric Filter for CIS-3.4-Ensure a log metric filter and alarm exist for IAM policy changes
+#
+#  AlarmIAMPolicyChanges:
+#    Type: AWS::CloudWatch::Alarm
+#    Condition: CreateResources
+#    DependsOn:
+#      - CallMetricFilterWaitLambda2
+#      - MetricFilterIAMPolicyChanges
+#    Properties:
+#      AlarmName: platform_IAM_Policy_Changes_Activity_Notification
+#      AlarmDescription: Alarm if IAM Policy Changes Activity attempted
+#      MetricName: IAMPolicyChangesActivity
+#      Namespace: LogMetrics
+#      Statistic: Sum
+#      Period: 60
+#      EvaluationPeriods: 1
+#      Threshold: 1
+#      TreatMissingData: notBreaching
+#      AlarmActions:
+#        - !Sub 'arn:aws:sns:${AWS::Region}:${AWS::AccountId}:platform_Compliance_Security_Notification'
+#      ComparisonOperator: GreaterThanOrEqualToThreshold
+#    Metadata:
+#      Comment: Alarm for CIS-3.4-Ensure a log metric filter and alarm exist for IAM policy changes
+#
+#
+#----------------------------------------------------------------------------------------------------------------------
+  # MetricFilterDeleteDisableCMK:
+  #   DependsOn: CallMetricFilterWaitLambda2
+  #   Type: AWS::Logs::MetricFilter
+  #   Condition: CreateResources
+  #   Properties:
+  #     LogGroupName: 'aws-controltower/CloudTrailLogs'
+  #     FilterPattern: '{($.eventSource=kms.amazonaws.com) && (($.eventName=DisableKey) || ($.eventName=ScheduleKeyDeletion))}'
+  #     MetricTransformations:
+  #       - MetricValue: '1'
+  #         MetricNamespace: LogMetrics
+  #         MetricName: DeleteDisableCMKsActivity
+  #   Metadata:
+  #     Comment: Metric Filter for 3.7 – Ensure a log metric filter and alarm exist for disabling or scheduled
+  #              deletion of customer created CMKs
+
+  # AlarmDeleteDisableCMK:
+  #   Type: AWS::CloudWatch::Alarm
+  #   Condition: CreateResources
+  #   DependsOn:
+  #     - CallMetricFilterWaitLambda2
+  #     - MetricFilterDeleteDisableCMK
+  #   Properties:
+  #     AlarmName: platform_Notification_to_delete_Disabled_or_Deletion_Scheduled_CMKs
+  #     AlarmDescription: Alarm to notify for deleting any Disabled or Deletion Scheduled customer created CMKs
+  #     MetricName: DeleteDisableCMKsActivity
+  #     Namespace: LogMetrics
+  #     Statistic: Sum
+  #     Period: 60
+  #     EvaluationPeriods: 1
+  #     Threshold: 1
+  #     TreatMissingData: notBreaching
+  #     AlarmActions:
+  #       - !Sub 'arn:aws:sns:${AWS::Region}:${AWS::AccountId}:platform_Compliance_Security_Notification'
+  #     ComparisonOperator: GreaterThanOrEqualToThreshold
+  #   Metadata:
+  #     Comment: Alarm for Metric Filter for 3.7 – Ensure a log metric filter and alarm exist for disabling or scheduled
+  #              deletion of customer created CMKs
+
+#----------------------------------------------------------------------------------------------------------------------
+  # MetricFilterCloudTrailChanges:
+  #   DependsOn: CallMetricFilterWaitLambda2
+  #   Type: AWS::Logs::MetricFilter
+  #   Condition: CreateResources
+  #   Properties:
+  #     LogGroupName: 'aws-controltower/CloudTrailLogs'
+  #     FilterPattern: '{($.eventName=CreateTrail) || ($.eventName=UpdateTrail) || ($.eventName=DeleteTrail) || ($.eventName=StartLogging) || ($.eventName=StopLogging)}'
+  #     MetricTransformations:
+  #       - MetricValue: '1'
+  #         MetricNamespace: LogMetrics
+  #         MetricName: CloudTrailChangesActivity
+  #   Metadata:
+  #     Comment: Metric Filter for CIS-3.5-Ensure a log metric filter and alarm exist for CloudTrail configuration changes
+
+  # AlarmCloudTrailChanges:
+  #   Type: AWS::CloudWatch::Alarm
+  #   Condition: CreateResources
+  #   DependsOn:
+  #     - CallMetricFilterWaitLambda2
+  #     - MetricFilterCloudTrailChanges
+  #   Properties:
+  #     AlarmName: platform_CloudTrail_Policy_Changes_Activity_Notification
+  #     AlarmDescription: Alarm if CloudTrail Policy Changes Activity attempted
+  #     MetricName: CloudTrailChangesActivity
+  #     Namespace: LogMetrics
+  #     Statistic: Sum
+  #     Period: 60
+  #     EvaluationPeriods: 1
+  #     Threshold: 1
+  #     TreatMissingData: notBreaching
+  #     AlarmActions:
+  #       - !Sub 'arn:aws:sns:${AWS::Region}:${AWS::AccountId}:platform_Compliance_Security_Notification'
+  #     ComparisonOperator: GreaterThanOrEqualToThreshold
+  #   Metadata:
+  #     Comment: Alarm for CIS-3.5-Ensure a log metric filter and alarm exist for CloudTrail configuration changes
+
+#----------------------------------------------------------------------------------------------------------------------
+  # MetricFilterAuthenticationFailures:
+  #   DependsOn: CallMetricFilterWaitLambda2
+  #   Type: AWS::Logs::MetricFilter
+  #   Condition: CreateResources
+  #   Properties:
+  #     LogGroupName: 'aws-controltower/CloudTrailLogs'
+  #     FilterPattern: '{($.eventName=ConsoleLogin) && ($.errorMessage="Failed authentication")}'
+  #     MetricTransformations:
+  #       - MetricValue: '1'
+  #         MetricNamespace: LogMetrics
+  #         MetricName: AuthenticationFailuresActivity
+  #   Metadata:
+  #     Comment: Metric Filter for CIS-3.6-Ensure a log metric filter and alarm exist for AWS Management
+  #       Console authentication failures
+
+  # AlarmAuthenticationFailures:
+  #   Type: AWS::CloudWatch::Alarm
+  #   Condition: CreateResources
+  #   DependsOn:
+  #     - CallMetricFilterWaitLambda2
+  #     - MetricFilterAuthenticationFailures
+  #   Properties:
+  #     AlarmName: platform_Console_Authentication_Failures_Notification
+  #     AlarmDescription: Alarm if AWS Console Authentication Failures Attempted
+  #     MetricName: AuthenticationFailuresActivity
+  #     Namespace: LogMetrics
+  #     Statistic: Sum
+  #     Period: 60
+  #     EvaluationPeriods: 1
+  #     Threshold: 1
+  #     TreatMissingData: notBreaching
+  #     AlarmActions:
+  #       - !Sub 'arn:aws:sns:${AWS::Region}:${AWS::AccountId}:platform_Compliance_Security_Notification'
+  #     ComparisonOperator: GreaterThanOrEqualToThreshold
+  #   Metadata:
+  #     Comment: Metric Filter for CIS-3.6-Ensure a log metric filter and alarm exist for AWS Management
+  #       Console authentication failures
+
+#----------------------------------------------------------------------------------------------------------------------
+#  MetricFilterS3BucketPolicyChanges:
+#    DependsOn: CallMetricFilterWaitLambda2
+#    Type: AWS::Logs::MetricFilter
+#    Condition: CreateResources
+#    Properties:
+#      LogGroupName: 'aws-controltower/CloudTrailLogs'
+#      FilterPattern: '{($.eventSource=s3.amazonaws.com) && (($.eventName=PutBucketAcl) || ($.eventName=PutBucketPolicy) || ($.eventName=PutBucketCors) || ($.eventName=PutBucketLifecycle) || ($.eventName=PutBucketReplication) || ($.eventName=DeleteBucketPolicy) || ($.eventName=DeleteBucketCors) || ($.eventName=DeleteBucketLifecycle) || ($.eventName=DeleteBucketReplication))}'
+#      MetricTransformations:
+#        - MetricValue: '1'
+#          MetricNamespace: LogMetrics
+#          MetricName: S3BucketPolicyChangesActivity
+#    Metadata:
+#      Comment: Metric Filter for CIS-3.9-Ensure a log metric filter and alarm exist for S3 bucket policy changes
+#
+#  AlarmS3BucketPolicyChanges:
+#    Type: AWS::CloudWatch::Alarm
+#    Condition: CreateResources
+#    DependsOn:
+#      - CallMetricFilterWaitLambda2
+#      - MetricFilterS3BucketPolicyChanges
+#    Properties:
+#      AlarmName: platform_S3Bucket_Policy_Changes_Activity_Notification
+#      AlarmDescription: Alarm if S3Bucket Policy Changes Activity attempted
+#      MetricName: S3BucketPolicyChangesActivity
+#      Namespace: LogMetrics
+#      Statistic: Sum
+#      Period: 60
+#      EvaluationPeriods: 1
+#      Threshold: 1
+#      TreatMissingData: notBreaching
+#      AlarmActions:
+#        - !Sub 'arn:aws:sns:${AWS::Region}:${AWS::AccountId}:platform_Compliance_Security_Notification'
+#      ComparisonOperator: GreaterThanOrEqualToThreshold
+#    Metadata:
+#      Comment: Alarm for CIS-3.9-Ensure a log metric filter and alarm exist for S3 bucket policy changes
+
+#----------------------------------------------------------------------------------------------------------------------
+#   MetricFilterNACLChanges:
+#     DependsOn: CallMetricFilterWaitLambda2
+#     Type: AWS::Logs::MetricFilter
+#     Condition: CreateResources
+#     Properties:
+#       LogGroupName: 'aws-controltower/CloudTrailLogs'
+#       FilterPattern: '{($.eventName=CreateNetworkAcl) || ($.eventName=CreateNetworkAclEntry) || ($.eventName=DeleteNetworkAcl) || ($.eventName=DeleteNetworkAclEntry) || ($.eventName=ReplaceNetworkAclEntry) || ($.eventName=ReplaceNetworkAclAssociation)}'
+#       MetricTransformations:
+#         - MetricValue: '1'
+#           MetricNamespace: LogMetrics
+#           MetricName: NACLChangesActivity
+#     Metadata:
+#       Comment: Metric Filter for CIS-3.11-Ensure a log metric filter and alarm exist for changes to
+#                Network Access Control Lists (NACL)
+
+#   AlarmNACLChanges:
+#     Type: AWS::CloudWatch::Alarm
+#     Condition: CreateResources
+#     DependsOn:
+#       - CallMetricFilterWaitLambda2
+#       - MetricFilterNACLChanges
+#     Properties:
+#       AlarmName: platform_NACL_Changes_Activity_Notification
+#       AlarmDescription: Alarm if Network Access Control Lists Changes Attempted
+#       MetricName: NACLChangesActivity
+#       Namespace: LogMetrics
+#       Statistic: Sum
+#       Period: 60
+#       EvaluationPeriods: 1
+#       Threshold: 1
+#       TreatMissingData: notBreaching
+#       AlarmActions:
+#         - !Sub 'arn:aws:sns:${AWS::Region}:${AWS::AccountId}:platform_Compliance_Security_Notification'
+#       ComparisonOperator: GreaterThanOrEqualToThreshold
+#     Metadata:
+#       Comment: Metric Filter for CIS-3.11-Ensure a log metric filter and alarm exist for changes to
+#                Network Access Control Lists (NACL)
+
+# #----------------------------------------------------------------------------------------------------------------------
+#   MetricFilterNetworkGatewayChanges:
+#     DependsOn: CallMetricFilterWaitLambda2
+#     Type: AWS::Logs::MetricFilter
+#     Condition: CreateResources
+#     Properties:
+#       LogGroupName: 'aws-controltower/CloudTrailLogs'
+#       FilterPattern: '{($.eventName=CreateCustomerGateway) || ($.eventName=DeleteCustomerGateway) || ($.eventName=AttachInternetGateway) || ($.eventName=CreateInternetGateway) || ($.eventName=DeleteInternetGateway) || ($.eventName=DetachInternetGateway)}'
+#       MetricTransformations:
+#         - MetricValue: '1'
+#           MetricNamespace: LogMetrics
+#           MetricName: NetworkGatewayChangesActivity
+#     Metadata:
+#       Comment: Metric Filter for CIS-3.12-Ensure a log metric filter and alarm exist for changes to network gateways
+
+#   AlarmNetworkGatewayChanges:
+#     Type: AWS::CloudWatch::Alarm
+#     Condition: CreateResources
+#     DependsOn:
+#       - CallMetricFilterWaitLambda2
+#       - MetricFilterNetworkGatewayChanges
+#     Properties:
+#       AlarmName: platform_Network_Gateway_Changes_Activity_Notification
+#       AlarmDescription: Alarm if Network Gateways Policy Changes Activity attempted
+#       MetricName: NetworkGatewayChangesActivity
+#       Namespace: LogMetrics
+#       Statistic: Sum
+#       Period: 60
+#       EvaluationPeriods: 1
+#       Threshold: 1
+#       TreatMissingData: notBreaching
+#       AlarmActions:
+#         - !Sub 'arn:aws:sns:${AWS::Region}:${AWS::AccountId}:platform_Compliance_Security_Notification'
+#       ComparisonOperator: GreaterThanOrEqualToThreshold
+#     Metadata:
+#       Comment: Alarm for CIS-3.12-Ensure a log metric filter and alarm exist for changes to network gateways
+
+#----------------------------------------------------------------------------------------------------------------------
+#   MetricFilterRouteTableChanges:
+#     DependsOn: CallMetricFilterWaitLambda2
+#     Type: AWS::Logs::MetricFilter
+#     Condition: CreateResources
+#     Properties:
+#       LogGroupName: 'aws-controltower/CloudTrailLogs'
+#       FilterPattern: '{($.eventName=CreateRoute) || ($.eventName=CreateRouteTable) || ($.eventName=ReplaceRoute) || ($.eventName=ReplaceRouteTableAssociation) || ($.eventName=DeleteRouteTable) || ($.eventName=DeleteRoute) || ($.eventName=DisassociateRouteTable)}'
+#       MetricTransformations:
+#         - MetricValue: '1'
+#           MetricNamespace: LogMetrics
+#           MetricName: RouteTableChangesActivity
+#     Metadata:
+#       Comment: Metric Filter for CIS-3.13-Ensure a log metric filter and alarm exist for route table changes
+
+#   AlarmRouteTableChanges:
+#     Type: AWS::CloudWatch::Alarm
+#     Condition: CreateResources
+#     DependsOn:
+#       - CallMetricFilterWaitLambda2
+#       - MetricFilterRouteTableChanges
+#     Properties:
+#       AlarmName: platform_Route_Table_Changes_Activity_Notification
+#       AlarmDescription: Alarm if Route Table Changes Activity attempted
+#       MetricName: RouteTableChangesActivity
+#       Namespace: LogMetrics
+#       Statistic: Sum
+#       Period: 60
+#       EvaluationPeriods: 1
+#       Threshold: 1
+#       TreatMissingData: notBreaching
+#       AlarmActions:
+#         - !Sub 'arn:aws:sns:${AWS::Region}:${AWS::AccountId}:platform_Compliance_Security_Notification'
+#       ComparisonOperator: GreaterThanOrEqualToThreshold
+#     Metadata:
+#       Comment: Alarm for CIS-3.13-Ensure a log metric filter and alarm exist for route table changes
+
+# #----------------------------------------------------------------------------------------------------------------------
+#   MetricFilterVPCChanges:
+#     DependsOn: CallMetricFilterWaitLambda2
+#     Type: AWS::Logs::MetricFilter
+#     Condition: CreateResources
+#     Properties:
+#       LogGroupName: 'aws-controltower/CloudTrailLogs'
+#       FilterPattern: '{($.eventName=CreateVpc) || ($.eventName=DeleteVpc) || ($.eventName=ModifyVpcAttribute) || ($.eventName=AcceptVpcPeeringConnection) || ($.eventName=CreateVpcPeeringConnection) || ($.eventName=DeleteVpcPeeringConnection) || ($.eventName=RejectVpcPeeringConnection) || ($.eventName=AttachClassicLinkVpc) || ($.eventName=DetachClassicLinkVpc) || ($.eventName=DisableVpcClassicLink) || ($.eventName=EnableVpcClassicLink)}'
+#       MetricTransformations:
+#         - MetricValue: '1'
+#           MetricNamespace: LogMetrics
+#           MetricName: VPCChangesActivity
+#     Metadata:
+#       Comment: Metric Filter for CIS-3.14-Ensure a log metric filter and alarm exist for VPC Changes
+      
+#   AlarmVPCChanges:
+#     Type: AWS::CloudWatch::Alarm
+#     Condition: CreateResources
+#     DependsOn:
+#       - CallMetricFilterWaitLambda2
+#       - MetricFilterVPCChanges
+#     Properties:
+#       AlarmName: platform_VPC_Changes_Activity_Notification
+#       AlarmDescription: Alarm if VPC Changes Activity attempted
+#       MetricName: VPCChangesActivity
+#       Namespace: LogMetrics
+#       Statistic: Sum
+#       Period: 60
+#       EvaluationPeriods: 1
+#       Threshold: 1
+#       TreatMissingData: notBreaching
+#       AlarmActions:
+#         - !Sub 'arn:aws:sns:${AWS::Region}:${AWS::AccountId}:platform_Compliance_Security_Notification'
+#       ComparisonOperator: GreaterThanOrEqualToThreshold
+#     Metadata:
+#       Comment: Alarm for CIS-3.14-Ensure a log metric filter and alarm exist for VPC Changes
+
+#----------------------------------------------------------------------------------------------------------------------
+
+  InstanceProfileStackSetRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: !Sub 'platform_stackset_instance_profile_role'
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonEC2FullAccess
+        - arn:aws:iam::aws:policy/IAMFullAccess
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
+  FunctionToPlatformRemediateInstanceProfile:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        S3Bucket:
+          Fn::Sub:
+              - "${S3BucketName}${AWS::Region}"
+              - {S3BucketName: !Ref S3BucketName}
+        S3Key:
+          Fn::Sub:
+            - "${releasefolder}/platform_remediate_instance_profile.zip"
+            - {releasefolder: !Ref FolderName}
+      FunctionName: platform_remediate_instance_profile
+      Tags:
+        - Value: "yes"
+          Key: platform_donotdelete
+      Handler: platform_remediate_instance_profile.lambda_handler
+      Role: !GetAtt InstanceProfileStackSetRole.Arn
+      Timeout: 900
+      MemorySize: 186
+      Runtime: python3.8
+
+  ScheduledRulePlatformRemediateInstanceProfile:
+    Type: "AWS::Events::Rule"
+    Properties:
+      Name: platform-RemediateInstanceProfileSchedule
+      Description: "Scheduled Rule for every 4 hours"
+      ScheduleExpression: "rate(4 hours)"
+      State: "ENABLED"
+      Targets:
+        - Arn: !GetAtt FunctionToPlatformRemediateInstanceProfile.Arn
+          Id: "TargetFunctionV1"
+
+  PermissionForPlatformRemediateInstanceProfileScheduler:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref FunctionToPlatformRemediateInstanceProfile
+      Action: "lambda:InvokeFunction"
+      Principal: "events.amazonaws.com"
+      SourceArn:
+        Fn::GetAtt:
+          - "ScheduledRulePlatformRemediateInstanceProfile"
+          - "Arn"      
+
+#----------------------------------------------------------------------------------------------------------------------
+  PlatformSqsEncryptRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: !Sub 'platform_sqs_encrypt_role'
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+                - events.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonSQSFullAccess
+        - arn:aws:iam::aws:policy/CloudWatchEventsFullAccess
+        - arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess
+        - arn:aws:iam::aws:policy/AWSLambda_FullAccess
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
+  FunctionToEncryotPlatformSqs:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        S3Bucket:
+          Fn::Sub:
+              - "${S3BucketName}${AWS::Region}"
+              - {S3BucketName: !Ref S3BucketName}
+        S3Key:
+          Fn::Sub:
+            - "${releasefolder}/platform_encrypt_platform_sqs.zip"
+            - {releasefolder: !Ref FolderName}
+      FunctionName: platform_encrypt_platform_sqs
+      Tags:
+        - Value: "yes"
+          Key: platform_donotdelete
+      Handler: platform_encrypt_platform_sqs.lambda_handler
+      Role: !GetAtt PlatformSqsEncryptRole.Arn
+      Timeout: 900
+      MemorySize: 186
+      Runtime: python3.8
+
+  ScheduledRuleFunctionPlatformEncryptSQS:
+    Type: "AWS::Events::Rule"
+    Properties:
+      Name: platform-FunctionPlatformEncptSQS
+      Description: "Scheduled Rule for every 12 hours"
+      ScheduleExpression: "rate(12 hours)"
+      State: "ENABLED"
+      Targets:
+        - Arn: !GetAtt FunctionToEncryotPlatformSqs.Arn
+          Id: "TargetFunctionV1"
+
+  PermissionForFunctionPlatformEncryptSQS:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref FunctionToEncryotPlatformSqs
+      Action: "lambda:InvokeFunction"
+      Principal: "events.amazonaws.com"
+      SourceArn:
+        Fn::GetAtt:
+          - "ScheduledRuleFunctionPlatformEncryptSQS"
+          - "Arn"
+
+#----------------------------------------------------------------------------------------------------------------------
+
+  PlatformAMIsTagRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: !Sub 'platform_tag_ami_per_account_role'
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+                - events.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonEC2FullAccess
+        - arn:aws:iam::aws:policy/CloudWatchEventsFullAccess
+        - arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess
+        - arn:aws:iam::aws:policy/AWSLambda_FullAccess
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
+  FunctionPlatformAMIsTagRole:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        S3Bucket:
+          Fn::Sub:
+              - "${S3BucketName}${AWS::Region}"
+              - {S3BucketName: !Ref S3BucketName}
+        S3Key:
+          Fn::Sub:
+            - "${releasefolder}/platform_tag_ami_per_account.zip"
+            - {releasefolder: !Ref FolderName}
+      FunctionName: platform_tag_ami_per_account
+      Tags:
+        - Value: "yes"
+          Key: platform_donotdelete
+      Handler: platform_tag_ami_per_account.lambda_handler
+      Role: !GetAtt PlatformAMIsTagRole.Arn
+      Timeout: 900
+      MemorySize: 186
+      Runtime: python3.8
+
+  ScheduledRuleFunctionPlatformAMIsTag:
+    Type: "AWS::Events::Rule"
+    Properties:
+      Name: platform-FunctionPlatformAMIsTag
+      Description: "Scheduled Rule for every 12 hours"
+      ScheduleExpression: "rate(12 hours)"
+      State: "ENABLED"
+      Targets:
+        - Arn: !GetAtt FunctionPlatformAMIsTagRole.Arn
+          Id: "TargetFunctionV1"
+
+  PermissionForFunctionPlatformAMIsTagScheduler:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref FunctionPlatformAMIsTagRole
+      Action: "lambda:InvokeFunction"
+      Principal: "events.amazonaws.com"
+      SourceArn:
+        Fn::GetAtt:
+          - "ScheduledRuleFunctionPlatformAMIsTag"
+          - "Arn"  
+
+#----------------------------------------------------------------------------------------------------
+  PlatformEKSAMIsTagRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: !Sub 'platform_tag_eks_ami_per_account_role'
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+                - events.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonEC2FullAccess
+        - arn:aws:iam::aws:policy/CloudWatchEventsFullAccess
+        - arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess
+        - arn:aws:iam::aws:policy/AWSLambda_FullAccess
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
+  FunctionPlatformEKSAMIsTagRole:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        S3Bucket:
+          Fn::Sub:
+              - "${S3BucketName}${AWS::Region}"
+              - {S3BucketName: !Ref S3BucketName}
+        S3Key:
+          Fn::Sub:
+            - "${releasefolder}/platform_tag_eks_ami_per_account.zip"
+            - {releasefolder: !Ref FolderName}
+      FunctionName: platform_tag_eks_ami_per_account
+      Tags:
+        - Value: "yes"
+          Key: platform_donotdelete
+      Handler: platform_tag_eks_ami_per_account.lambda_handler
+      Role: !GetAtt PlatformEKSAMIsTagRole.Arn
+      Timeout: 900
+      MemorySize: 186
+      Runtime: python3.10
+
+  ScheduledRuleFunctionPlatformEKSAMIsTag:
+    Type: "AWS::Events::Rule"
+    Properties:
+      Name: platform-FunctionPlatformEKSAMIsTag
+      Description: "Scheduled Rule for every 12 hours"
+      ScheduleExpression: "rate(12 hours)"
+      State: "ENABLED"
+      Targets:
+        - Arn: !GetAtt FunctionPlatformEKSAMIsTagRole.Arn
+          Id: "TargetFunctionV2"
+
+  PermissionForFunctionPlatformEKSAMIsTagScheduler:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref FunctionPlatformEKSAMIsTagRole
+      Action: "lambda:InvokeFunction"
+      Principal: "events.amazonaws.com"
+      SourceArn:
+        Fn::GetAtt:
+          - "ScheduledRuleFunctionPlatformEKSAMIsTag"
+          - "Arn" 

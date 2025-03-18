@@ -1,0 +1,86 @@
+[
+    {
+      "ParameterKey": "releses3bucket",
+      "ParameterValue": "azure-devops-da2.0-release-dev-us-east-1"
+    },
+    {
+        "ParameterKey": "FolderName",
+        "ParameterValue": "ReleaseNumber"
+    },
+    {
+        "ParameterKey": "BucketNameWithOutRegion",
+        "ParameterValue": "azure-devops-da2.0-stackset-dev-"
+    },
+    {
+        "ParameterKey": "PrivateProduction",
+        "ParameterValue": "ou-93cv-2ph2c0tc"
+    },
+    {
+        "ParameterKey": "PrivateStaging",
+        "ParameterValue": "ou-93cv-chay3epk"
+    },
+    {
+        "ParameterKey": "PrivateException",
+        "ParameterValue": "ou-93cv-3o8ln75z"
+    },
+    {
+        "ParameterKey": "PublicProduction",
+        "ParameterValue": "ou-93cv-fag0s09t"
+    },
+    {
+        "ParameterKey": "PublicStaging",
+        "ParameterValue": "ou-93cv-g1h2soie"
+    },
+    {
+        "ParameterKey": "PublicException",
+        "ParameterValue": "ou-93cv-y1nb1t78"
+    },
+    {
+        "ParameterKey": "DataManagement",
+        "ParameterValue": "ou-93cv-08v7arsy"
+    },
+    {
+        "ParameterKey": "HybridAccount",
+        "ParameterValue": "ou-93cv-o3i3n5qr"
+    },
+    {
+        "ParameterKey": "Migration",
+        "ParameterValue": "ou-93cv-es78cli7"
+    },
+    {
+      "ParameterKey": "ResouceSyncBucketName",
+      "ParameterValue": "ssm-resource-sync-us-east-1-364355817034"
+    },
+    {
+      "ParameterKey": "ExecutionLogsBucketName",
+      "ParameterValue": "ssm-execution-logs-us-east-1-364355817034"
+    },
+    {
+      "ParameterKey": "PatchingTemplateStackAccountId",
+      "ParameterValue": "364355817034"
+    },
+    {
+      "ParameterKey": "PatchingTemplateStackRegion",
+      "ParameterValue": "us-east-1"
+    },
+    {
+      "ParameterKey": "ManagedInstanceDataEncryptionKey",
+      "ParameterValue": "arn:aws:kms:us-east-1:364355817034:key/8a8c5135-e3bd-4b6a-b5f8-b56782438278"
+    },
+    {
+      "ParameterKey": "BaselineOverrideBucket",
+      "ParameterValue": "arn:aws:s3:::patch-baseline-override-us-east-1-364355817034"
+    },
+    {
+      "ParameterKey": "ServiceCatalogLaunchRoleName",
+      "ParameterValue": "platform-service-catalog-launch-role"
+    },
+    {
+      "ParameterKey": "CronValue",
+      "ParameterValue": "cron(0 0 5 ? * WED *)"
+    },
+    {
+      "ParameterKey": "MasterAccountId",
+      "ParameterValue": "364355817034"
+    }
+]

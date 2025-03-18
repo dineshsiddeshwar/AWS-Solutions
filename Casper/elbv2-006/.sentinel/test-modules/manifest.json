@@ -1,0 +1,28 @@
+{
+	"records": [
+		{
+			"key": "test\\ELBV2-006\\fail-type-lambda\\tfplan-functions",
+			"source": "../../common-functions/tfplan-functions/tfplan-functions.sentinel",
+			"sourceSum": "",
+			"dest": "C:/Users/NZ278LV/OneDrive - EY/Desktop/Casper/elbv2-006/common-functions/tfplan-functions/tfplan-functions.sentinel"
+		},
+		{
+			"key": "test\\ELBV2-006\\pass-type-alb\\tfplan-functions",
+			"source": "../../common-functions/tfplan-functions/tfplan-functions.sentinel",
+			"sourceSum": "",
+			"dest": "C:/Users/NZ278LV/OneDrive - EY/Desktop/Casper/elbv2-006/common-functions/tfplan-functions/tfplan-functions.sentinel"
+		},
+		{
+			"key": "test\\ELBV2-006\\pass-type-instance\\tfplan-functions",
+			"source": "../../common-functions/tfplan-functions/tfplan-functions.sentinel",
+			"sourceSum": "",
+			"dest": "C:/Users/NZ278LV/OneDrive - EY/Desktop/Casper/elbv2-006/common-functions/tfplan-functions/tfplan-functions.sentinel"
+		},
+		{
+			"key": "test\\ELBV2-006\\pass-type-ip\\tfplan-functions",
+			"source": "../../common-functions/tfplan-functions/tfplan-functions.sentinel",
+			"sourceSum": "",
+			"dest": "C:/Users/NZ278LV/OneDrive - EY/Desktop/Casper/elbv2-006/common-functions/tfplan-functions/tfplan-functions.sentinel"
+		}
+	]
+}

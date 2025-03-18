@@ -1,0 +1,17 @@
+{
+    "serviceprovider": "aws",
+    "servicerequirement_name": "AWS::EC2::Implementation",
+    "serviceDisplayName": "AWS EC2",
+    "id": "AWS_EC2_8_1",
+    "label": "Ensure deletion protection is enabled",
+    "description": "Check that DeletionPolicy attribute is set to retain to ensure that deletion of stack does not cause loss of additional attached resources",
+    "type": "Detective",
+    "implementationProvider": "wiz",
+    "wizNativeType": [
+        "virtualMachine"
+    ],
+    "link": "Detective-Pipeline/AWS/AWS_EC2/AWS_EC2_8_1.rego",
+    "requirementId": [
+        "AWS_EC2_8"
+    ]
+}

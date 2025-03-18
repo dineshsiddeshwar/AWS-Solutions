@@ -1,0 +1,36 @@
+{
+    "PermissionSets" :{
+    "ListOfPermissionSetsArn" : ["arn:aws:sso:::permissionSet/ssoins-7223762a4aecf0e0/ps-8b70f28995af82e4",
+                                "arn:aws:sso:::permissionSet/ssoins-7223762a4aecf0e0/ps-dc2da0e2c748492d",
+                                "arn:aws:sso:::permissionSet/ssoins-7223762a4aecf0e0/ps-7e6d8150f7e2ce10",
+                                "arn:aws:sso:::permissionSet/ssoins-7223762a4aecf0e0/ps-e5159221367bfa5e",
+                                "arn:aws:sso:::permissionSet/ssoins-7223762a4aecf0e0/ps-6f989881b7a2b477",
+                                "arn:aws:sso:::permissionSet/ssoins-7223762a4aecf0e0/ps-9e9e31870688796a",
+                                "arn:aws:sso:::permissionSet/ssoins-7223762a4aecf0e0/ps-18da1ca6b1ce785f",
+                                "arn:aws:sso:::permissionSet/ssoins-7223762a4aecf0e0/ps-0a3ac94562174115",
+                                "arn:aws:sso:::permissionSet/ssoins-7223762a4aecf0e0/ps-de84e9333e231810",
+                                "arn:aws:sso:::permissionSet/ssoins-7223762a4aecf0e0/ps-8dc92f9f73edc155",
+                                "arn:aws:sso:::permissionSet/ssoins-7223762a4aecf0e0/ps-13d8162b1cab9c4a",
+                                "arn:aws:sso:::permissionSet/ssoins-7223762a4aecf0e0/ps-f9f6fada7f628adb",
+                                "arn:aws:sso:::permissionSet/ssoins-7223762a4aecf0e0/ps-0eeb97a1f87dd55e",
+                                "arn:aws:sso:::permissionSet/ssoins-7223762a4aecf0e0/ps-b5638fd032ee052b",
+                                "arn:aws:sso:::permissionSet/ssoins-7223762a4aecf0e0/ps-1ac338ead7bd3c32",
+                                "arn:aws:sso:::permissionSet/ssoins-7223762a4aecf0e0/ps-483b3b1cae8d603a",
+                                "arn:aws:sso:::permissionSet/ssoins-7223762a4aecf0e0/ps-5868251880b96bb7",
+                                "arn:aws:sso:::permissionSet/ssoins-7223762a4aecf0e0/ps-cc2ce8fc3e157b9a",
+                                "arn:aws:sso:::permissionSet/ssoins-7223762a4aecf0e0/ps-6eed603a35813d68",
+                                "arn:aws:sso:::permissionSet/ssoins-7223762a4aecf0e0/ps-f9a5fd3434f7743d",
+                                "arn:aws:sso:::permissionSet/ssoins-7223762a4aecf0e0/ps-6f4f3ff91d432f5f",
+                                "arn:aws:sso:::permissionSet/ssoins-7223762a4aecf0e0/ps-0bffcd79bc73c115",
+                                "arn:aws:sso:::permissionSet/ssoins-7223762a4aecf0e0/ps-c6fc087cf25018b7",
+                                "arn:aws:sso:::permissionSet/ssoins-7223762a4aecf0e0/ps-c46ba476960d9708",
+                                "arn:aws:sso:::permissionSet/ssoins-7223762a4aecf0e0/ps-6eb412e9eb05f812",
+                                "arn:aws:sso:::permissionSet/ssoins-7223762a4aecf0e0/ps-090ddd99d63be54f",
+                                "arn:aws:sso:::permissionSet/ssoins-7223762a4aecf0e0/ps-e87281336f3beb63",
+                                "arn:aws:sso:::permissionSet/ssoins-7223762a4aecf0e0/ps-8598663abc06b8a7",
+                                "arn:aws:sso:::permissionSet/ssoins-7223762a4aecf0e0/ps-0bfd208280b48a11",
+                                "arn:aws:sso:::permissionSet/ssoins-7223762a4aecf0e0/ps-56d44de1cf974e4c"],
+    "instance_arn" : ["arn:aws:sso:::instance/ssoins-7223762a4aecf0e0"]
+    }
+}
+ 

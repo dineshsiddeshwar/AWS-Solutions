@@ -1,0 +1,137 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": [
+        "config:Put*",
+        "config:UntagResource"
+      ],
+      "Effect": "Deny",
+      "Resource": "*",
+      "Condition": {
+        "ArnNotLike": {
+          "aws:PrincipalARN": [
+            "arn:aws:iam::*:role/platform*",
+            "arn:aws:iam::*:role/aws-reserved/sso.amazonaws.com/*platform*",
+            "arn:aws:iam::*:role/*AWSControlTower*",
+            "arn:aws:iam::master_account_id:role/aws-service-role/stacksets.cloudformation.amazonaws.com/AWSServiceRoleForCloudFormationStackSetsOrgAdmin*",
+            "arn:aws:iam::*:role/stacksets-exec*",
+            "arn:aws:sts::*:assumed-role/aws-controltower*",
+            "arn:aws:iam::*:role/aws-controltower-ConfigRecorderRole"
+          ]
+        },
+        "Null": {
+          "aws:TagKeys": "false"
+        },
+        "ForAllValues:StringEqualsIgnoreCase": {
+          "aws:TagKeys": [
+            "platform_donotdelete"
+          ]
+        }
+      }
+    },
+    {
+      "Action": [
+        "logs:*",
+        "events:*"
+      ],
+      "Effect": "Deny",
+      "Resource": [
+        "arn:aws:logs:*:*:log-group:platform*:*",
+        "arn:aws:events:*:*:rule/platform*",
+        "arn:aws:cloudformation:*:*:stack/StackSet-platform*",
+        "arn:aws:cloudformation:*:*:stack/awsconfigconforms-OrgConformsPack-Platform*"
+      ],
+      "Condition": {
+        "ArnNotLike": {
+          "aws:PrincipalARN": [
+            "arn:aws:iam::*:role/platform*",
+            "arn:aws:iam::*:role/*Wiz*",
+            "arn:aws:iam::*:role/aws-reserved/sso.amazonaws.com/*platform*",
+            "arn:aws:iam::*:role/*AWSControlTower*",
+            "arn:aws:iam::master_account_id:role/aws-service-role/stacksets.cloudformation.amazonaws.com/AWSServiceRoleForCloudFormationStackSetsOrgAdmin*",
+            "arn:aws:iam::*:role/stacksets-exec*",
+            "arn:aws:sts::*:assumed-role/aws-controltower*",
+            "arn:aws:iam::*:role/aws-controltower-ConfigRecorderRole"
+          ]
+        }
+      }
+    },
+    {
+      "Action": [
+        "cloudformation:*",
+        "lambda:*"
+      ],
+      "Effect": "Deny",
+      "Resource": [
+        "arn:aws:cloudformation:*:*:stack/platform*",
+        "arn:aws:lambda:*:*:function:platform*"
+      ],
+      "Condition": {
+        "ArnNotLike": {
+          "aws:PrincipalARN": [
+            "arn:aws:iam::*:role/platform*",
+            "arn:aws:iam::*:role/*Wiz*",
+            "arn:aws:iam::*:role/aws-reserved/sso.amazonaws.com/*platform*",
+            "arn:aws:iam::*:role/*AWSControlTower*",
+            "arn:aws:iam::master_account_id:role/aws-service-role/stacksets.cloudformation.amazonaws.com/AWSServiceRoleForCloudFormationStackSetsOrgAdmin*",
+            "arn:aws:iam::*:role/stacksets-exec*",
+            "arn:aws:sts::*:assumed-role/aws-controltower*",
+            "arn:aws:iam::*:role/aws-controltower-ConfigRecorderRole"
+          ]
+        }
+      }
+    },
+    {
+      "Action": [
+        "cloudwatch:DeleteAlarms",
+        "cloudwatch:DisableAlarmActions",
+        "ec2:DeleteFlowLogs"
+      ],
+      "Effect": "Deny",
+      "Resource": [
+        "arn:aws:cloudwatch:*:*:alarm:platform*"
+      ],
+      "Condition": {
+        "ArnNotLike": {
+          "aws:PrincipalARN": [
+            "arn:aws:iam::*:role/platform*",
+            "arn:aws:iam::*:role/aws-reserved/sso.amazonaws.com/*platform*",
+            "arn:aws:iam::*:role/*AWSControlTower*",
+            "arn:aws:iam::master_account_id:role/aws-service-role/stacksets.cloudformation.amazonaws.com/AWSServiceRoleForCloudFormationStackSetsOrgAdmin*",
+            "arn:aws:iam::*:role/stacksets-exec*",
+            "arn:aws:sts::*:assumed-role/aws-controltower*",
+            "arn:aws:iam::*:role/aws-controltower-ConfigRecorderRole"
+          ]
+        }
+      }
+    },
+    {
+      "Action": [
+        "guardduty:DeclineInvitations",
+        "guardduty:Delete*",
+        "guardduty:Disassociate*",
+        "guardduty:InviteMembers",
+        "guardduty:StopMonitoringMembers",
+        "guardduty:UnarchiveFindings",
+        "guardduty:Update*",
+        "config:Delete*"
+      ],
+      "Effect": "Deny",
+      "Resource": "*",
+      "Condition": {
+        "ArnNotLike": {
+          "aws:PrincipalARN": [
+            "arn:aws:iam::*:role/platform*",
+            "arn:aws:iam::*:role/aws-reserved/sso.amazonaws.com/*platform*",
+            "arn:aws:iam::*:role/*AWSControlTower*",
+            "arn:aws:iam::master_account_id:role/aws-service-role/stacksets.cloudformation.amazonaws.com/AWSServiceRoleForCloudFormationStackSetsOrgAdmin*",
+            "arn:aws:iam::*:role/stacksets-exec*",
+            "arn:aws:sts::*:assumed-role/aws-controltower*",
+            "arn:aws:iam::*:role/aws-controltower-ConfigRecorderRole"
+          ]
+        }
+      }
+    }
+  ]
+}

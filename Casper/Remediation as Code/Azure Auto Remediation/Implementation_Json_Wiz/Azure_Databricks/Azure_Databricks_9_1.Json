@@ -1,0 +1,17 @@
+{
+    "serviceprovider": "azure",
+    "servicerequirement_name": "Azure::Databricks::Implementation",
+    "serviceDisplayName": "AWS Databricks",
+    "id": "AWS_Databricks_9_1",
+    "label": "Ensure access control list is used in Azure Databricks to enforce least privilege model",
+    "description": "Access control lists (ACLs) must be used to configure permission to access workspace objects (folders, notebooks, experiments, and models), clusters, pools, jobs, Delta Live Tables pipelines, and data tables. Admin users can manage access control lists, as can users who have been given delegated permissions to manage access control lists.",
+    "type": "Detective",
+    "implementationProvider": "wiz",
+    "wizNativeType": [
+        ""
+    ],
+    "link": "link to terrform line/comment where requirement is implemented",
+    "requirementId": [
+        "Azure_Databricks_9"
+    ]
+  }

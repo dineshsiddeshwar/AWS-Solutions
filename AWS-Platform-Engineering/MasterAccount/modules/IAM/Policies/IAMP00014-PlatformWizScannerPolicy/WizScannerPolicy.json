@@ -1,0 +1,86 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Action": [
+                "ecr:BatchGetImage",
+                "ecr:DescribeImages",
+                "ecr:GetAuthorizationToken",
+                "ecr:GetDownloadUrlForLayer",
+                "ecr:ListTagsForResource",
+                "ecr:GetRegistryPolicy",
+                "ecr-public:DescribeImages",
+                "ecr-public:ListTagsForResource",
+                "ecr-public:GetAuthorizationToken"
+            ],
+            "Resource": "*",
+            "Effect": "Allow"
+        },
+        {
+            "Action": [
+                "ec2:CopySnapshot",
+                "ec2:CreateSnapshot",
+                "kms:CreateKey",
+                "kms:DescribeKey",
+                "ec2:GetEbsEncryptionByDefault",
+                "ec2:DescribeSnapshots"
+            ],
+            "Resource": "*",
+            "Effect": "Allow"
+        },
+        {
+            "Action": [
+                "ec2:CreateTags"
+            ],
+            "Resource": "arn:aws:ec2:*::snapshot/*",
+            "Effect": "Allow"
+        },
+        {
+            "Action": "kms:CreateAlias",
+            "Resource": [
+                "arn:aws:kms:*:*:alias/wizKey",
+                "arn:aws:kms:*:*:key/*"
+            ],
+            "Effect": "Allow"
+        },
+        {
+            "Condition": {
+                "StringLike": {
+                    "kms:ViaService": "ec2.*.amazonaws.com"
+                }
+            },
+            "Action": [
+                "kms:CreateGrant",
+                "kms:ReEncryptFrom"
+            ],
+            "Resource": "*",
+            "Effect": "Allow"
+        },
+        {
+            "Condition": {
+                "StringEquals": {
+                    "aws:ResourceTag/wiz": "auto-gen-cmk"
+                }
+            },
+            "Action": [
+                "kms:GetKeyPolicy",
+                "kms:PutKeyPolicy"
+            ],
+            "Resource": "*",
+            "Effect": "Allow"
+        },
+        {
+            "Condition": {
+                "StringEquals": {
+                    "ec2:ResourceTag/wiz": "auto-gen-snapshot"
+                }
+            },
+            "Action": [
+                "ec2:DeleteSnapshot",
+                "ec2:ModifySnapshotAttribute"
+            ],
+            "Resource": "*",
+            "Effect": "Allow"
+        }
+    ]
+}

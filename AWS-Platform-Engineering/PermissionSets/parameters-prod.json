@@ -1,0 +1,23 @@
+{
+    "PermissionSets" :{
+    "ListOfPermissionSetsArn" : ["arn:aws:sso:::permissionSet/ssoins-7223f85a78ca6f59/ps-c6ed59dc10852eac", "arn:aws:sso:::permissionSet/ssoins-7223f85a78ca6f59/ps-42f24b30bcd673b2", 
+    "arn:aws:sso:::permissionSet/ssoins-7223f85a78ca6f59/ps-5f6ddc7d0df5a736", "arn:aws:sso:::permissionSet/ssoins-7223f85a78ca6f59/ps-c5e58495f61f96b2", 
+    "arn:aws:sso:::permissionSet/ssoins-7223f85a78ca6f59/ps-bf2f8c313809a846", "arn:aws:sso:::permissionSet/ssoins-7223f85a78ca6f59/ps-586229e5c6cfbbbf", 
+    "arn:aws:sso:::permissionSet/ssoins-7223f85a78ca6f59/ps-6c35716fabddee62", "arn:aws:sso:::permissionSet/ssoins-7223f85a78ca6f59/ps-6007aba4a4db9b7b", 
+    "arn:aws:sso:::permissionSet/ssoins-7223f85a78ca6f59/ps-c02642adcbcd6d28", "arn:aws:sso:::permissionSet/ssoins-7223f85a78ca6f59/ps-d3ae1384309b0eb6", 
+    "arn:aws:sso:::permissionSet/ssoins-7223f85a78ca6f59/ps-550af8973791d675", "arn:aws:sso:::permissionSet/ssoins-7223f85a78ca6f59/ps-b6d552f77152ca63", 
+    "arn:aws:sso:::permissionSet/ssoins-7223f85a78ca6f59/ps-7319db5706875720", "arn:aws:sso:::permissionSet/ssoins-7223f85a78ca6f59/ps-f185e87a2c37b020", 
+    "arn:aws:sso:::permissionSet/ssoins-7223f85a78ca6f59/ps-f031391c84cbab5d", "arn:aws:sso:::permissionSet/ssoins-7223f85a78ca6f59/ps-7f76c995914f73c9", 
+    "arn:aws:sso:::permissionSet/ssoins-7223f85a78ca6f59/ps-c4762ff2b331af38", "arn:aws:sso:::permissionSet/ssoins-7223f85a78ca6f59/ps-46d8be3ff9ad5cf1", 
+    "arn:aws:sso:::permissionSet/ssoins-7223f85a78ca6f59/ps-4a6954f4be12e397", "arn:aws:sso:::permissionSet/ssoins-7223f85a78ca6f59/ps-816875dc7ea3c2b7", 
+    "arn:aws:sso:::permissionSet/ssoins-7223f85a78ca6f59/ps-288142f4c6f42e68", "arn:aws:sso:::permissionSet/ssoins-7223f85a78ca6f59/ps-6c4759872612a155", 
+    "arn:aws:sso:::permissionSet/ssoins-7223f85a78ca6f59/ps-462d5ffd2872148e", "arn:aws:sso:::permissionSet/ssoins-7223f85a78ca6f59/ps-4aa7c84bf449e475", 
+    "arn:aws:sso:::permissionSet/ssoins-7223f85a78ca6f59/ps-00fbc3f74087e806", "arn:aws:sso:::permissionSet/ssoins-7223f85a78ca6f59/ps-17d6bd4b580223bd", 
+    "arn:aws:sso:::permissionSet/ssoins-7223f85a78ca6f59/ps-6f1f5986d929eb96", "arn:aws:sso:::permissionSet/ssoins-7223f85a78ca6f59/ps-065f6aad313c36f6", 
+    "arn:aws:sso:::permissionSet/ssoins-7223f85a78ca6f59/ps-66dec9fdb02e081d", "arn:aws:sso:::permissionSet/ssoins-7223f85a78ca6f59/ps-6c1e240338b7f447", 
+    "arn:aws:sso:::permissionSet/ssoins-7223f85a78ca6f59/ps-8e05c58f6402f51d"],
+    "instance_arn" : ["arn:aws:sso:::instance/ssoins-7223f85a78ca6f59"]
+                            }
+    
+}
+ 

@@ -1,0 +1,17 @@
+{
+    "serviceprovider": "azure",
+    "servicerequirement_name": "Azure::Databricks::Implementation",
+    "serviceDisplayName": "AWS Databricks",
+    "id": "AWS_Databricks_5_1",
+    "label": "Ensure organization-managed CMK is enabled for DBFS and Databricks notebooks",
+    "description": "This control checks whether Azure Databricks notebook is encrypted using organization managed CMK for additional control of organization data. Adding organization managed key helps to better protect and control access to the data. Azure Databricks notebooks are stored in the scalable management layer powered by Microsoft, and are by default encrypted with a Microsoft-managed key. As per security recommendations, it is better practice to bring organization-managed per-workspace key to encrypt the notebooks.",
+    "type": "Detective",
+    "implementationProvider": "wiz",
+    "wizNativeType": [
+        ""
+    ],
+    "link": "link to terrform line/comment where requirement is implemented",
+    "requirementId": [
+        "Azure_Databricks_5"
+    ]
+  }

@@ -1,0 +1,17 @@
+{
+    "serviceprovider": "aws",
+    "servicerequirement_name": "AWS::S3::Implementation",
+    "serviceDisplayName": "AWS S3",
+    "id": "AWS_S3_15_1",
+    "label": "Ensure resource tagging is added to S3 bucket",
+    "description": "Identification of organizational IT assets is crucial aspect of governance and security. Visibility into S3 buckets helps in data classification, billing and identify the owners. assess their security posture and take action on potential areas of weakness.",
+    "type": "Detective",
+    "implementationProvider": "wiz",
+    "wizNativeType": [
+        "bucket"
+    ],
+    "link": "Detective-Pipeline/AWS/AWS_S3/AWS_S3_15_1.rego",
+    "requirementId": [
+        "AWS_S3_15"
+    ]
+}

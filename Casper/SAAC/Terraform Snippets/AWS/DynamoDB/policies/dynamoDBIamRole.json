@@ -1,0 +1,17 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Action": [
+                "dynamodb:BatchGetItem",
+                "dynamodb:GetItem",
+                "dynamodb:Query",
+                "dynamodb:Scan",
+                "dynamodb:Scan"
+            ],
+            "Effect": "Allow",
+            "Sid": "ReadOnlyAPIActionsOnBooks",
+            "Resource": "arn:aws:dynamodb:${region}:${account_id}:table/Books"
+        }
+    ]
+}

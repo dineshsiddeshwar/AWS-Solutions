@@ -1,0 +1,257 @@
+{ 
+    "serviceprovider": "azure", 
+    "servicerequirement_name": [ 
+        "Azure::Virtual_Machine::*" 
+    ], 
+    "service_type":"Compute",
+    "servicedisplay_name": "Virtual Machine", 
+    "serviceapproval_status": { 
+        "Prod": "", 
+        "SNP": "", 
+        "NP": "" 
+    }, 
+    "phase": "Service Discovery", 
+    "mapping": [ 
+
+        { 
+            "requirement_name": "Ensure Azure Virtual machines are secured using virtual networks", 
+            "policy": "https://github.com/ey-org/cloudsec-ccm/blob/master/Baseline%20Requirement%20Library/Azure/Virtual%20Machine/Virtual%20Machine.md#1-ensure-azure-virtual-machines-are-secured-using-virtual-networks", 
+            "security_domain": "Network Security", 
+            "ticket_enabled": "false", 
+            "tags": [], 
+            "severity": { 
+                "cvss_score":"Critical",
+                "cvss_severity":"Critical",
+                "cvss_vector": "#CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:L/I:L/A:H"                      
+            },           
+            "control_mapping": ["CS0012300"], 
+            "implementations": [] 
+        }, 
+        { 
+            "requirement_name": "Ensure virtual machine network traffic is logged using Network watcher", 
+            "policy": "https://github.com/ey-org/cloudsec-ccm/blob/master/Baseline%20Requirement%20Library/Azure/Virtual%20Machine/Virtual%20Machine.md#2-ensure-virtual-machine-network-traffic-is-logged-using-network-watcher", 
+            "security_domain": "Security Logging", 
+            "ticket_enabled": "false", 
+            "tags": [], 
+            "severity": { 
+                "cvss_score":"Medium",
+                "cvss_severity":"Medium",
+                "cvss_vector": "#CVSS:3.1/AV:N/AC:H/PR:H/UI:N/S:U/C:L/I:L/A:L"                        
+            },           
+            "control_mapping": [""], 
+            "implementations": [] 
+        }, 
+        { 
+            "requirement_name": "Ensure VMs are not associated with any public IP address", 
+            "policy": "https://github.com/ey-org/cloudsec-ccm/blob/master/Baseline%20Requirement%20Library/Azure/Virtual%20Machine/Virtual%20Machine.md#3-ensure-vms-are-not-associated-with-any-public-ip-address", 
+            "security_domain": "Network Security", 
+            "ticket_enabled": "false", 
+            "tags": [], 
+            "severity": { 
+                "cvss_score":"Critical",
+                "cvss_severity":"Critical",
+                "cvss_vector": "#CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:L/I:L/A:H"                      
+            },            
+            "control_mapping": ["CS0012300"], 
+            "implementations": [] 
+        }, 
+        { 
+            "requirement_name": "Ensure Activity logging is enabled for virtual machines and logs are sent to Splunk", 
+            "policy": "https://github.com/ey-org/cloudsec-ccm/blob/master/Baseline%20Requirement%20Library/Azure/Virtual%20Machine/Virtual%20Machine.md#4-ensure-activity-logging-is-enabled-for-virtual-machines-and-logs-are-sent-to-splunk",
+            "security_domain": "Security Logging", 
+            "ticket_enabled": "false", 
+            "tags": [], 
+            "severity": { 
+                "cvss_score":"Medium",
+                "cvss_severity":"Medium",
+                "cvss_vector": "#CVSS:3.1/AV:N/AC:H/PR:H/UI:N/S:U/C:L/I:L/A:L"                        
+            },           
+            "control_mapping": [""], 
+            "implementations": [] 
+        }, 
+        { 
+            "requirement_name": "Ensure that 'OS and Data' disks are encrypted with Organization Managed Key (CMK)", 
+            "policy": "https://github.com/ey-org/cloudsec-ccm/blob/master/Baseline%20Requirement%20Library/Azure/Virtual%20Machine/Virtual%20Machine.md#5-ensure-that-os-and-data-disks-are-encrypted-with-organization-managed-key-cmk", 
+            "security_domain": "Data Protection", 
+            "ticket_enabled": "false", 
+            "tags": [], 
+            "severity": { 
+                "cvss_score":"High",
+                "cvss_severity":"High",
+                "cvss_vector": "#CVSS:3.1/AV:A/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:L"                      
+            },           
+            "control_mapping": ["CS0012168"], 
+            "implementations": [] 
+        }, 
+        { 
+            "requirement_name": "Ensure all the sensitive information is encrypted during transit", 
+            "policy": "https://github.com/ey-org/cloudsec-ccm/blob/master/Baseline%20Requirement%20Library/Azure/Virtual%20Machine/Virtual%20Machine.md#6-ensure-all-the-sensitive-information-is-encrypted-during-transit", 
+            "security_domain": "Data Protection", 
+            "ticket_enabled": "false", 
+            "tags": [], 
+            "severity": { 
+                "cvss_score":"High",
+                "cvss_severity":"High",
+                "cvss_vector": "#CVSS:3.1/AV:A/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:L"                       
+            },           
+            "control_mapping": ["CS0012261"], 
+            "implementations": [] 
+        }, 
+        { 
+            "requirement_name": "Ensure all the web applications deployed on VM Should not be exposed to Internet", 
+            "policy": "https://github.com/ey-org/cloudsec-ccm/blob/master/Baseline%20Requirement%20Library/Azure/Virtual%20Machine/Virtual%20Machine.md#7-ensure-all-the-web-applications-deployed-on-vm-should-not-be-exposed-to-internet", 
+            "security_domain": "Network Security", 
+            "ticket_enabled": "false", 
+            "tags": [], 
+            "severity": { 
+                "cvss_score":"High",
+                "cvss_severity":"High",
+                "cvss_vector": "#CVSS:3.1/AV:A/AC:L/PR:L/UI:N/S:C/C:L/I:H/A:L"                      
+            },           
+            "control_mapping": ["CS0012300"], 
+            "implementations": [] 
+        }, 
+        { 
+            "requirement_name": "Ensure multi-factor authentication is enabled for all privileged user principals in Virtual machine", 
+            "policy": "https://github.com/ey-org/cloudsec-ccm/blob/master/Baseline%20Requirement%20Library/Azure/Virtual%20Machine/Virtual%20Machine.md#8-ensure-multi-factor-authentication-is-enabled-for-all-privileged-user-principals-in-virtual-machine",
+            "security_domain": "IAM", 
+            "ticket_enabled": "false", 
+            "tags": [], 
+            "severity": { 
+                "cvss_score":"High",
+                "cvss_severity":"High",
+                "cvss_vector": "#CVSS:3.1/AV:A/AC:L/PR:L/UI:N/S:C/C:H/I:H/A:L"                      
+            },           
+            "control_mapping": ["CS0012298"], 
+            "implementations": [] 
+        }, 
+
+        { 
+            "requirement_name": "Ensure administrative tasks are performed only in secure and Azure-managed workstations", 
+            "policy": "https://github.com/ey-org/cloudsec-ccm/blob/master/Baseline%20Requirement%20Library/Azure/Virtual%20Machine/Virtual%20Machine.md#9-ensure-administrative-tasks-are-performed-only-in-secure-and-azure-managed-workstations", 
+            "security_domain": "IAM", 
+            "ticket_enabled": "false", 
+            "tags": [], 
+            "severity": { 
+                "cvss_score":"Medium",
+                "cvss_severity":"Medium",
+                "cvss_vector": "#CVSS:3.1/AV:L/AC:H/PR:H/UI:N/S:C/C:H/I:L/A:L"                      
+            },           
+            "control_mapping": ["CS0012298"], 
+            "implementations": [] 
+        }, 
+        { 
+            "requirement_name": "Ensure least privilege access method is implemented using Role-based access control (RBAC)", 
+            "policy": "https://github.com/ey-org/cloudsec-ccm/blob/master/Baseline%20Requirement%20Library/Azure/Virtual%20Machine/Virtual%20Machine.md#10-ensure-least-privilege-access-method-is-implemented-using-role-based-access-control-rbac", 
+            "security_domain": "IAM", 
+            "ticket_enabled": "false", 
+            "tags": [], 
+            "severity": { 
+                "cvss_score":"Medium",
+                "cvss_severity":"Medium",
+                "cvss_vector": "#CVSS:3.1/AV:A/AC:H/PR:L/UI:R/S:U/C:L/I:H/A:H"                     
+            },           
+            "control_mapping": ["CS0012298"], 
+            "implementations": [] 
+        }, 
+        { 
+            "requirement_name": "Ensure Azure secrets securely managed using Managed Identities", 
+            "policy": "https://github.com/ey-org/cloudsec-ccm/blob/master/Baseline%20Requirement%20Library/Azure/Virtual%20Machine/Virtual%20Machine.md#11-ensure-azure-secrets-securely-managed-using-managed-identities", 
+            "security_domain": "IAM", 
+            "ticket_enabled": "false", 
+            "tags": [], 
+            "severity": { 
+                "cvss_score":"Medium",
+                "cvss_severity":"Medium",
+                "cvss_vector": "#CVSS:3.1/AV:L/AC:H/PR:H/UI:N/S:C/C:H/I:L/A:L"                      
+            },           
+            "control_mapping": ["CS0012298"], 
+            "implementations": [] 
+        }, 
+        { 
+            "requirement_name": "Ensure users do not have permission to remove any already installed security software", 
+            "policy": "https://github.com/ey-org/cloudsec-ccm/blob/master/Baseline%20Requirement%20Library/Azure/Virtual%20Machine/Virtual%20Machine.md#12-ensure-users-do-not-have-permission-to-remove-any-already-installed-security-software",
+            "security_domain": "IAM", 
+            "ticket_enabled": "false", 
+            "tags": [], 
+            "severity": { 
+                "cvss_score":"High",
+                "cvss_severity":"High",
+                "cvss_vector": "#CVSS:3.1/AV:N/AC:H/PR:H/UI:R/S:C/C:H/I:H/A:L"                      
+            },           
+            "control_mapping": ["CS0012298"], 
+            "implementations": [] 
+        }, 
+        { 
+            "requirement_name": "Ensure only organization approved VM images are used for deployment", 
+            "policy": "https://github.com/ey-org/cloudsec-ccm/blob/master/Baseline%20Requirement%20Library/Azure/Virtual%20Machine/Virtual%20Machine.md#13-ensure-only-organization-approved-vm-images-are-used-for-deployment", 
+            "security_domain": "Asset Management", 
+            "ticket_enabled": "false", 
+            "tags": [], 
+            "severity": { 
+                "cvss_score":"High",
+                "cvss_severity":"High",
+                "cvss_vector": "#CVSS:3.1/AV:N/AC:H/PR:H/UI:R/S:C/C:H/I:H/A:L"                       
+            },           
+            "control_mapping": [""], 
+            "implementations": [] 
+        }, 
+        { 
+            "requirement_name": "Ensure that Virtual Machine uses standard organizational Resource tagging method", 
+            "policy": "https://github.com/ey-org/cloudsec-ccm/blob/master/Baseline%20Requirement%20Library/Azure/Virtual%20Machine/Virtual%20Machine.md#14-ensure-that-virtual-machine-uses-standard-organizational-resource-tagging-method", 
+            "security_domain": "Asset Management", 
+            "ticket_enabled": "false", 
+            "tags": [], 
+            "severity": { 
+                "cvss_score":"Low",
+                "cvss_severity":"Low",
+                "cvss_vector": "#CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:L/I:N/A:N"                       
+            },           
+            "control_mapping": [""], 
+            "implementations": [] 
+        }, 
+        { 
+            "requirement_name": "Ensure strict Inbound access control is enforced", 
+            "policy": "https://github.com/ey-org/cloudsec-ccm/blob/master/Baseline%20Requirement%20Library/Azure/Virtual%20Machine/Virtual%20Machine.md#15-ensure-strict-inbound-access-control-is-enforced",
+            "security_domain": "IAM", 
+            "ticket_enabled": "false", 
+            "tags": [], 
+            "severity": { 
+                "cvss_score":"High",
+                "cvss_severity":"High",
+                "cvss_vector": "#CVSS:3.1/AV:N/AC:H/PR:L/UI:N/S:C/C:H/I:H/A:L"                      
+            },           
+            "control_mapping": ["CS0012300"], 
+            "implementations": [] 
+        }, 
+        { 
+            "requirement_name": "Ensure Azure VM adheres to organization patch and vulnerability management standards",
+            "policy": "https://github.com/ey-org/cloudsec-ccm/blob/master/Baseline%20Requirement%20Library/Azure/Virtual%20Machine/Virtual%20Machine.md#16-ensure-azure-vm-adheres-to-organization-patch-and-vulnerability-management-standards",
+            "security_domain": "Asset Management", 
+            "ticket_enabled": "false", 
+            "tags": [], 
+            "severity": { 
+                "cvss_score":"Critical",
+                "cvss_severity":"Critical",
+                "cvss_vector": "#CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:C/C:L/I:H/A:L"                      
+            },           
+            "control_mapping": ["CS0012267"], 
+            "implementations": [] 
+        },
+        { 
+            "requirement_name": "Ensure idle Azure VM instances are identified and stopped or terminated",
+            "policy": "https://github.com/ey-org/cloudsec-ccm/blob/master/Baseline%20Requirement%20Library/Azure/Virtual%20Machine/Virtual%20Machine.md#17-ensure-idle-azure-vm-instances-are-identified-and-stopped-or-terminated",
+            "security_domain": "Asset Management", 
+            "ticket_enabled": "false", 
+            "tags": [], 
+            "severity": { 
+                "cvss_score":"Medium",
+                "cvss_severity":"Medium",
+                "cvss_vector": "#CVSS:3.1/AV:A/AC:H/PR:H/UI:N/S:C/C:L/I:H/A:L"                      
+            },           
+            "control_mapping": [""], 
+            "implementations": [] 
+        }
+
+    ]
+}

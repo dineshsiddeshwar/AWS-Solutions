@@ -1,0 +1,33 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: EC2 Isolation - Assumerole in all the account
+Parameters:
+  CENTRALACCOUNT:
+    Type: String
+    Description: "Central account where logic lambda deployed"
+Resources:
+  assumeRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: ec2-assumerole
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+                AWS: !Sub 'arn:aws:iam::${CENTRALACCOUNT}:role/*GetIsolationRole*'
+            Action: 'sts:AssumeRole'
+      Path: /        
+      Policies:
+        - PolicyName: ec2-assumerole-Policy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: 
+                  - sts:AssumeRole
+                  - ec2:CreateSecurityGroup
+                  - ec2:DescribeSecurityGroups
+                  - ec2:ModifyInstanceAttribute
+                  - ec2:DescribeInstances
+                  - ec2:CreateTags
+                Resource: "*"
