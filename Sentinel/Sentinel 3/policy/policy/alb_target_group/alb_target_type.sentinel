@@ -1,0 +1,16 @@
+# Imports common-functions
+import "tfplan-functions" as tfplan
+
+# Store all the allowed target type in a variable
+allowed_target_type = ["alb","instance","ip"]
+
+# Get all RDS Clusters
+target_group = tfplan.find_resources("aws_lb_target_group")
+
+# Return all the load balancer which doesn't have allowed target type
+violating_resources = tfplan.filter_attribute_not_in_list(target_group, "target_type", allowed_target_type, true)
+
+# Main rule
+main = rule {
+    length(violating_resources["messages"]) is 0
+}

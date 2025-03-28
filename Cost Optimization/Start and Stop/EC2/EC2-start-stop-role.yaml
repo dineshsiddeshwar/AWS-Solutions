@@ -1,0 +1,210 @@
+Description: (SO00121) - The CloudFormation template for Resource Scheduler Quick Setup
+AWSTemplateFormatVersion: '2010-09-09'
+Parameters:
+  ResourceType:
+    Type: String
+    Description: Choose the resource type
+    Default: "EC2"
+    AllowedValues:
+      - "EC2"
+      - "RDS"
+      - "ASG"
+Resources:
+################# Custom rresouce lambda role ##################################
+  tagrole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      RoleName: !Sub Solventum-custom-resource-creation-role-${ResourceType}
+  
+  tagpolicy:
+    Type: AWS::IAM::RolePolicy
+    DependsOn: tagrole
+    Properties:
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Action:
+              - 'logs:CreateLogGroup'
+              - 'logs:CreateLogStream'
+              - 'logs:PutLogEvents'
+            Resource:
+              - 'arn:aws:logs:*:*:log-group:/aws/lambda/*'
+              - 'arn:aws:logs:*:*:log-group:/aws/lambda/*:log-stream:*'
+            Effect: Allow
+            Sid: LogsPermissions
+          - Action:
+              - 'sts:GetCallerIdentity'
+            Resource: '*'
+            Effect: Allow
+            Sid: STSLAMBDAPermissions
+          - Sid: cloudformation
+            Effect: Allow
+            Action:
+              - 'cloudformation:List*'
+              - 'cloudformation:Describe*'
+              - 'cloudformation:Get*'
+              - 'cloudformation:Update*'
+              - 'cloudformation:Delete*'
+            Resource:
+              - !Sub 'arn:aws:cloudformation:*:${AWS::AccountId}:stack/Solventum*'
+          - Sid: ssm
+            Effect: Allow
+            Action:
+              - 'ssm:Get*'
+              - 'ssm:Start*'
+              - 'ssm:Update*'
+              - 'ssm:Create*'
+              - 'ssm:Delete*'
+            Resource: "*"
+      PolicyName: !Sub Solventum-custom-resource-creation-policy-${ResourceType}
+      RoleName: !Ref tagrole
+
+##################################################################################################
+  EventRoleToInvokeSSM:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub Solventum-Resource-Scheduler-TriggerRole-${ResourceType}
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: events.amazonaws.com
+            Condition:
+              StringEquals:
+                aws:SourceAccount: !Sub ${AWS::AccountId}
+        Version: '2012-10-17'
+      Path: /
+      # PermissionsBoundary: !If
+      #   - ShouldAttachConfigurationPolicy
+      #   - !Sub arn:${AWS::Partition}:iam::aws:policy/AWSQuickSetupSchedulerPermissionsBoundary
+      #   - !Ref AWS::NoValue
+  EventRoletoInvokeSSMPolicy:
+    Type: AWS::IAM::Policy
+    DependsOn: ConfigurationAutomationRole
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action: ssm:StartAutomationExecution
+            Effect: Allow
+            Resource:
+              - !Sub arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:automation-definition/Solventum*:$DEFAULT
+          - Action: iam:PassRole
+            Effect: Allow
+            Resource: !GetAtt ConfigurationAutomationRole.Arn
+        Version: '2012-10-17'
+      PolicyName: !Sub Solventum-InvokeSSMDocumentPolicy-${ResourceType}
+      Roles:
+        - !Ref EventRoleToInvokeSSM
+
+#########################################################################################################
+  ConfigurationAutomationRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub Solventum-Resource-Scheduler-ConfigurationRole-${ResourceType}
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: ssm.amazonaws.com
+            Condition:
+              StringEquals:
+                aws:SourceAccount: !Sub ${AWS::AccountId}
+              ArnLike:
+                aws:SourceArn: !Sub arn:${AWS::Partition}:ssm:*:${AWS::AccountId}:automation-execution/*
+        Version: '2012-10-17'
+      Path: /
+      # PermissionsBoundary: !If
+      #   - ShouldAttachConfigurationPolicy
+      #   - !Sub arn:${AWS::Partition}:iam::aws:policy/AWSQuickSetupSchedulerPermissionsBoundary
+      #   - !Ref AWS::NoValue
+  
+  StartAssociationRolePolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action: ssm:StartAssociationsOnce
+            Effect: Allow
+            Resource:
+              - !Sub arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:association/*
+              - !Sub arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:association/*
+          - Action: iam:PassRole
+            Effect: Allow
+            Resource:
+              - !GetAtt ConfigurationAutomationRole.Arn
+        Version: '2012-10-17'
+      PolicyName: !Sub Solventum-StartAssociationPolicy-${ResourceType}
+      Roles:
+        - !Ref ConfigurationAutomationRole
+  EC2SchedulePolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action:
+              - ec2:DescribeInstances
+              - ec2:DescribeInstanceStatus
+              - ec2:DescribeRegions
+              - ec2:DescribeTags
+              - tag:GetResources
+            Effect: Allow
+            Resource: '*'
+          - Action:
+              - ec2:StartInstances
+              - ec2:StopInstances
+            Effect: Allow
+            Resource: !Sub arn:${AWS::Partition}:ec2:${AWS::Region}:${AWS::AccountId}:instance/*
+          - Action:
+              - ssm:GetCalendarState
+            Effect: Allow
+            Resource: !Sub arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:document/Solventum*
+        Version: '2012-10-17'
+      PolicyName: !Sub Solventum-EC2SchedulePolicy-${ResourceType}
+      Roles:
+        - !Ref ConfigurationAutomationRole
+  EnableExplorerRolePolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - iam:ListRoles
+              - config:DescribeConfigurationRecorders
+              - compute-optimizer:GetEnrollmentStatus
+              - support:DescribeTrustedAdvisorChecks
+            Resource: '*'
+          - Effect: Allow
+            Action:
+              - ssm:UpdateServiceSetting
+              - ssm:GetServiceSetting
+            Resource:
+              - !Sub arn:${AWS::Partition}:ssm:*:*:servicesetting/ssm/opsitem/ssm-patchmanager
+              - !Sub arn:${AWS::Partition}:ssm:*:*:servicesetting/ssm/opsitem/EC2
+              - !Sub arn:${AWS::Partition}:ssm:*:*:servicesetting/ssm/opsdata/ExplorerOnboarded
+              - !Sub arn:${AWS::Partition}:ssm:*:*:servicesetting/ssm/opsdata/Association
+              - !Sub arn:${AWS::Partition}:ssm:*:*:servicesetting/ssm/opsdata/ComputeOptimizer
+              - !Sub arn:${AWS::Partition}:ssm:*:*:servicesetting/ssm/opsdata/ConfigCompliance
+              - !Sub arn:${AWS::Partition}:ssm:*:*:servicesetting/ssm/opsdata/OpsData-TrustedAdvisor
+              - !Sub arn:${AWS::Partition}:ssm:*:*:servicesetting/ssm/opsdata/SupportCenterCase
+          - Effect: Allow
+            Action:
+              - iam:CreateServiceLinkedRole
+            Resource: !Sub arn:${AWS::Partition}:iam::*:role/aws-service-role/ssm.${AWS::URLSuffix}/AWSServiceRoleForAmazonSSM
+            Condition:
+              StringEquals:
+                iam:AWSServiceName: ssm.amazonaws.com
+      PolicyName: !Sub Solventum-SSMQuickSetupEnableExplorerInlinePolicy-${ResourceType}
+      Roles:
+        - !Ref ConfigurationAutomationRole
+####################################################################################################################
+

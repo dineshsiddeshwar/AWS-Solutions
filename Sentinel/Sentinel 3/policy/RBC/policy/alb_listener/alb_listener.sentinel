@@ -1,0 +1,17 @@
+# Imports common-functions
+import "tfplan-functions" as tfplan
+
+# Get all RDS Clusters
+lb_listener = tfplan.find_resources("aws_lb_listener")
+
+# Return all the load balancer which doesn't have allowed target type
+violating_resources  = tfplan.filter_attribute_is_not_value(lb_listener, "port", 80, true)
+violating_resources2 = tfplan.filter_attribute_is_not_value(lb_listener, "default_action.0.type", "redirect", true)
+violating_resources3 = tfplan.filter_attribute_is_not_value(lb_listener, "default_action.0.redirect.0.port", "443", true)
+violating_resources4 = tfplan.filter_attribute_is_not_value(lb_listener, "default_action.0.redirect.0.protocol", "HTTPS", true)
+
+# Main rule
+validated = length(violating_resources["messages"]) is 0 and length(violating_resources2["messages"]) is 0 and length(violating_resources3["messages"]) is 0 and length(violating_resources4["messages"]) is 0
+main = rule {
+    validated is true
+}

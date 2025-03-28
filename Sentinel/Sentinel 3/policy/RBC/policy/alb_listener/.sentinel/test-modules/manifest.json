@@ -1,0 +1,16 @@
+{
+	"records": [
+		{
+			"key": "test\\alb_listener\\pass\\tfplan-functions",
+			"source": "../../common-functions/tfplan-functions/tfplan-functions.sentinel",
+			"sourceSum": "",
+			"dest": "C:/Users/DT495QF/Downloads/RBC/policy/alb_listener/common-functions/tfplan-functions/tfplan-functions.sentinel"
+		},
+		{
+			"key": "test\\alb_listener\\fail\\tfplan-functions",
+			"source": "../../common-functions/tfplan-functions/tfplan-functions.sentinel",
+			"sourceSum": "",
+			"dest": "C:/Users/DT495QF/Downloads/RBC/policy/alb_listener/common-functions/tfplan-functions/tfplan-functions.sentinel"
+		}
+	]
+}

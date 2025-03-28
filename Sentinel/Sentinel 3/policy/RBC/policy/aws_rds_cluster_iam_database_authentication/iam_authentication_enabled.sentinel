@@ -1,0 +1,14 @@
+# Imports common-functions
+import "tfplan-functions" as tfplan
+
+# Get all RDS Clusters
+rds_clusters = tfplan.find_resources("aws_rds_cluster")
+
+# Return all the rds_clusters that violate the rule 
+# "AWS RDS clusters have a backup retention period set to at least 7 days."
+violating_resources = tfplan.filter_attribute_is_not_value(rds_clusters,"iam_database_authentication_enabled",true,true)
+
+# Main rule
+main = rule {
+    length(violating_resources["messages"]) is 0
+}

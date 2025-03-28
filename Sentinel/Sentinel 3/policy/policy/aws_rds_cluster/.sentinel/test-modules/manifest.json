@@ -1,0 +1,16 @@
+{
+	"records": [
+		{
+			"key": "test\\restrict-aws-rds-cluster\\fail\\tfplan-functions",
+			"source": "../../common-functions/tfplan-functions/tfplan-functions.sentinel",
+			"sourceSum": "",
+			"dest": "C:/Users/DT495QF/OneDrive - EY/Documents/RBC/policy/aws_rds_cluster/common-functions/tfplan-functions/tfplan-functions.sentinel"
+		},
+		{
+			"key": "test\\restrict-aws-rds-cluster\\pass\\tfplan-functions",
+			"source": "../../common-functions/tfplan-functions/tfplan-functions.sentinel",
+			"sourceSum": "",
+			"dest": "C:/Users/DT495QF/OneDrive - EY/Documents/RBC/policy/aws_rds_cluster/common-functions/tfplan-functions/tfplan-functions.sentinel"
+		}
+	]
+}

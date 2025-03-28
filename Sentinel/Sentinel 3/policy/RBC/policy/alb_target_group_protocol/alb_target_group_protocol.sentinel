@@ -1,0 +1,13 @@
+# Imports common-functions
+import "tfplan-functions" as tfplan
+
+# Get all RDS Clusters
+target_group = tfplan.find_resources("aws_lb_target_group")
+
+# Return all the load balancer which doesn't have allowed target type
+violating_resources = tfplan.filter_attribute_is_value(target_group, "protocol", "HTTP", true)
+
+# Main rule
+main = rule {
+    length(violating_resources["messages"]) is 0
+}

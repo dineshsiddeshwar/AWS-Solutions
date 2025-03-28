@@ -1,0 +1,28 @@
+import "tfplan-functions" as tfplan 
+
+violatingResource = 1
+
+elb_listner = tfplan.find_resources("aws_lb_listener")
+
+for elb_listner as address, resource {
+    getPort = tfplan.evaluate_attribute(resource,"port")
+    if getPort == 80 {
+        ref = resource.change.after.default_action
+        for ref as defaultType{
+            getType = tfplan.evaluate_attribute(defaultType,"type")
+                if getType == "redirect"{
+                    for defaultType.redirect as defaultBlock{
+                        redirectPort = tfplan.evaluate_attribute(defaultBlock,"port")
+                        redirectProtocol = tfplan.evaluate_attribute(defaultBlock,"protocol")
+                        if redirectPort == "443" and redirectProtocol == "HTTPS"{
+                            violatingResource = 0
+                        }
+                    }
+                }
+        }
+    }
+}
+
+main = rule {
+    violatingResource == 0
+}
