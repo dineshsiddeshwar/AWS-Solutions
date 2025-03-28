@@ -20,7 +20,7 @@ Resources:
             Principal:
               Service: lambda.amazonaws.com
             Action: sts:AssumeRole
-      RoleName: !Sub Solventum-custom-resource-creation-role-${ResourceType}
+      RoleName: !Sub Cloud-Engineering-custom-resource-creation-role-${ResourceType}
   
   tagpolicy:
     Type: AWS::IAM::RolePolicy
@@ -52,7 +52,7 @@ Resources:
               - 'cloudformation:Update*'
               - 'cloudformation:Delete*'
             Resource:
-              - !Sub 'arn:aws:cloudformation:*:${AWS::AccountId}:stack/Solventum*'
+              - !Sub 'arn:aws:cloudformation:*:${AWS::AccountId}:stack/Cloud-Engineering*'
           - Sid: ssm
             Effect: Allow
             Action:
@@ -62,14 +62,14 @@ Resources:
               - 'ssm:Create*'
               - 'ssm:Delete*'
             Resource: "*"
-      PolicyName: !Sub Solventum-custom-resource-creation-policy-${ResourceType}
+      PolicyName: !Sub Cloud-Engineering-custom-resource-creation-policy-${ResourceType}
       RoleName: !Ref tagrole
 
 ##################################################################################################
   EventRoleToInvokeSSM:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: !Sub Solventum-Resource-Scheduler-TriggerRole-${ResourceType}
+      RoleName: !Sub Cloud-Engineering-Resource-Scheduler-TriggerRole-${ResourceType}
       AssumeRolePolicyDocument:
         Statement:
           - Action: sts:AssumeRole
@@ -94,12 +94,12 @@ Resources:
           - Action: ssm:StartAutomationExecution
             Effect: Allow
             Resource:
-              - !Sub arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:automation-definition/Solventum*:$DEFAULT
+              - !Sub arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:automation-definition/Cloud-Engineering*:$DEFAULT
           - Action: iam:PassRole
             Effect: Allow
             Resource: !GetAtt ConfigurationAutomationRole.Arn
         Version: '2012-10-17'
-      PolicyName: !Sub Solventum-InvokeSSMDocumentPolicy-${ResourceType}
+      PolicyName: !Sub Cloud-Engineering-InvokeSSMDocumentPolicy-${ResourceType}
       Roles:
         - !Ref EventRoleToInvokeSSM
 
@@ -107,7 +107,7 @@ Resources:
   ConfigurationAutomationRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: !Sub Solventum-Resource-Scheduler-ConfigurationRole-${ResourceType}
+      RoleName: !Sub Cloud-Engineering-Resource-Scheduler-ConfigurationRole-${ResourceType}
       AssumeRolePolicyDocument:
         Statement:
           - Action: sts:AssumeRole
@@ -141,7 +141,7 @@ Resources:
             Resource:
               - !GetAtt ConfigurationAutomationRole.Arn
         Version: '2012-10-17'
-      PolicyName: !Sub Solventum-StartAssociationPolicy-${ResourceType}
+      PolicyName: !Sub Cloud-Engineering-StartAssociationPolicy-${ResourceType}
       Roles:
         - !Ref ConfigurationAutomationRole
   EC2SchedulePolicy:
@@ -165,9 +165,9 @@ Resources:
           - Action:
               - ssm:GetCalendarState
             Effect: Allow
-            Resource: !Sub arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:document/Solventum*
+            Resource: !Sub arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:document/Cloud-Engineering*
         Version: '2012-10-17'
-      PolicyName: !Sub Solventum-EC2SchedulePolicy-${ResourceType}
+      PolicyName: !Sub Cloud-Engineering-EC2SchedulePolicy-${ResourceType}
       Roles:
         - !Ref ConfigurationAutomationRole
   EnableExplorerRolePolicy:
@@ -203,7 +203,7 @@ Resources:
             Condition:
               StringEquals:
                 iam:AWSServiceName: ssm.amazonaws.com
-      PolicyName: !Sub Solventum-SSMQuickSetupEnableExplorerInlinePolicy-${ResourceType}
+      PolicyName: !Sub Cloud-Engineering-SSMQuickSetupEnableExplorerInlinePolicy-${ResourceType}
       Roles:
         - !Ref ConfigurationAutomationRole
 ####################################################################################################################

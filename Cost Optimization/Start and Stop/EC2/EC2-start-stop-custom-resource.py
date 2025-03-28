@@ -104,7 +104,7 @@ def delete_caledar(ResourceProperties):
     try:
         print("Inside delete calendar")
         ssm_client = boto3.client("ssm", region_name=ResourceProperties['Region'])
-        calendar_name =f"Solventum-{ResourceProperties['ResourceType']}-scheduler-{ResourceProperties['TagKey']}-{ResourceProperties['TagValue']}-{ResourceProperties['UID']}"
+        calendar_name =f"Cloud-Engineering-{ResourceProperties['ResourceType']}-scheduler-{ResourceProperties['TagKey']}-{ResourceProperties['TagValue']}-{ResourceProperties['UID']}"
         response = ssm_client.delete_document(Name=calendar_name)
         if response:
             return SUCCESS
@@ -205,7 +205,7 @@ def create_all_document(ResourceProperties):
               Api: StartAssociationsOnce
               AssociationIds: '{{ AssociationIDs }}'
         """
-        create_document(ssm_client,"Solventum-start-association-Document-EC2",startassocdocument)
+        create_document(ssm_client,"Cloud-Engineering-start-association-Document-EC2",startassocdocument)
         start = """
         description: |
           ### Document Name - EC2StartSSMDocument
@@ -309,7 +309,7 @@ def create_all_document(ResourceProperties):
                         start_tagged_instances(list(batches))
                         return list_tagged_instance_ids
         """
-        create_document(ssm_client,"Solventum-start-SSM-Document-EC2",start)
+        create_document(ssm_client,"Cloud-Engineering-start-SSM-Document-EC2",start)
         stop = """
         description: |
           ### Document Name - EC2StopSSMDocument
@@ -413,7 +413,7 @@ def create_all_document(ResourceProperties):
                         stop_tagged_instances(list(batches))
                         return list_tagged_instance_ids
         """
-        create_document(ssm_client,"Solventum-Stop-SSM-Document-EC2",stop)
+        create_document(ssm_client,"Cloud-Engineering-Stop-SSM-Document-EC2",stop)
         return SUCCESS
         #create_document(name,content)
     except Exception as ex:
@@ -423,9 +423,9 @@ def create_all_document(ResourceProperties):
 def delete_all_document(ResourceProperties):
     try:
         ssm_client = boto3.client("ssm", region_name=ResourceProperties['Region'])
-        delete_document(ssm_client,"Solventum-start-SSM-Document")
-        delete_document(ssm_client,"Solventum-start-association-Document")
-        delete_document(ssm_client,"Solventum-Stop-SSM-Document")
+        delete_document(ssm_client,"Cloud-Engineering-start-SSM-Document")
+        delete_document(ssm_client,"Cloud-Engineering-start-association-Document")
+        delete_document(ssm_client,"Cloud-Engineering-Stop-SSM-Document")
         return SUCCESS
     except Exception as ex:
         raise ex
@@ -435,7 +435,7 @@ def lambda_handler(event,context):
         print(event)
         response_data = {}
         print("Received a {} Request".format(event['RequestType']))
-        calendar_name =f"Solventum-{event['ResourceProperties']['ResourceType']}-scheduler-{event['ResourceProperties']['TagKey']}-{event['ResourceProperties']['TagValue']}-{event['ResourceProperties']['UID']}"
+        calendar_name =f"Cloud-Engineering-{event['ResourceProperties']['ResourceType']}-scheduler-{event['ResourceProperties']['TagKey']}-{event['ResourceProperties']['TagValue']}-{event['ResourceProperties']['UID']}"
         if event['RequestType'] == 'Create':
             
             response_data["CalendarCreated"] =  create_caledar(event["ResourceProperties"],calendar_name)

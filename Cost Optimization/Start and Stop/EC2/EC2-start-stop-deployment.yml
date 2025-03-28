@@ -89,7 +89,7 @@ Resources:
     Type: AWS::Lambda::Function
     Condition: EC2
     Properties:
-      FunctionName: !Sub Solventum-custom-resource-creation-${ResourceType}-${UID}
+      FunctionName: !Sub Cloud-Engineering-custom-resource-creation-${ResourceType}-${UID}
       Code:
         ZipFile: |
           import requests
@@ -198,7 +198,7 @@ Resources:
               try:
                   print("Inside delete calendar")
                   ssm_client = boto3.client("ssm", region_name=ResourceProperties['Region'])
-                  calendar_name =f"Solventum-{ResourceProperties['ResourceType']}-scheduler-{ResourceProperties['TagKey']}-{ResourceProperties['TagValue']}-{ResourceProperties['UID']}"
+                  calendar_name =f"Cloud-Engineering-{ResourceProperties['ResourceType']}-scheduler-{ResourceProperties['TagKey']}-{ResourceProperties['TagValue']}-{ResourceProperties['UID']}"
                   response = ssm_client.delete_document(Name=calendar_name)
                   if response:
                       return SUCCESS
@@ -299,7 +299,7 @@ Resources:
                         Api: StartAssociationsOnce
                         AssociationIds: '{{ AssociationIDs }}'
                   """
-                  create_document(ssm_client,"Solventum-start-association-Document-EC2",startassocdocument)
+                  create_document(ssm_client,"Cloud-Engineering-start-association-Document-EC2",startassocdocument)
                   start = """
                   description: |
                     ### Document Name - EC2StartSSMDocument
@@ -403,7 +403,7 @@ Resources:
                                   start_tagged_instances(list(batches))
                                   return list_tagged_instance_ids
                   """
-                  create_document(ssm_client,"Solventum-start-SSM-Document-EC2",start)
+                  create_document(ssm_client,"Cloud-Engineering-start-SSM-Document-EC2",start)
                   stop = """
                   description: |
                     ### Document Name - EC2StopSSMDocument
@@ -507,7 +507,7 @@ Resources:
                                   stop_tagged_instances(list(batches))
                                   return list_tagged_instance_ids
                   """
-                  create_document(ssm_client,"Solventum-Stop-SSM-Document-EC2",stop)
+                  create_document(ssm_client,"Cloud-Engineering-Stop-SSM-Document-EC2",stop)
                   return SUCCESS
                   #create_document(name,content)
               except Exception as ex:
@@ -517,9 +517,9 @@ Resources:
           def delete_all_document(ResourceProperties):
               try:
                   ssm_client = boto3.client("ssm", region_name=ResourceProperties['Region'])
-                  delete_document(ssm_client,"Solventum-start-SSM-Document")
-                  delete_document(ssm_client,"Solventum-start-association-Document")
-                  delete_document(ssm_client,"Solventum-Stop-SSM-Document")
+                  delete_document(ssm_client,"Cloud-Engineering-start-SSM-Document")
+                  delete_document(ssm_client,"Cloud-Engineering-start-association-Document")
+                  delete_document(ssm_client,"Cloud-Engineering-Stop-SSM-Document")
                   return SUCCESS
               except Exception as ex:
                   raise ex
@@ -529,7 +529,7 @@ Resources:
                   print(event)
                   response_data = {}
                   print("Received a {} Request".format(event['RequestType']))
-                  calendar_name =f"Solventum-{event['ResourceProperties']['ResourceType']}-scheduler-{event['ResourceProperties']['TagKey']}-{event['ResourceProperties']['TagValue']}-{event['ResourceProperties']['UID']}"
+                  calendar_name =f"Cloud-Engineering-{event['ResourceProperties']['ResourceType']}-scheduler-{event['ResourceProperties']['TagKey']}-{event['ResourceProperties']['TagValue']}-{event['ResourceProperties']['UID']}"
                   if event['RequestType'] == 'Create':
                       
                       response_data["CalendarCreated"] =  create_caledar(event["ResourceProperties"],calendar_name)
@@ -566,21 +566,12 @@ Resources:
                     
       Description: Lambda Function to create a tag for the account
       Handler: index.lambda_handler
-      Role: !Sub 'arn:aws:iam::${AWS::AccountId}:role/Solventum-custom-resource-creation-role-${ResourceType}'
+      Role: !Sub 'arn:aws:iam::${AWS::AccountId}:role/Cloud-Engineering-custom-resource-creation-role-${ResourceType}'
       Runtime: python3.12
       Layers:
         - !Sub 'arn:aws:lambda:${AWS::Region}:336392948345:layer:${PANDASLibraryName}:${PANDASLibraryVersion}'
       Timeout: 900
       MemorySize: 10240
-      Tags: 
-        - Key: AlternateEmail
-          Value: "dsiddeshwar.cw@solventum.com"
-        - Key: ProductOwnerEmail
-          Value: "dsiddeshwar.cw@solventum.com"
-        - Key: ResourceCreator
-          Value: "dsiddeshwar.cw@solventum.com"
-        - Key: ApplicationID
-          Value: "419"
 
   CFNWaiterCustomResource:
     Type: "AWS::CloudFormation::CustomResource"
@@ -604,17 +595,17 @@ Resources:
     Condition: EC2
     DependsOn: CFNWaiterCustomResource
     Properties:
-      AssociationName: !Sub Solventum-${ResourceType}-${TagKey}-Scheduler-StartEC2Instances-${UID}
-      Name: !Sub Solventum-start-SSM-Document-${ResourceType}
+      AssociationName: !Sub Cloud-Engineering-${ResourceType}-${TagKey}-Scheduler-StartEC2Instances-${UID}
+      Name: !Sub Cloud-Engineering-start-SSM-Document-${ResourceType}
       Parameters:
         TargetTagKey:
           - !Sub tag:${TagKey}
         TargetTagValue:
           - !Ref TagValue
         AutomationAssumeRole:
-          - !Sub arn:aws:iam::${AWS::AccountId}:role/Solventum-Resource-Scheduler-ConfigurationRole-${ResourceType}
+          - !Sub arn:aws:iam::${AWS::AccountId}:role/Cloud-Engineering-Resource-Scheduler-ConfigurationRole-${ResourceType}
         ChangeCalendarName:
-          - !Sub Solventum-${ResourceType}-scheduler-${TagKey}-${TagValue}-${UID}
+          - !Sub Cloud-Engineering-${ResourceType}-scheduler-${TagKey}-${TagValue}-${UID}
     
 
   StopAssociation:
@@ -622,24 +613,24 @@ Resources:
     Condition: EC2
     DependsOn: CFNWaiterCustomResource
     Properties:
-      AssociationName: !Sub Solventum-${ResourceType}-${TagKey}-Scheduler-StopEC2Instances-${UID}
-      Name: !Sub Solventum-Stop-SSM-Document-${ResourceType}
+      AssociationName: !Sub Cloud-Engineering-${ResourceType}-${TagKey}-Scheduler-StopEC2Instances-${UID}
+      Name: !Sub Cloud-Engineering-Stop-SSM-Document-${ResourceType}
       Parameters:
         TargetTagKey:
           - !Sub tag:${TagKey}
         TargetTagValue:
           - !Ref TagValue
         AutomationAssumeRole:
-          - !Sub arn:aws:iam::${AWS::AccountId}:role/Solventum-Resource-Scheduler-ConfigurationRole-${ResourceType}
+          - !Sub arn:aws:iam::${AWS::AccountId}:role/Cloud-Engineering-Resource-Scheduler-ConfigurationRole-${ResourceType}
         ChangeCalendarName:
-          - !Sub Solventum-${ResourceType}-scheduler-${TagKey}-${TagValue}-${UID}
+          - !Sub Cloud-Engineering-${ResourceType}-scheduler-${TagKey}-${TagValue}-${UID}
   
   StartEC2InstancesEventRule:
     Type: AWS::Events::Rule
     Condition: EC2
     DependsOn: CFNWaiterCustomResource
     Properties:
-      Name: !Sub Solventum-${ResourceType}-${UID}-start-rule
+      Name: !Sub Cloud-Engineering-${ResourceType}-${UID}-start-rule
       Description: This rule will start the custom ssm document to start  instances
       EventPattern:
         source:
@@ -647,26 +638,26 @@ Resources:
         detail-type:
           - Calendar State Change
         resources:
-          - !Sub arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:document/Solventum-${ResourceType}-scheduler-${TagKey}-${TagValue}-${UID}
+          - !Sub arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:document/Cloud-Engineering-${ResourceType}-scheduler-${TagKey}-${TagValue}-${UID}
         detail:
           state:
             - OPEN
       State: ENABLED
       Targets:
-        - Arn: !Sub arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:automation-definition/Solventum-start-association-Document-${ResourceType}:$DEFAULT
+        - Arn: !Sub arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:automation-definition/Cloud-Engineering-start-association-Document-${ResourceType}:$DEFAULT
           Id: Target0
           Input: !Sub
             - '{"AssociationIDs":["${AssociationIDs}"],"AutomationAssumeRole":["${AutomationAssumeRole}"]}'
             - AssociationIDs: !GetAtt StartAssociation.AssociationId
-              AutomationAssumeRole: !Sub arn:aws:iam::${AWS::AccountId}:role/Solventum-Resource-Scheduler-ConfigurationRole-${ResourceType}
-          RoleArn: !Sub arn:aws:iam::${AWS::AccountId}:role/Solventum-Resource-Scheduler-TriggerRole-${ResourceType}
+              AutomationAssumeRole: !Sub arn:aws:iam::${AWS::AccountId}:role/Cloud-Engineering-Resource-Scheduler-ConfigurationRole-${ResourceType}
+          RoleArn: !Sub arn:aws:iam::${AWS::AccountId}:role/Cloud-Engineering-Resource-Scheduler-TriggerRole-${ResourceType}
 
   StopEC2InstancesEventRule:
     Type: AWS::Events::Rule
     Condition: EC2
     DependsOn: CFNWaiterCustomResource
     Properties:
-      Name: !Sub Solventum-${ResourceType}-${UID}-stop-rule
+      Name: !Sub Cloud-Engineering-${ResourceType}-${UID}-stop-rule
       Description: This rule will start the custom ssm document to stop ec2 instances
       EventPattern:
         source:
@@ -674,18 +665,18 @@ Resources:
         detail-type:
           - Calendar State Change
         resources:
-          - !Sub arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:document/Solventum-${ResourceType}-scheduler-${TagKey}-${TagValue}-${UID}
+          - !Sub arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:document/Cloud-Engineering-${ResourceType}-scheduler-${TagKey}-${TagValue}-${UID}
         detail:
           state:
             - CLOSED
       State: ENABLED
       Targets:
-        - Arn: !Sub arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:automation-definition/Solventum-start-association-Document-${ResourceType}:$DEFAULT
+        - Arn: !Sub arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:automation-definition/Cloud-Engineering-start-association-Document-${ResourceType}:$DEFAULT
           Id: Target0
           Input: !Sub
             - '{"AssociationIDs":["${AssociationIDs}"],"AutomationAssumeRole":["${AutomationAssumeRole}"]}'
             - AssociationIDs: !GetAtt StopAssociation.AssociationId
-              AutomationAssumeRole: !Sub arn:aws:iam::${AWS::AccountId}:role/Solventum-Resource-Scheduler-ConfigurationRole-${ResourceType}
-          RoleArn: !Sub arn:aws:iam::${AWS::AccountId}:role/Solventum-Resource-Scheduler-TriggerRole-${ResourceType}
+              AutomationAssumeRole: !Sub arn:aws:iam::${AWS::AccountId}:role/Cloud-Engineering-Resource-Scheduler-ConfigurationRole-${ResourceType}
+          RoleArn: !Sub arn:aws:iam::${AWS::AccountId}:role/Cloud-Engineering-Resource-Scheduler-TriggerRole-${ResourceType}
 
   
