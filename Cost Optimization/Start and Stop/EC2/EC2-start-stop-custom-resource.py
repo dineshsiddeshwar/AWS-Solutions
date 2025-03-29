@@ -419,6 +419,19 @@ def create_all_document(ResourceProperties):
     except Exception as ex:
         raise ex
 
+def create_ssm_explorer(ResourceProperties):
+    try:
+        ssm_client = boto3.client("ssm", region_name=ResourceProperties['Region'])
+        ssm_response = ssm_client.create_association(
+                Name='Cloud-Engineering-Scheduler-SSM-EnableExplorer',Parameters={'AutomationAssumeRole': f"Cloud-Engineering-Resource-Scheduler-ConfigurationRole-{ResourceProperties["ResourceType"]}"})
+        if ssm_response:
+            return True
+        else:
+            raise "SOmething went wrong in creating ssm explorer"
+    except Exception as ex:
+        if 'AssociationAlreadyExists' in str(ex):
+            return True
+        raise ex
 
 def delete_all_document(ResourceProperties):
     try:
@@ -437,7 +450,7 @@ def lambda_handler(event,context):
         print("Received a {} Request".format(event['RequestType']))
         calendar_name =f"Cloud-Engineering-{event['ResourceProperties']['ResourceType']}-scheduler-{event['ResourceProperties']['TagKey']}-{event['ResourceProperties']['TagValue']}-{event['ResourceProperties']['UID']}"
         if event['RequestType'] == 'Create':
-            
+            response_data["EnablerAssociation"] =  create_ssm_explorer(event['ResourceProperties'])
             response_data["CalendarCreated"] =  create_caledar(event["ResourceProperties"],calendar_name)
             response_data["DocumentCreated"] =  create_all_document(event["ResourceProperties"])
 
