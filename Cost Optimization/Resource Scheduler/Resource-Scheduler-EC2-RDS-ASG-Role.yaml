@@ -9,6 +9,18 @@ Parameters:
       - "EC2"
       - "RDS"
       - "ASG"
+
+Conditions:
+  EC2: !Equals
+    - !Ref ResourceType
+    - 'EC2'
+  RDS: !Equals
+    - !Ref ResourceType
+    - 'RDS'
+  ASG: !Equals
+    - !Ref ResourceType
+    - 'ASG'
+
 Resources:
 ################# Custom rresouce lambda role ##################################
   tagrole:
@@ -61,6 +73,10 @@ Resources:
               - 'ssm:Update*'
               - 'ssm:Create*'
               - 'ssm:Delete*'
+              - 'ssm:List*'
+            Resource: "*"
+          - Action: iam:PassRole
+            Effect: Allow
             Resource: "*"
       PolicyName: !Sub Cloud-Engineering-custom-resource-creation-policy-${ResourceType}
       RoleName: !Ref tagrole
@@ -146,6 +162,7 @@ Resources:
         - !Ref ConfigurationAutomationRole
   EC2SchedulePolicy:
     Type: AWS::IAM::Policy
+    Condition: EC2
     Properties:
       PolicyDocument:
         Statement:
@@ -170,6 +187,49 @@ Resources:
       PolicyName: !Sub Cloud-Engineering-EC2SchedulePolicy-${ResourceType}
       Roles:
         - !Ref ConfigurationAutomationRole
+  ASGSchedulePolicy:
+    Type: AWS::IAM::Policy
+    Condition: ASG
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action:
+              - autoscaling:Describe*
+              - autoscaling:Resume*
+              - autoscaling:Suspend*
+            Effect: Allow
+            Resource: '*'
+          - Action:
+              - ssm:GetCalendarState
+            Effect: Allow
+            Resource: !Sub arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:document/Cloud-Engineering*
+        Version: '2012-10-17'
+      PolicyName: !Sub Cloud-Engineering-ASGSchedulePolicy-${ResourceType}
+      Roles:
+        - !Ref ConfigurationAutomationRole
+  
+  RDSSchedulePolicy:
+    Type: AWS::IAM::Policy
+    Condition: RDS
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action:
+              - rds:Describe*
+              - rds:Start*
+              - rds:Stop*
+              - rds:List*
+            Effect: Allow
+            Resource: '*'
+          - Action:
+              - ssm:GetCalendarState
+            Effect: Allow
+            Resource: !Sub arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:document/Cloud-Engineering*
+        Version: '2012-10-17'
+      PolicyName: !Sub Cloud-Engineering-RDSSchedulePolicy-${ResourceType}
+      Roles:
+        - !Ref ConfigurationAutomationRole
+
   EnableExplorerRolePolicy:
     Type: AWS::IAM::Policy
     Properties:
