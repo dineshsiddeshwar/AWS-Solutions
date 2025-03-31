@@ -618,15 +618,6 @@ Resources:
         - !Sub 'arn:aws:lambda:${AWS::Region}:336392948345:layer:${PANDASLibraryName}:${PANDASLibraryVersion}'
       Timeout: 900
       MemorySize: 10240
-      Tags: 
-        - Key: AlternateEmail
-          Value: "dsiddeshwar.cw@Cloud-Engineering.com"
-        - Key: ProductOwnerEmail
-          Value: "dsiddeshwar.cw@Cloud-Engineering.com"
-        - Key: ResourceCreator
-          Value: "dsiddeshwar.cw@Cloud-Engineering.com"
-        - Key: ApplicationID
-          Value: "419"
 
   CFNWaiterCustomResource:
     Type: "AWS::CloudFormation::CustomResource"
@@ -1249,15 +1240,6 @@ Resources:
         - !Sub 'arn:aws:lambda:${AWS::Region}:336392948345:layer:${PANDASLibraryName}:${PANDASLibraryVersion}'
       Timeout: 900
       MemorySize: 10240
-      Tags: 
-        - Key: AlternateEmail
-          Value: "dsiddeshwar.cw@Cloud-Engineering.com"
-        - Key: ProductOwnerEmail
-          Value: "dsiddeshwar.cw@Cloud-Engineering.com"
-        - Key: ResourceCreator
-          Value: "dsiddeshwar.cw@Cloud-Engineering.com"
-        - Key: ApplicationID
-          Value: "419"
 
   CFNWaiterCustomResourcerds:
     Type: "AWS::CloudFormation::CustomResource"
@@ -1892,15 +1874,6 @@ Resources:
         - !Sub 'arn:aws:lambda:${AWS::Region}:336392948345:layer:${PANDASLibraryName}:${PANDASLibraryVersion}'
       Timeout: 900
       MemorySize: 10240
-      Tags: 
-        - Key: AlternateEmail
-          Value: "dsiddeshwar.cw@Cloud-Engineering.com"
-        - Key: ProductOwnerEmail
-          Value: "dsiddeshwar.cw@Cloud-Engineering.com"
-        - Key: ResourceCreator
-          Value: "dsiddeshwar.cw@Cloud-Engineering.com"
-        - Key: ApplicationID
-          Value: "419"
 
   CFNWaiterCustomResourceasg:
     Type: "AWS::CloudFormation::CustomResource"
