@@ -1,3 +1,0 @@
-aiohttp==3.7.4
-gql==3.0.0a5
-pandas==1.4.3

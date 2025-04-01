@@ -1,4 +1,0 @@
-# config.remote.tfbackend
-workspaces { name = "awsatshell_audit__dev_us-east-1" }
-hostname     = "app.terraform.io"
-organization = "ecp-shell-prod"
