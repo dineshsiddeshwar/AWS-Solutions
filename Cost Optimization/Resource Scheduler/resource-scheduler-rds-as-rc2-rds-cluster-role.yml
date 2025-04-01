@@ -9,6 +9,7 @@ Parameters:
       - "EC2"
       - "RDS"
       - "ASG"
+      - "RDS-Cluster"
 
 Conditions:
   EC2: !Equals
@@ -20,6 +21,9 @@ Conditions:
   ASG: !Equals
     - !Ref ResourceType
     - 'ASG'
+  Cluster: !Equals
+    - !Ref ResourceType
+    - 'RDS-Cluster'
 
 Resources:
 ################# Custom rresouce lambda role ##################################
@@ -229,6 +233,28 @@ Resources:
       PolicyName: !Sub Cloud-Engineering-RDSSchedulePolicy-${ResourceType}
       Roles:
         - !Ref ConfigurationAutomationRole
+  
+  RDSClusterSchedulePolicy:
+    Type: AWS::IAM::Policy
+    Condition: Cluster
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action:
+              - rds:Describe*
+              - rds:Start*
+              - rds:Stop*
+              - rds:List*
+            Effect: Allow
+            Resource: '*'
+          - Action:
+              - ssm:GetCalendarState
+            Effect: Allow
+            Resource: !Sub arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:document/Cloud-Engineering*
+        Version: '2012-10-17'
+      PolicyName: !Sub Cloud-Engineering-RDSSchedulePolicy-${ResourceType}
+      Roles:
+        - !Ref ConfigurationAutomationRole
 
   EnableExplorerRolePolicy:
     Type: AWS::IAM::Policy
@@ -267,4 +293,3 @@ Resources:
       Roles:
         - !Ref ConfigurationAutomationRole
 ####################################################################################################################
-
