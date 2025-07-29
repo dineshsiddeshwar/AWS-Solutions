@@ -1,0 +1,1 @@
+python .\excel_to_mermaid.py --input .\logging-architecture.xlsx --output logging-architecture.png
