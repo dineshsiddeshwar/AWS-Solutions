@@ -1,0 +1,12 @@
+README.md
+setup.py
+cloud_cost_opt/__init__.py
+cloud_cost_opt/cli.py
+cloud_cost_opt/recommend.py
+cloud_cost_opt/services.py
+cloud_cost_opt.egg-info/PKG-INFO
+cloud_cost_opt.egg-info/SOURCES.txt
+cloud_cost_opt.egg-info/dependency_links.txt
+cloud_cost_opt.egg-info/entry_points.txt
+cloud_cost_opt.egg-info/requires.txt
+cloud_cost_opt.egg-info/top_level.txt

@@ -1,0 +1,9 @@
+Metadata-Version: 2.4
+Name: cloud_cost_opt
+Version: 0.1
+Summary: Cloud cost optimization CLI tool
+Author: Your Name
+Requires-Dist: click
+Dynamic: author
+Dynamic: requires-dist
+Dynamic: summary

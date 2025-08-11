@@ -1,0 +1,2 @@
+[console_scripts]
+cost-opt = cloud_cost_opt.cli:cli
