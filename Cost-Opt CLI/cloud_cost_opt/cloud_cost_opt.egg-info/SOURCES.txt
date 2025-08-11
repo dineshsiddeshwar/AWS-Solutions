@@ -11,3 +11,15 @@ cloud_cost_opt.egg-info/dependency_links.txt
 cloud_cost_opt.egg-info/entry_points.txt
 cloud_cost_opt.egg-info/requires.txt
 cloud_cost_opt.egg-info/top_level.txt
+cloud_cost_opt/Remediators/EC2/ec2_1_remediation.py
+cloud_cost_opt/Remediators/EC2/ec2_2_remediation.py
+cloud_cost_opt/Remediators/EC2/remediate_1.py
+cloud_cost_opt/Remediators/EC2/remediate_2.py
+cloud_cost_opt/Remediators/RDS/rds_1_remediation.py
+cloud_cost_opt/Remediators/RDS/rds_2_remediation.py
+cloud_cost_opt/Remediators/RDS/remediate_1.py
+cloud_cost_opt/Remediators/RDS/remediate_2.py
+cloud_cost_opt/Remediators/VM/remediate_1.py
+cloud_cost_opt/Remediators/VM/remediate_2.py
+cloud_cost_opt/Remediators/VM/vm_1_remediation.py
+cloud_cost_opt/Remediators/VM/vm_2_remediation.py

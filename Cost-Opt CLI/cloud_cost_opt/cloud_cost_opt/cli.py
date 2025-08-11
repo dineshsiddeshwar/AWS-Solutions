@@ -55,7 +55,7 @@ def remediate(service, index):
         # Dynamically import and run the remediation script
         folder = service.upper()
         script_name = f"{service.lower()}_{index}_remediation.py"
-        script_path = os.path.join(os.path.dirname(__file__), "..", "Remediators", folder, script_name)
+        script_path = os.path.join(os.path.dirname(__file__), "Remediators", folder, script_name)
         script_path = os.path.abspath(script_path)
         if os.path.exists(script_path):
             spec = importlib.util.spec_from_file_location("remediate_module", script_path)
