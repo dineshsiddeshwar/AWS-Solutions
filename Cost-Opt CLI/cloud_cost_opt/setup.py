@@ -10,6 +10,7 @@ setup(
             'cost-opt=cloud_cost_opt.cli:cli',
         ],
     },
+    include_package_data=True,
     author="Your Name",
     description="Cloud cost optimization CLI tool",
 )
