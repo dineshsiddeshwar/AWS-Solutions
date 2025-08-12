@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Recommendations for {{ service }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Recommendations for {{ service }}</h1>
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <div class="flash">{{ messages[0] }}</div>
+          {% endif %}
+        {% endwith %}
+        <ul>
+            {% for rec in recommendations %}
+            <li>
+                {{ loop.index }}. {{ rec }}
+                <form action="{{ url_for('remediate', service=service, index=loop.index) }}" method="post" style="display:inline;">
+                    <button type="submit" class="remediate-btn">Remediate</button>
+                </form>
+            </li>
+            {% endfor %}
+        </ul>
+        <a href="{{ url_for('home') }}">Back to Services</a>
+    </div>
+</body>
+</html>

@@ -17,8 +17,18 @@ def cli():
 @cli.command()
 def list():
     """List available cost optimization services."""
-    for svc in list_services():
-        print(f"{svc['name']}  description: {svc['description']}")
+    services = list_services()
+    name_col = "Service Name"
+    desc_col = "Description"
+    name_width = max(len(name_col), max(len(svc['name']) for svc in services))
+    desc_width = max(len(desc_col), max(len(svc['description']) for svc in services))
+    print(f"{name_col:<{name_width}} | {desc_col:<{desc_width}}")
+    print("-" * (name_width + desc_width + 3))
+    for svc in services:
+        print(f"{svc['name']:<{name_width}} | {svc['description']:<{desc_width}}")
+    print()
+    print("To get recommendations for a service, use: cost-opt recommend <service>")
+    print("Example: cost-opt recommend ec2")
 
 @cli.command()
 @click.argument('service')
@@ -37,7 +47,8 @@ def recommend(service):
 @cli.command()
 @click.argument('service')
 @click.argument('index', type=int)
-def remediate(service, index):
+@click.option('--auto', is_flag=True, help='Run remediation without prompts (for web usage)')
+def remediate(service, index, auto):
     """Select a recommendation and remediate or save to CSV."""
     recs = get_recommendation(service)
     if not recs:
@@ -50,19 +61,17 @@ def remediate(service, index):
     selected = recs[idx]
     print(f"Selected recommendation for {service}:")
     print(f"{index}. {selected}")
-    choice = input("Shall we proceed? yes/no: ").strip().lower()
-    if choice == "yes":
-        # Dynamically import and run the remediation script
-        folder = service.upper()
-        script_name = f"{service.lower()}_{index}_remediation.py"
-        script_path = os.path.join(os.path.dirname(__file__), "Remediators", folder, script_name)
-        script_path = os.path.abspath(script_path)
-        if os.path.exists(script_path):
-            spec = importlib.util.spec_from_file_location("remediate_module", script_path)
-            remediate_module = importlib.util.module_from_spec(spec)
-            spec.loader.exec_module(remediate_module)
-            if hasattr(remediate_module, "list_actions"):
-                remediate_module.list_actions()
+    folder = service.upper()
+    script_name = f"{service.lower()}_{index}_remediation.py"
+    script_path = os.path.join(os.path.dirname(__file__), "Remediators", folder, script_name)
+    script_path = os.path.abspath(script_path)
+    if os.path.exists(script_path):
+        spec = importlib.util.spec_from_file_location("remediate_module", script_path)
+        remediate_module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(remediate_module)
+        if hasattr(remediate_module, "list_actions"):
+            remediate_module.list_actions()
+            if not auto:
                 priv = input("Do you have right privileges to do above activities? yes/no: ").strip().lower()
                 if priv == "yes":
                     pass
@@ -73,18 +82,12 @@ def remediate(service, index):
                 else:
                     print("Wrong key entered. Exiting.")
                     return
-            if hasattr(remediate_module, "remediate"):
-                remediate_module.remediate()
-            else:
-                print("Remediation function not found in script.")
+        if hasattr(remediate_module, "remediate"):
+            remediate_module.remediate()
         else:
-            print(f"Remediation script not found: {script_path}")
-    elif choice == "no":
-        save_to_csv(service, selected)
-        print("Recommendation saved to CSV. Exiting.")
+            print("Remediation function not found in script.")
     else:
-        print("Wrong key entered. Exiting.")
-        return
+        print(f"Remediation script not found: {script_path}")
 
 if __name__ == "__main__":
     import sys

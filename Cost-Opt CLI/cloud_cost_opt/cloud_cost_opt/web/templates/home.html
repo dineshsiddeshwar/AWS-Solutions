@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Cloud Cost Optimization</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Cloud Cost Optimization</h1>
+        <h2>Select a Service</h2>
+        <ul>
+            {% for svc in services %}
+            <li>
+                <a href="{{ url_for('recommend', service=svc['name']) }}">{{ svc['name'] }}</a> - {{ svc['description'] }}
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</body>
+</html>
