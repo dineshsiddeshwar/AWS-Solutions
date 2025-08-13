@@ -41,7 +41,8 @@ def recommend(service):
     print(f"Recommendations for {service}:")
     for i, rec in enumerate(recs, 1):
         print(f"{i}. {rec}")
-    print("\nTo remediate a recommendation, run: cost-opt remediate <service> <number>")
+    print("\nIMPORTANT: Before running remediation, tag any resource with Exception=yes if you want to exclude it from automated actions.")
+    print("To remediate a recommendation, run: cost-opt remediate <service> <number>")
     print("Example: cost-opt remediate ec2 3 will select the 3rd recommendation for EC2 and prompt for remediation.")
 
 @cli.command()
