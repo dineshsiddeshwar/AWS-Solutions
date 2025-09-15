@@ -14,11 +14,11 @@
 
 #### Purpose
 
-The purpose of this document is to provide a detailed overview of Resource Scheduler Solutions. This documentation serves as a reference for developers, system administrators, and stakeholders involved in Solventum, ensuring a clear understanding of the system architecture, processes, and responsibilities.
+The purpose of this document is to provide a detailed overview of Resource Scheduler Solutions. This documentation serves as a reference for developers, system administrators, and stakeholders involved in Cloud teams, ensuring a clear understanding of the system architecture, processes, and responsibilities.
 
 #### Overview
 
-The Resource Scheduler solution is for Solventum business user for scheduling their resources like EC2, RDS, RDS-Cluster, and ASG to save costs.
+The Resource Scheduler solution is for Cloud teams business user for scheduling their resources like EC2, RDS, RDS-Cluster, and ASG to save costs.
 
 #### Objective
 
@@ -37,7 +37,7 @@ The primary objectives of this document are:
 
 * 1 - Service Catalogue:
     * Resource scheduler products are created on management accounts and are part of a portfolio. And is shared across Child accounts
-    * If Solventum business users need a Solution, then they need to launch the shared Resource Scheduler product
+    * If Cloud teams business users need a Solution, then they need to launch the shared Resource Scheduler product
 
 * 2 - CloudFormation Template:
     * Once we launch the product, the CF stack will be created
@@ -62,7 +62,7 @@ The primary objectives of this document are:
 
 #### Workflow
 
-1. Solventum Cloud User will get the service catalogue product shared with their account
+1. Cloud teams Cloud User will get the service catalogue product shared with their account
 2. The user needs to launch the product with all the parameters which will deploy all the resources required.
 3. Once the systems manager changes the calendar is created, it will include the event which is responsible for the event bridge rule to trigger.
 4. Once the event starts, it will trigger the start resource rule and then trigger the start instance association, which will start Resources.
@@ -88,7 +88,7 @@ The primary objectives of this document are:
 ### Approach 1: Launching the Scheduler Product Manually
 
 #### Step 1
-Log in to the AWS account as the `jitney-developer` role.  
+Log in to the AWS account with service catalog product access.  
 Choose the region.  
 Choose **Service Catalog Service**.
 
